@@ -17,7 +17,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="w-full border-t border-slate-800/80 bg-[#070a12] text-slate-400 py-12">
+    <footer className="w-full border-t border-neutral-800/80 bg-black text-neutral-400 py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10">
           {/* Logo & Description */}
@@ -97,7 +97,7 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar: Copyright and Socials */}
-        <div className="pt-8 border-t border-slate-800/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <div className="pt-8 border-t border-neutral-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
           <p>© {currentYear} Audiq. All rights reserved.</p>
 
           <div className="flex items-center space-x-5 text-slate-400">

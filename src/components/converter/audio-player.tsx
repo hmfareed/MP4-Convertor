@@ -82,7 +82,7 @@ export function AudioPlayer({ src, duration = 0 }: AudioPlayerProps) {
   const progressPercent = (currentTime / effectiveDuration) * 100;
 
   return (
-    <div className="w-full rounded-xl bg-slate-900/90 border border-slate-800 p-3 sm:p-4 flex flex-col gap-3">
+    <div className="w-full rounded-xl bg-black/90 border border-neutral-800 p-3 sm:p-4 flex flex-col gap-3">
       {/* Hidden audio element if real audio URL provided */}
       {src && <audio ref={audioRef} src={src} preload="metadata" />}
 
@@ -92,7 +92,7 @@ export function AudioPlayer({ src, duration = 0 }: AudioPlayerProps) {
           type="button"
           size="icon"
           onClick={togglePlay}
-          className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-600 to-blue-500 text-white shadow-md hover:from-purple-500 hover:to-blue-400"
+          className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-900/30 hover:from-blue-500 hover:to-indigo-500"
           aria-label={isPlaying ? "Pause audio preview" : "Play audio preview"}
         >
           {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5" />}
@@ -104,7 +104,7 @@ export function AudioPlayer({ src, duration = 0 }: AudioPlayerProps) {
           variant="ghost"
           size="icon"
           onClick={restartAudio}
-          className="h-8 w-8 text-slate-400 hover:text-white"
+          className="h-8 w-8 text-neutral-400 hover:text-white"
           aria-label="Restart audio preview"
         >
           <RotateCcw className="h-3.5 w-3.5" />
@@ -119,10 +119,10 @@ export function AudioPlayer({ src, duration = 0 }: AudioPlayerProps) {
             step="0.1"
             value={currentTime}
             onChange={handleSeek}
-            className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-500"
+            className="w-full h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
             aria-label="Seek audio preview"
           />
-          <div className="flex justify-between text-[11px] font-mono text-slate-400">
+          <div className="flex justify-between text-[11px] font-mono text-neutral-400">
             <span>{formatDuration(currentTime)}</span>
             <span>{formatDuration(effectiveDuration)}</span>
           </div>
@@ -134,7 +134,7 @@ export function AudioPlayer({ src, duration = 0 }: AudioPlayerProps) {
           variant="ghost"
           size="icon"
           onClick={toggleMute}
-          className="h-8 w-8 text-slate-400 hover:text-white"
+          className="h-8 w-8 text-neutral-400 hover:text-white"
           aria-label={isMuted ? "Unmute audio preview" : "Mute audio preview"}
         >
           {isMuted ? <VolumeX className="h-4 w-4 text-rose-400" /> : <Volume2 className="h-4 w-4" />}

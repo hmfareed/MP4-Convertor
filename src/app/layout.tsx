@@ -24,7 +24,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark scroll-smooth">
-      <body className={`${inter.className} min-h-screen flex flex-col bg-[#080c14] text-slate-100`}>
+      <body className={`${inter.className} min-h-screen flex flex-col bg-black text-neutral-100`}>
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

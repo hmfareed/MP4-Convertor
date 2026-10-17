@@ -18,34 +18,34 @@ export function AboutSection() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         {/* Subsection 1 */}
-        <div className="rounded-2xl border border-slate-800/80 bg-[#0d1322]/60 p-6 space-y-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+        <div className="rounded-2xl border border-neutral-800/90 bg-[#030712]/90 hover:border-blue-900/60 p-6 space-y-3 transition-colors">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/25">
             <Zap className="h-5 w-5" />
           </div>
           <h3 className="text-base font-semibold text-white">Simple Conversion</h3>
-          <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+          <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
             Drag and drop your MP4 file or pick it from your device. Our automated pipeline extracts the soundtrack directly, ensuring lossless audio demuxing and crisp MP3 output.
           </p>
         </div>
 
         {/* Subsection 2 */}
-        <div className="rounded-2xl border border-slate-800/80 bg-[#0d1322]/60 p-6 space-y-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+        <div className="rounded-2xl border border-neutral-800/90 bg-[#030712]/90 hover:border-blue-900/60 p-6 space-y-3 transition-colors">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/25">
             <Sliders className="h-5 w-5" />
           </div>
           <h3 className="text-base font-semibold text-white">Quality Options</h3>
-          <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+          <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
             Select from 5 standard MP3 bitrates (96, 128, 192, 256, or 320 kbps). Choose between space-saving lightweight audio or studio-grade 320 kbps fidelity.
           </p>
         </div>
 
         {/* Subsection 3 */}
-        <div className="rounded-2xl border border-slate-800/80 bg-[#0d1322]/60 p-6 space-y-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+        <div className="rounded-2xl border border-neutral-800/90 bg-[#030712]/90 hover:border-blue-900/60 p-6 space-y-3 transition-colors">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">
             <ShieldCheck className="h-5 w-5" />
           </div>
           <h3 className="text-base font-semibold text-white">Privacy-Conscious</h3>
-          <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+          <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
             We never share or analyze your files. Uploaded media is held securely in temporary storage and automatically purged after 24 hours per our strict retention policy.
           </p>
         </div>
@@ -53,7 +53,7 @@ export function AboutSection() {
 
       {/* Start Converting Call to Action */}
       <div className="text-center">
-        <Button asChild variant="gradient" size="lg" className="rounded-xl font-semibold gap-2">
+        <Button asChild variant="gradient" size="lg" className="rounded-xl font-semibold gap-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-900/40">
           <Link href="/#converter">
             <span>Start Converting</span>
             <ArrowUpRight className="h-4 w-4" />

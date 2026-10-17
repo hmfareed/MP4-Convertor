@@ -61,7 +61,7 @@ export function FeaturesSection() {
         <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-3">
           Designed for Speed & Simplicity
         </h2>
-        <p className="text-sm sm:text-base text-slate-400">
+        <p className="text-sm sm:text-base text-neutral-400">
           Everything you need to convert MP4 videos into high-quality MP3 tracks
           without unnecessary bloat, watermarks, or account walls.
         </p>
@@ -73,16 +73,16 @@ export function FeaturesSection() {
           return (
             <div
               key={feature.title}
-              className="rounded-2xl border border-slate-800/80 bg-[#0d1322]/60 p-6 transition-all duration-200 hover:border-slate-700/80 hover:bg-[#0d1322]/90 flex flex-col justify-between"
+              className="rounded-2xl border border-neutral-800/90 bg-[#030712]/90 p-6 transition-all duration-200 hover:border-blue-900/60 hover:bg-[#060c1c] flex flex-col justify-between"
             >
               <div className="space-y-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/25">
                   <Icon className="h-5 w-5" />
                 </div>
                 <h3 className="text-base font-semibold text-white">
                   {feature.title}
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
                   {feature.description}
                 </p>
               </div>

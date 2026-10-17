@@ -126,8 +126,8 @@ export function Navbar() {
         className={cn(
           "sticky top-0 z-40 w-full transition-all duration-200 border-b",
           scrolled
-            ? "bg-[#080c14]/90 backdrop-blur-md border-slate-800/80 shadow-lg shadow-black/20"
-            : "bg-[#080c14]/60 backdrop-blur-sm border-slate-800/40"
+            ? "bg-black/90 backdrop-blur-md border-neutral-800/80 shadow-lg shadow-black/40"
+            : "bg-black/60 backdrop-blur-sm border-blue-950/40"
         )}
       >
         <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -188,11 +188,11 @@ export function Navbar() {
               className={cn(
                 "flex items-center gap-2 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors",
                 isConversionsActive
-                  ? "text-white bg-slate-800/80"
-                  : "text-slate-300 hover:text-white hover:bg-slate-800/50"
+                  ? "text-white bg-blue-950/60 border border-blue-800/40"
+                  : "text-neutral-300 hover:text-white hover:bg-neutral-900/60"
               )}
             >
-              <History className="h-4 w-4 text-purple-400" />
+              <History className="h-4 w-4 text-blue-400" />
               <span>My Conversions</span>
             </Link>
 
@@ -200,7 +200,7 @@ export function Navbar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-800/90 text-slate-300 hover:text-white hover:bg-slate-700/80 border border-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 transition-all font-semibold text-xs"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-900/90 text-neutral-300 hover:text-white hover:bg-neutral-800 border border-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 transition-all font-semibold text-xs"
                   aria-label="User account menu"
                 >
                   {user ? user.name.charAt(0).toUpperCase() : <User className="h-4 w-4" />}
@@ -309,12 +309,12 @@ export function Navbar() {
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-b border-slate-800 bg-[#0d1322]/95 backdrop-blur-lg px-4 pt-3 pb-5 space-y-2 animate-in slide-in-from-top-3">
+          <div className="md:hidden border-b border-neutral-800 bg-[#030712]/95 backdrop-blur-lg px-4 pt-3 pb-5 space-y-2 animate-in slide-in-from-top-3">
             {user && (
-              <div className="px-3 py-2 mb-2 rounded-lg bg-slate-900/60 border border-slate-800 flex items-center justify-between">
+              <div className="px-3 py-2 mb-2 rounded-lg bg-black/80 border border-neutral-800 flex items-center justify-between">
                 <div>
                   <p className="text-xs font-semibold text-white">{user.name}</p>
-                  <p className="text-[11px] text-slate-400">{user.email}</p>
+                  <p className="text-[11px] text-neutral-400">{user.email}</p>
                 </div>
                 <button
                   onClick={handleLogout}
@@ -335,8 +335,8 @@ export function Navbar() {
               className={cn(
                 "block px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                 isHomeActive
-                  ? "bg-purple-600/10 text-purple-300 border border-purple-500/20"
-                  : "text-slate-300 hover:text-white hover:bg-slate-800/60"
+                  ? "bg-blue-600/15 text-blue-300 border border-blue-500/30"
+                  : "text-neutral-300 hover:text-white hover:bg-neutral-900/60"
               )}
             >
               Home
@@ -350,8 +350,8 @@ export function Navbar() {
               className={cn(
                 "block px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                 isAboutActive
-                  ? "bg-purple-600/10 text-purple-300 border border-purple-500/20"
-                  : "text-slate-300 hover:text-white hover:bg-slate-800/60"
+                  ? "bg-blue-600/15 text-blue-300 border border-blue-500/30"
+                  : "text-neutral-300 hover:text-white hover:bg-neutral-900/60"
               )}
             >
               About
@@ -365,8 +365,8 @@ export function Navbar() {
               className={cn(
                 "block px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                 isFeaturesActive
-                  ? "bg-purple-600/10 text-purple-300 border border-purple-500/20"
-                  : "text-slate-300 hover:text-white hover:bg-slate-800/60"
+                  ? "bg-blue-600/15 text-blue-300 border border-blue-500/30"
+                  : "text-neutral-300 hover:text-white hover:bg-neutral-900/60"
               )}
             >
               Features
@@ -377,11 +377,11 @@ export function Navbar() {
               className={cn(
                 "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                 isConversionsActive
-                  ? "bg-purple-600/10 text-purple-300 border border-purple-500/20"
-                  : "text-slate-300 hover:text-white hover:bg-slate-800/60"
+                  ? "bg-blue-600/15 text-blue-300 border border-blue-500/30"
+                  : "text-neutral-300 hover:text-white hover:bg-neutral-900/60"
               )}
             >
-              <History className="h-4 w-4 text-purple-400" />
+              <History className="h-4 w-4 text-blue-400" />
               <span>My Conversions</span>
             </Link>
 
