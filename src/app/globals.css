@@ -4,33 +4,33 @@
 
 @layer base {
   :root {
-    --background: 0 0% 0%; /* #000000 AMOLED Pure Black */
-    --foreground: 210 40% 98%;
+    --background: 0 0% 0%; /* #000000 Pure AMOLED Black */
+    --foreground: 0 0% 98%;
 
-    --card: 222 47% 4%; /* #030712 AMOLED with subtle blue shade */
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 4%; /* #0a0a0a AMOLED neutral dark */
+    --card-foreground: 0 0% 98%;
 
-    --popover: 222 47% 4%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 222 40% 10%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 9%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 222 30% 10%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 0 0% 9%;
+    --muted-foreground: 0 0% 64%;
 
-    --accent: 217 91% 60%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 0 0% 12%;
+    --accent-foreground: 0 0% 98%;
 
     --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 222 25% 14%; /* #172033 Subtle dark blueish border */
-    --input: 222 25% 14%;
-    --ring: 217 91% 60%;
+    --border: 0 0% 15%; /* #262626 Neutral-800 */
+    --input: 0 0% 15%;
+    --ring: 262 83% 58%;
 
     --radius: 0.75rem;
   }
@@ -41,26 +41,21 @@
     @apply border-border;
   }
   body {
-    @apply bg-black text-foreground antialiased min-h-screen selection:bg-blue-600/30 selection:text-white;
+    @apply bg-black text-foreground antialiased min-h-screen selection:bg-purple-600/30 selection:text-white;
     font-feature-settings: "rlig" 1, "calt" 1;
     background-color: #000000;
-    background-image: 
-      radial-gradient(ellipse at 50% -5%, rgba(37, 99, 235, 0.16) 0%, rgba(30, 58, 138, 0.05) 50%, #000000 85%),
-      radial-gradient(ellipse at 85% 15%, rgba(59, 130, 246, 0.06) 0%, transparent 55%),
-      radial-gradient(ellipse at 15% 45%, rgba(37, 99, 235, 0.04) 0%, transparent 50%);
-    background-attachment: fixed;
   }
 }
 
 /* Custom gradient text helper */
 .gradient-text {
-  @apply bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent;
+  @apply bg-gradient-to-r from-purple-400 via-violet-300 to-indigo-400 bg-clip-text text-transparent;
 }
 
 .gradient-btn {
-  @apply bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 text-white font-medium shadow-lg shadow-blue-900/30 hover:from-blue-500 hover:via-indigo-500 hover:to-blue-400 active:scale-[0.98] transition-all duration-150;
+  @apply bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-500 text-white font-medium shadow-md shadow-purple-900/20 hover:from-purple-500 hover:via-indigo-500 hover:to-purple-400 active:scale-[0.98] transition-all duration-150;
 }
 
 .gradient-btn-secondary {
-  @apply bg-gradient-to-r from-blue-600/20 to-indigo-600/20 text-white border border-blue-500/30 hover:border-blue-500/60 transition-all duration-150;
+  @apply bg-gradient-to-r from-purple-600/20 to-indigo-600/20 text-white border border-purple-500/30 hover:border-purple-500/60 transition-all duration-150;
 }

@@ -127,7 +127,7 @@ export function Navbar() {
           "sticky top-0 z-40 w-full transition-all duration-200 border-b",
           scrolled
             ? "bg-black/90 backdrop-blur-md border-neutral-800/80 shadow-lg shadow-black/40"
-            : "bg-black/60 backdrop-blur-sm border-blue-950/40"
+            : "bg-black/60 backdrop-blur-sm border-neutral-800/80"
         )}
       >
         <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -148,7 +148,7 @@ export function Navbar() {
             >
               Home
               {isHomeActive && (
-                <span className="absolute bottom-[-1.25rem] left-0 right-0 h-[2px] bg-gradient-to-r from-blue-500 to-purple-500 rounded-full" />
+                <span className="absolute bottom-[-1.25rem] left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full" />
               )}
             </Link>
 
@@ -162,7 +162,7 @@ export function Navbar() {
             >
               About
               {isAboutActive && (
-                <span className="absolute bottom-[-1.25rem] left-0 right-0 h-[2px] bg-gradient-to-r from-blue-500 to-purple-500 rounded-full" />
+                <span className="absolute bottom-[-1.25rem] left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full" />
               )}
             </Link>
 
@@ -176,7 +176,7 @@ export function Navbar() {
             >
               Features
               {isFeaturesActive && (
-                <span className="absolute bottom-[-1.25rem] left-0 right-0 h-[2px] bg-gradient-to-r from-blue-500 to-purple-500 rounded-full" />
+                <span className="absolute bottom-[-1.25rem] left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full" />
               )}
             </Link>
           </nav>
@@ -188,11 +188,11 @@ export function Navbar() {
               className={cn(
                 "flex items-center gap-2 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors",
                 isConversionsActive
-                  ? "text-white bg-blue-950/60 border border-blue-800/40"
+                  ? "text-white bg-neutral-900 border border-neutral-800"
                   : "text-neutral-300 hover:text-white hover:bg-neutral-900/60"
               )}
             >
-              <History className="h-4 w-4 text-blue-400" />
+              <History className="h-4 w-4 text-purple-400" />
               <span>My Conversions</span>
             </Link>
 
@@ -200,7 +200,7 @@ export function Navbar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-900/90 text-neutral-300 hover:text-white hover:bg-neutral-800 border border-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 transition-all font-semibold text-xs"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-900/90 text-neutral-300 hover:text-white hover:bg-neutral-800 border border-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 transition-all font-semibold text-xs"
                   aria-label="User account menu"
                 >
                   {user ? user.name.charAt(0).toUpperCase() : <User className="h-4 w-4" />}
@@ -309,9 +309,9 @@ export function Navbar() {
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-b border-neutral-800 bg-[#030712]/95 backdrop-blur-lg px-4 pt-3 pb-5 space-y-2 animate-in slide-in-from-top-3">
+          <div className="md:hidden border-b border-neutral-800 bg-black/95 backdrop-blur-lg px-4 pt-3 pb-5 space-y-2 animate-in slide-in-from-top-3">
             {user && (
-              <div className="px-3 py-2 mb-2 rounded-lg bg-black/80 border border-neutral-800 flex items-center justify-between">
+              <div className="px-3 py-2 mb-2 rounded-lg bg-neutral-900/90 border border-neutral-800 flex items-center justify-between">
                 <div>
                   <p className="text-xs font-semibold text-white">{user.name}</p>
                   <p className="text-[11px] text-neutral-400">{user.email}</p>
@@ -335,7 +335,7 @@ export function Navbar() {
               className={cn(
                 "block px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                 isHomeActive
-                  ? "bg-blue-600/15 text-blue-300 border border-blue-500/30"
+                  ? "bg-neutral-900 text-white border border-neutral-800 font-semibold"
                   : "text-neutral-300 hover:text-white hover:bg-neutral-900/60"
               )}
             >
@@ -350,7 +350,7 @@ export function Navbar() {
               className={cn(
                 "block px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                 isAboutActive
-                  ? "bg-blue-600/15 text-blue-300 border border-blue-500/30"
+                  ? "bg-neutral-900 text-white border border-neutral-800 font-semibold"
                   : "text-neutral-300 hover:text-white hover:bg-neutral-900/60"
               )}
             >
@@ -365,7 +365,7 @@ export function Navbar() {
               className={cn(
                 "block px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                 isFeaturesActive
-                  ? "bg-blue-600/15 text-blue-300 border border-blue-500/30"
+                  ? "bg-neutral-900 text-white border border-neutral-800 font-semibold"
                   : "text-neutral-300 hover:text-white hover:bg-neutral-900/60"
               )}
             >
@@ -377,11 +377,11 @@ export function Navbar() {
               className={cn(
                 "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                 isConversionsActive
-                  ? "bg-blue-600/15 text-blue-300 border border-blue-500/30"
+                  ? "bg-neutral-900 text-white border border-neutral-800 font-semibold"
                   : "text-neutral-300 hover:text-white hover:bg-neutral-900/60"
               )}
             >
-              <History className="h-4 w-4 text-blue-400" />
+              <History className="h-4 w-4 text-purple-400" />
               <span>My Conversions</span>
             </Link>
 

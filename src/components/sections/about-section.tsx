@@ -18,8 +18,8 @@ export function AboutSection() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         {/* Subsection 1 */}
-        <div className="rounded-2xl border border-neutral-800/90 bg-[#030712]/90 hover:border-blue-900/60 p-6 space-y-3 transition-colors">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/25">
+        <div className="rounded-2xl border border-neutral-800/80 bg-[#0a0a0a] hover:border-neutral-700 hover:bg-[#121212] p-6 space-y-3 transition-all duration-200 group">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 transition-transform group-hover:scale-105">
             <Zap className="h-5 w-5" />
           </div>
           <h3 className="text-base font-semibold text-white">Simple Conversion</h3>
@@ -29,8 +29,8 @@ export function AboutSection() {
         </div>
 
         {/* Subsection 2 */}
-        <div className="rounded-2xl border border-neutral-800/90 bg-[#030712]/90 hover:border-blue-900/60 p-6 space-y-3 transition-colors">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/25">
+        <div className="rounded-2xl border border-neutral-800/80 bg-[#0a0a0a] hover:border-neutral-700 hover:bg-[#121212] p-6 space-y-3 transition-all duration-200 group">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 transition-transform group-hover:scale-105">
             <Sliders className="h-5 w-5" />
           </div>
           <h3 className="text-base font-semibold text-white">Quality Options</h3>
@@ -40,8 +40,8 @@ export function AboutSection() {
         </div>
 
         {/* Subsection 3 */}
-        <div className="rounded-2xl border border-neutral-800/90 bg-[#030712]/90 hover:border-blue-900/60 p-6 space-y-3 transition-colors">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">
+        <div className="rounded-2xl border border-neutral-800/80 bg-[#0a0a0a] hover:border-neutral-700 hover:bg-[#121212] p-6 space-y-3 transition-all duration-200 group">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 transition-transform group-hover:scale-105">
             <ShieldCheck className="h-5 w-5" />
           </div>
           <h3 className="text-base font-semibold text-white">Privacy-Conscious</h3>
@@ -53,7 +53,7 @@ export function AboutSection() {
 
       {/* Start Converting Call to Action */}
       <div className="text-center">
-        <Button asChild variant="gradient" size="lg" className="rounded-xl font-semibold gap-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-900/40">
+        <Button asChild variant="gradient" size="lg" className="rounded-xl font-semibold gap-2 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-500 hover:from-purple-500 hover:to-indigo-500 text-white shadow-lg shadow-purple-900/30">
           <Link href="/#converter">
             <span>Start Converting</span>
             <ArrowUpRight className="h-4 w-4" />

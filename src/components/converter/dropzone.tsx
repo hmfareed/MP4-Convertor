@@ -159,17 +159,17 @@ export function Dropzone({
           onClick={triggerFileInput}
           onKeyDown={handleKeyDown}
           className={cn(
-            "relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 sm:p-12 text-center transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+            "relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 sm:p-12 text-center transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-purple-500",
             isDragOver
-              ? "border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-500/10 scale-[1.005]"
-              : "border-neutral-800/90 hover:border-blue-500/40 bg-black/75 hover:bg-[#02050e]",
+              ? "border-purple-500 bg-purple-500/10 shadow-lg shadow-purple-500/10 scale-[1.005]"
+              : "border-neutral-800 hover:border-neutral-700 bg-black hover:bg-[#080808]",
             errorMessage && "border-rose-500/60 bg-rose-500/5",
             disabled && "cursor-not-allowed opacity-50 pointer-events-none"
           )}
         >
-          {/* Cloud Icon with Gradient Outline / Glow */}
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600/20 to-indigo-500/20 border border-blue-500/30 text-blue-400 shadow-md shadow-blue-900/30 group-hover:scale-105 transition-transform">
-            <UploadCloud className="h-8 w-8 text-blue-400" />
+          {/* Cloud Icon with Subtle Neutral Ring */}
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-neutral-900 border border-neutral-800 text-neutral-300 shadow-md group-hover:scale-105 transition-transform">
+            <UploadCloud className="h-8 w-8 text-neutral-300" />
           </div>
 
           {/* Heading */}
@@ -191,7 +191,7 @@ export function Dropzone({
               triggerFileInput();
             }}
             disabled={disabled}
-            className="h-11 px-6 rounded-xl font-medium gap-2 text-sm bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-900/40"
+            className="h-11 px-6 rounded-xl font-medium gap-2 text-sm bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-500 hover:from-purple-500 hover:to-indigo-500 text-white shadow-lg shadow-purple-900/30"
           >
             <FileText className="h-4 w-4" />
             <span>Choose File</span>

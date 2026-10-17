@@ -21,11 +21,11 @@ export function SelectedFileCard({
   disabled = false,
 }: SelectedFileCardProps) {
   return (
-    <div className="w-full rounded-xl border border-blue-950/60 bg-black/90 p-4 sm:p-5 transition-all">
+    <div className="w-full rounded-xl border border-neutral-800 bg-[#0a0a0a] p-4 sm:p-5 transition-all">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         {/* Left: Icon & File Details */}
         <div className="flex items-center gap-3.5 min-w-0 w-full sm:w-auto">
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-950/40 border border-blue-500/30 text-blue-400">
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-neutral-900 border border-neutral-800 text-purple-400">
             <FileVideo className="h-6 w-6" />
           </div>
 
