@@ -123,3 +123,56 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export async function GET(req: NextRequest) {
+  try {
+    await connectDB();
+
+    const { getCurrentUser } = await import("@/lib/auth/session");
+    const user = await getCurrentUser();
+
+    let ownerId: string;
+    if (user) {
+      ownerId = user._id.toString();
+    } else {
+      const cookieStore = cookies();
+      const guestToken = cookieStore.get("mp4_guest_token")?.value;
+      if (!guestToken) {
+        return NextResponse.json({ conversions: [] });
+      }
+      ownerId = crypto.createHash("sha256").update(guestToken).digest("hex");
+    }
+
+    const jobs = await ConversionJob.find({
+      ownerId,
+      deletedAt: { $exists: false },
+    })
+      .sort({ createdAt: -1 })
+      .limit(50);
+
+    const formatted = jobs.map((job) => ({
+      id: job._id.toString(),
+      originalFilename: job.originalFilename,
+      outputFilename: job.output?.filename || `${job.originalFilename.replace(/\.[^/.]+$/, "")}.mp3`,
+      size: job.output?.sizeBytes || job.fileSizeBytes,
+      duration: job.output?.durationSec || 0,
+      bitrate: job.settings.bitrateKbps,
+      status: job.status,
+      createdAt: job.createdAt,
+      downloadUrl:
+        job.status === "completed"
+          ? `/api/conversions/${job._id}/download`
+          : undefined,
+      previewUrl:
+        job.status === "completed"
+          ? `/api/conversions/${job._id}/preview`
+          : undefined,
+    }));
+
+    return NextResponse.json({ conversions: formatted });
+  } catch (err: unknown) {
+    console.error("Fetch conversions error:", err);
+    return errorResponse("INTERNAL_ERROR", "Failed to load conversion history.", 500);
+  }
+}
+

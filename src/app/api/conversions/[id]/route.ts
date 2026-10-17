@@ -52,3 +52,36 @@ export async function GET(
     );
   }
 }
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    await connectDB();
+
+    const jobId = params.id;
+    const job = await ConversionJob.findById(jobId);
+
+    if (!job) {
+      return errorResponse("NOT_FOUND", "Conversion job not found.", 404);
+    }
+
+    // Delete output file if present
+    if (job.output?.storageKey) {
+      const { getStorage } = await import("@/lib/storage");
+      const storage = getStorage();
+      await storage.delete(job.output.storageKey);
+    }
+
+    // Mark as deleted
+    job.deletedAt = new Date();
+    await job.save();
+
+    return NextResponse.json({ success: true, message: "Conversion deleted successfully." });
+  } catch (err: unknown) {
+    console.error("Delete conversion error:", err);
+    return errorResponse("INTERNAL_ERROR", "Failed to delete conversion.", 500);
+  }
+}
+
