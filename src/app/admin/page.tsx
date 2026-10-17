@@ -28,6 +28,7 @@ import {
   ShieldCheck,
   Activity,
   Cpu,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -100,7 +101,7 @@ export default function AdminPage() {
   const [jobSearch, setJobSearch] = useState("");
   const [jobStatusFilter, setJobStatusFilter] = useState("all");
 
-  const loadData = async () => {
+  const loadData = async (filterOverride?: string, searchOverride?: string) => {
     setIsLoading(true);
     try {
       // 1. Verify admin role
@@ -125,7 +126,9 @@ export default function AdminPage() {
       }
 
       // 3. Fetch jobs
-      const jobsRes = await fetch(`/api/admin/jobs?search=${encodeURIComponent(jobSearch)}&status=${jobStatusFilter}`);
+      const statusParam = filterOverride !== undefined ? filterOverride : jobStatusFilter;
+      const searchParam = searchOverride !== undefined ? searchOverride : jobSearch;
+      const jobsRes = await fetch(`/api/admin/jobs?search=${encodeURIComponent(searchParam)}&status=${statusParam}`);
       if (jobsRes.ok) {
         const jData = await jobsRes.json();
         setJobs(jData.jobs || []);
@@ -141,6 +144,16 @@ export default function AdminPage() {
       setIsAuthorized(false);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const navigateToJobsWithFilter = (status: string) => {
+    setJobSearch("");
+    setActiveTab("jobs");
+    if (jobStatusFilter === status) {
+      loadData(status, "");
+    } else {
+      setJobStatusFilter(status);
     }
   };
 
@@ -445,7 +458,7 @@ export default function AdminPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={loadData}
+              onClick={() => loadData()}
               disabled={isLoading}
               className="h-9 gap-1.5 text-xs text-slate-300 hover:text-white border-slate-700 bg-[#0d1424]"
             >
@@ -462,13 +475,23 @@ export default function AdminPage() {
             <div className="space-y-6">
               {/* Key Metric Cards with Distinctive Section Icons */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1">
+                <button
+                  type="button"
+                  onClick={() => navigateToJobsWithFilter("all")}
+                  className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1 text-left hover:border-purple-500/50 hover:bg-[#11192e] transition-all cursor-pointer group"
+                  title="View all jobs"
+                >
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">Total Volume</span>
-                    <Layers className="h-3.5 w-3.5 text-purple-400" />
+                    <span className="text-[10px] uppercase font-semibold text-slate-400 group-hover:text-purple-300 tracking-wider transition-colors">
+                      Total Volume
+                    </span>
+                    <Layers className="h-3.5 w-3.5 text-purple-400 group-hover:scale-110 transition-transform" />
                   </div>
-                  <p className="text-2xl font-bold text-white">{metrics?.totalJobs ?? 0}</p>
-                </div>
+                  <div className="flex items-baseline justify-between">
+                    <p className="text-2xl font-bold text-white">{metrics?.totalJobs ?? 0}</p>
+                    <ChevronRight className="h-3.5 w-3.5 text-slate-600 group-hover:text-purple-400 group-hover:translate-x-0.5 transition-all" />
+                  </div>
+                </button>
 
                 <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1">
                   <div className="flex items-center justify-between">
@@ -478,15 +501,25 @@ export default function AdminPage() {
                   <p className="text-2xl font-bold text-emerald-400">{metrics?.successRate ?? 100}%</p>
                 </div>
 
-                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1">
+                <button
+                  type="button"
+                  onClick={() => navigateToJobsWithFilter("queued")}
+                  className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1 text-left hover:border-blue-500/50 hover:bg-[#11192e] transition-all cursor-pointer group"
+                  title="View queued & active jobs"
+                >
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-semibold text-blue-400 tracking-wider">Active Queue</span>
-                    <Activity className="h-3.5 w-3.5 text-blue-400" />
+                    <span className="text-[10px] uppercase font-semibold text-blue-400 group-hover:text-blue-300 tracking-wider transition-colors">
+                      Active Queue
+                    </span>
+                    <Activity className="h-3.5 w-3.5 text-blue-400 group-hover:scale-110 transition-transform" />
                   </div>
-                  <p className="text-2xl font-bold text-blue-400">
-                    {(metrics?.queueWaiting ?? 0) + (metrics?.queueActive ?? 0)}
-                  </p>
-                </div>
+                  <div className="flex items-baseline justify-between">
+                    <p className="text-2xl font-bold text-blue-400">
+                      {(metrics?.queueWaiting ?? 0) + (metrics?.queueActive ?? 0)}
+                    </p>
+                    <ChevronRight className="h-3.5 w-3.5 text-slate-600 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all" />
+                  </div>
+                </button>
 
                 <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1">
                   <div className="flex items-center justify-between">
@@ -506,59 +539,149 @@ export default function AdminPage() {
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("users")}
+                  className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1 text-left hover:border-emerald-500/50 hover:bg-[#11192e] transition-all cursor-pointer group"
+                  title="Manage users"
+                >
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-semibold text-emerald-400 tracking-wider">Users</span>
-                    <Users className="h-3.5 w-3.5 text-emerald-400" />
+                    <span className="text-[10px] uppercase font-semibold text-emerald-400 group-hover:text-emerald-300 tracking-wider transition-colors">
+                      Users
+                    </span>
+                    <Users className="h-3.5 w-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
                   </div>
-                  <p className="text-2xl font-bold text-white">{metrics?.totalUsers ?? 0}</p>
-                </div>
+                  <div className="flex items-baseline justify-between">
+                    <p className="text-2xl font-bold text-white">{metrics?.totalUsers ?? 0}</p>
+                    <ChevronRight className="h-3.5 w-3.5 text-slate-600 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all" />
+                  </div>
+                </button>
               </div>
 
               {/* Infrastructure Breakdown Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-5 space-y-3">
-                  <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-                    <Server className="h-4 w-4 text-purple-400" />
-                    <span>Job Status Breakdown</span>
-                  </h3>
-                  <div className="space-y-2 text-xs">
-                    <div className="flex justify-between items-center py-1.5 border-b border-slate-800/60">
-                      <span className="text-slate-400">Completed conversions</span>
-                      <span className="font-semibold text-emerald-400">{metrics?.completedJobs ?? 0}</span>
-                    </div>
-                    <div className="flex justify-between items-center py-1.5 border-b border-slate-800/60">
-                      <span className="text-slate-400">Failed conversions</span>
-                      <span className="font-semibold text-rose-400">{metrics?.failedJobs ?? 0}</span>
-                    </div>
-                    <div className="flex justify-between items-center py-1.5 border-b border-slate-800/60">
-                      <span className="text-slate-400">Cancelled conversions</span>
-                      <span className="font-semibold text-slate-300">{metrics?.cancelledJobs ?? 0}</span>
-                    </div>
-                    <div className="flex justify-between items-center py-1.5">
-                      <span className="text-slate-400">Currently processing</span>
-                      <span className="font-semibold text-blue-400">{metrics?.activeJobs ?? 0}</span>
-                    </div>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                      <Server className="h-4 w-4 text-purple-400" />
+                      <span>Job Status Breakdown</span>
+                    </h3>
+                    <span className="text-[10px] text-slate-500">Click to filter</span>
+                  </div>
+                  <div className="space-y-1 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => navigateToJobsWithFilter("completed")}
+                      className="w-full flex justify-between items-center py-2 px-2.5 -mx-2.5 rounded-lg hover:bg-slate-800/60 border-b border-slate-800/60 text-left transition-all group cursor-pointer"
+                      title="View completed conversions"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-emerald-400 ring-2 ring-emerald-400/20" />
+                        <span className="text-slate-300 group-hover:text-white transition-colors">Completed conversions</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-emerald-400">{metrics?.completedJobs ?? 0}</span>
+                        <ChevronRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => navigateToJobsWithFilter("failed")}
+                      className="w-full flex justify-between items-center py-2 px-2.5 -mx-2.5 rounded-lg hover:bg-slate-800/60 border-b border-slate-800/60 text-left transition-all group cursor-pointer"
+                      title="View failed conversions"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-rose-400 ring-2 ring-rose-400/20" />
+                        <span className="text-slate-300 group-hover:text-white transition-colors">Failed conversions</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-rose-400">{metrics?.failedJobs ?? 0}</span>
+                        <ChevronRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => navigateToJobsWithFilter("cancelled")}
+                      className="w-full flex justify-between items-center py-2 px-2.5 -mx-2.5 rounded-lg hover:bg-slate-800/60 border-b border-slate-800/60 text-left transition-all group cursor-pointer"
+                      title="View cancelled conversions"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-slate-400 ring-2 ring-slate-400/20" />
+                        <span className="text-slate-300 group-hover:text-white transition-colors">Cancelled conversions</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-slate-300">{metrics?.cancelledJobs ?? 0}</span>
+                        <ChevronRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => navigateToJobsWithFilter("processing")}
+                      className="w-full flex justify-between items-center py-2 px-2.5 -mx-2.5 rounded-lg hover:bg-slate-800/60 text-left transition-all group cursor-pointer"
+                      title="View currently processing jobs"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-blue-400 ring-2 ring-blue-400/20 animate-pulse" />
+                        <span className="text-slate-300 group-hover:text-white transition-colors">Currently processing</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-blue-400">{metrics?.activeJobs ?? 0}</span>
+                        <ChevronRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                      </div>
+                    </button>
                   </div>
                 </div>
 
                 <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-5 space-y-3">
-                  <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-                    <Activity className="h-4 w-4 text-blue-400" />
-                    <span>BullMQ & Worker Engine</span>
-                  </h3>
-                  <div className="space-y-2 text-xs">
-                    <div className="flex justify-between items-center py-1.5 border-b border-slate-800/60">
-                      <span className="text-slate-400">Waiting in BullMQ queue</span>
-                      <span className="font-semibold text-white">{metrics?.queueWaiting ?? 0}</span>
-                    </div>
-                    <div className="flex justify-between items-center py-1.5 border-b border-slate-800/60">
-                      <span className="text-slate-400">Active worker tasks</span>
-                      <span className="font-semibold text-indigo-400">{metrics?.queueActive ?? 0}</span>
-                    </div>
-                    <div className="flex justify-between items-center py-1.5">
-                      <span className="text-slate-400">Watchdog scanner & retention</span>
-                      <span className="font-semibold text-emerald-400">Active (Automatic cycles)</span>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                      <Activity className="h-4 w-4 text-blue-400" />
+                      <span>BullMQ & Worker Engine</span>
+                    </h3>
+                    <span className="text-[10px] text-slate-500">Queue engine</span>
+                  </div>
+                  <div className="space-y-1 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => navigateToJobsWithFilter("queued")}
+                      className="w-full flex justify-between items-center py-2 px-2.5 -mx-2.5 rounded-lg hover:bg-slate-800/60 border-b border-slate-800/60 text-left transition-all group cursor-pointer"
+                      title="View jobs waiting in queue"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-amber-400 ring-2 ring-amber-400/20" />
+                        <span className="text-slate-300 group-hover:text-white transition-colors">Waiting in BullMQ queue</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-white">{metrics?.queueWaiting ?? 0}</span>
+                        <ChevronRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => navigateToJobsWithFilter("processing")}
+                      className="w-full flex justify-between items-center py-2 px-2.5 -mx-2.5 rounded-lg hover:bg-slate-800/60 border-b border-slate-800/60 text-left transition-all group cursor-pointer"
+                      title="View active worker tasks"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-indigo-400 ring-2 ring-indigo-400/20 animate-pulse" />
+                        <span className="text-slate-300 group-hover:text-white transition-colors">Active worker tasks</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-indigo-400">{metrics?.queueActive ?? 0}</span>
+                        <ChevronRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                      </div>
+                    </button>
+
+                    <div className="flex justify-between items-center py-2 px-2.5 -mx-2.5 text-slate-400">
+                      <div className="flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-emerald-400 ring-2 ring-emerald-400/20" />
+                        <span>Watchdog scanner & retention</span>
+                      </div>
+                      <span className="font-semibold text-emerald-400">Active (Auto cycles)</span>
                     </div>
                   </div>
                 </div>
@@ -569,9 +692,25 @@ export default function AdminPage() {
           {/* TAB 2: JOBS */}
           {activeTab === "jobs" && (
             <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-1">
-                <Layers className="h-4 w-4 text-blue-400" />
-                <h3 className="text-sm font-semibold text-white">Conversion Queue & Job Records</h3>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-1">
+                <div className="flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-blue-400" />
+                  <h3 className="text-sm font-semibold text-white">Conversion Queue & Job Records</h3>
+                  {jobStatusFilter !== "all" && (
+                    <Badge variant="info" className="text-[10px] capitalize px-2 py-0.5 ml-1">
+                      {jobStatusFilter} ({jobs.length})
+                    </Badge>
+                  )}
+                </div>
+                {jobStatusFilter !== "all" && (
+                  <button
+                    type="button"
+                    onClick={() => setJobStatusFilter("all")}
+                    className="text-xs text-purple-400 hover:text-purple-300 transition-colors font-medium self-start sm:self-auto cursor-pointer"
+                  >
+                    Clear status filter (show all)
+                  </button>
+                )}
               </div>
 
               {/* Search & Filter Bar */}
