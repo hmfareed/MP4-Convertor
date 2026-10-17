@@ -35,7 +35,12 @@ function LoginForm() {
         throw new Error(errJson.error?.message || "Invalid email or password.");
       }
 
-      router.push(redirectPath);
+      const data = await res.json().catch(() => ({}));
+      const destination =
+        searchParams.get("redirect") ||
+        (data.user?.role === "admin" ? "/admin" : "/conversions");
+
+      router.push(destination);
       router.refresh();
     } catch (err: unknown) {
       setErrorMessage((err as Error).message);

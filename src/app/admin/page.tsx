@@ -201,14 +201,16 @@ export default function AdminPage() {
         </div>
         <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>
         <p className="text-xs text-slate-400 mb-6">
-          This area requires administrator privileges. If you are the system administrator, please promote your account using the server promotion script.
+          This area requires administrator privileges. Please sign in with your administrator account below.
         </p>
-        <div className="rounded-xl border border-slate-800 bg-[#0d1424] p-3 text-left w-full text-xs font-mono text-purple-300 mb-6">
-          <code>bun run scripts/promote-admin.ts you@example.com</code>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full mb-6">
+          <Button asChild variant="gradient" size="sm" className="w-full sm:w-auto">
+            <Link href="/login?redirect=/admin">Sign In to Admin Account</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
+            <Link href="/">Return to Home</Link>
+          </Button>
         </div>
-        <Button asChild variant="outline" size="sm">
-          <Link href="/">Return to Home</Link>
-        </Button>
       </div>
     );
   }
