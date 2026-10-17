@@ -23,6 +23,10 @@ import {
   JobStatus,
 } from "@/types/conversion";
 
+// Conic gradient with short, separated color beams that never touch each other
+const MOVING_BORDER_BEAMS =
+  "conic-gradient(from 0deg, transparent 0deg, #3b82f6 4deg, #3b82f6 14deg, transparent 18deg, transparent 60deg, #8b5cf6 64deg, #8b5cf6 74deg, transparent 78deg, transparent 120deg, #ec4899 124deg, #ec4899 134deg, transparent 138deg, transparent 180deg, #f59e0b 184deg, #f59e0b 194deg, transparent 198deg, transparent 240deg, #10b981 244deg, #10b981 254deg, transparent 258deg, transparent 300deg, #06b6d4 304deg, #06b6d4 314deg, transparent 318deg, transparent 360deg)";
+
 export function ConverterPanel() {
   const [selectedFile, setSelectedFile] = useState<SelectedFileMetadata | null>(null);
   const [settings, setSettings] = useState<IConversionSettings>({
@@ -324,26 +328,20 @@ export function ConverterPanel() {
 
   return (
     <div id="converter" className="w-full max-w-4xl mx-auto px-4 sm:px-6">
-      {/* Animated Multi-Color Rotating Border Shell */}
-      <div className="relative rounded-2xl p-[2px] overflow-hidden shadow-2xl">
-        {/* Soft rotating ambient aura */}
+      {/* Animated Multi-Color Rotating Border Shell with dark neutral base */}
+      <div className="relative rounded-2xl p-[2px] overflow-hidden shadow-2xl bg-neutral-800/80">
+        {/* Soft rotating ambient aura for separated beams */}
         <div
           aria-hidden="true"
-          className="absolute top-1/2 left-1/2 w-[220%] aspect-square -translate-x-1/2 -translate-y-1/2 animate-border-rotate opacity-35 blur-md pointer-events-none"
-          style={{
-            background:
-              "conic-gradient(from 0deg, #2563eb 0deg, #7c3aed 60deg, #ec4899 120deg, #f59e0b 180deg, #10b981 240deg, #06b6d4 300deg, #2563eb 360deg)",
-          }}
+          className="absolute top-1/2 left-1/2 w-[220%] aspect-square -translate-x-1/2 -translate-y-1/2 animate-border-rotate opacity-40 blur-md pointer-events-none"
+          style={{ background: MOVING_BORDER_BEAMS }}
         />
 
-        {/* Sharp rotating multi-color border beam */}
+        {/* Sharp rotating separated multi-color border beams */}
         <div
           aria-hidden="true"
           className="absolute top-1/2 left-1/2 w-[220%] aspect-square -translate-x-1/2 -translate-y-1/2 animate-border-rotate pointer-events-none"
-          style={{
-            background:
-              "conic-gradient(from 0deg, #2563eb 0deg, #7c3aed 60deg, #ec4899 120deg, #f59e0b 180deg, #10b981 240deg, #06b6d4 300deg, #2563eb 360deg)",
-          }}
+          style={{ background: MOVING_BORDER_BEAMS }}
         />
 
         {/* Inner Card Container on Pure AMOLED Dark */}

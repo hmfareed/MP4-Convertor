@@ -86,7 +86,7 @@ const config: Config = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "pulse-glow": "pulseGlow 3s ease-in-out infinite",
-        "border-rotate": "borderRotate 14s linear infinite",
+        "border-rotate": "borderRotate 16s linear infinite",
       },
     },
   },
