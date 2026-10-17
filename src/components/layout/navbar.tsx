@@ -39,6 +39,12 @@ interface AuthUser {
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
+
+  // Do not render public homepage navbar inside admin portal
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
+
   const [activeSection, setActiveSection] = useState<string>("home");
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [scrolled, setScrolled] = useState<boolean>(false);

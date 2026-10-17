@@ -1,9 +1,19 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Twitter, Github, Linkedin, Youtube } from "lucide-react";
 import { Logo } from "@/components/layout/logo";
 
 export function Footer() {
+  const pathname = usePathname();
+
+  // Do not render public footer on admin pages
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
+
   const currentYear = new Date().getFullYear();
 
   return (
