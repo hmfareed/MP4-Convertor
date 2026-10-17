@@ -4,6 +4,7 @@ import { getRedisConnection } from "@/lib/queue/redis";
 import { CONVERSION_QUEUE_NAME, ConversionQueuePayload } from "@/lib/queue/conversion-queue";
 import { processConversionJob } from "@/worker/processors/conversion";
 import { runStuckJobWatchdog } from "@/worker/watchdog";
+import { runRetentionCleanup } from "@/worker/cleanup";
 import { env } from "@/lib/config/env";
 
 async function startWorker() {
@@ -44,9 +45,24 @@ async function startWorker() {
     runStuckJobWatchdog().catch((err) => console.error("[Watchdog] Scan failed:", err));
   }, 60000);
 
+  // Periodic Privacy & Retention Cleanup (every 5 minutes)
+  const cleanupInterval = setInterval(() => {
+    runRetentionCleanup()
+      .then((res) => {
+        if (res.inputsCleaned > 0 || res.outputsExpired > 0 || res.retriedTasks > 0) {
+          console.log(`[Cleanup] Retention cycle finished:`, res);
+        }
+      })
+      .catch((err) => console.error("[Cleanup] Retention scan failed:", err));
+  }, 5 * 60 * 1000);
+
+  // Run once on worker startup
+  runRetentionCleanup().catch((err) => console.error("[Cleanup] Initial scan failed:", err));
+
   const shutdown = async () => {
     console.log("[Worker] Shutting down gracefully...");
     clearInterval(watchdogInterval);
+    clearInterval(cleanupInterval);
     await worker.close();
     process.exit(0);
   };

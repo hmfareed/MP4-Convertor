@@ -9,6 +9,7 @@ import { env } from "@/lib/config/env";
 import { cookies } from "next/headers";
 import crypto from "crypto";
 import { z } from "zod";
+import { checkRateLimit, getClientIp, rateLimitExceededResponse } from "@/lib/rate-limit/redis-limiter";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,17 @@ const createConversionSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = getClientIp(req);
+    const rateCheck = await checkRateLimit({
+      key: `convert:${ip}`,
+      limit: 30,
+      windowSec: 600,
+    });
+
+    if (!rateCheck.allowed) {
+      return rateLimitExceededResponse(rateCheck.retryAfterSec);
+    }
+
     await connectDB();
 
     const cookieStore = cookies();

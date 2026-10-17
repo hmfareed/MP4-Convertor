@@ -5,6 +5,7 @@ import { createSessionToken, claimGuestConversions, SESSION_COOKIE_NAME } from "
 import { errorResponse } from "@/lib/errors";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { checkRateLimit, getClientIp, rateLimitExceededResponse } from "@/lib/rate-limit/redis-limiter";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,17 @@ const registerSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = getClientIp(req);
+    const rateCheck = await checkRateLimit({
+      key: `auth_register:${ip}`,
+      limit: 5,
+      windowSec: 600,
+    });
+
+    if (!rateCheck.allowed) {
+      return rateLimitExceededResponse(rateCheck.retryAfterSec);
+    }
+
     await connectDB();
 
     const body = await req.json().catch(() => null);
