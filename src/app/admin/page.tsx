@@ -504,6 +504,58 @@ export default function AdminPage() {
               dailyUsers[0] || null
             );
 
+            // Smooth SVG Line & Area calculations
+            const svgWidth = 500;
+            const svgHeight = 150;
+            const padX = 24;
+            const padBottom = 130;
+            const padTop = 22;
+            const chartHeight = padBottom - padTop;
+
+            const linePoints = dailyUsers.map((item, i) => {
+              const x =
+                dailyUsers.length > 1
+                  ? padX + (i / (dailyUsers.length - 1)) * (svgWidth - 2 * padX)
+                  : svgWidth / 2;
+              const y = padBottom - (item.count / maxUsersInWindow) * chartHeight;
+              return { x, y, ...item };
+            });
+
+            const generateSmoothPath = (pts: typeof linePoints, isArea: boolean) => {
+              if (pts.length === 0) return "";
+              if (pts.length === 1) {
+                return isArea
+                  ? `M ${pts[0].x - 20} ${pts[0].y} L ${pts[0].x + 20} ${pts[0].y} L ${pts[0].x + 20} ${padBottom} L ${pts[0].x - 20} ${padBottom} Z`
+                  : `M ${pts[0].x - 20} ${pts[0].y} L ${pts[0].x + 20} ${pts[0].y}`;
+              }
+
+              let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+              for (let i = 0; i < pts.length - 1; i++) {
+                const p0 = pts[i === 0 ? i : i - 1];
+                const p1 = pts[i];
+                const p2 = pts[i + 1];
+                const p3 = pts[i + 2 < pts.length ? i + 2 : i + 1];
+
+                const cp1x = p1.x + (p2.x - p0.x) / 6;
+                const cp1y = p1.y + (p2.y - p0.y) / 6;
+                const cp2x = p2.x - (p3.x - p1.x) / 6;
+                const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+                d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+              }
+
+              if (isArea) {
+                const lastX = pts[pts.length - 1].x.toFixed(1);
+                const firstX = pts[0].x.toFixed(1);
+                d += ` L ${lastX} ${padBottom} L ${firstX} ${padBottom} Z`;
+              }
+
+              return d;
+            };
+
+            const linePath = generateSmoothPath(linePoints, false);
+            const areaPath = generateSmoothPath(linePoints, true);
+
             return (
               <div className="space-y-6">
                 {/* 1. KEY KPI CARDS GRID */}
@@ -671,7 +723,7 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    {/* Graph Canvas / Columns */}
+                    {/* Graph Canvas / Smooth SVG Line & Area Curve */}
                     <div className="relative pt-2 pb-1">
                       {/* Hover Status Bar */}
                       <div className="h-6 flex items-center justify-between text-xs px-1 mb-1">
@@ -685,7 +737,7 @@ export default function AdminPage() {
                           </div>
                         ) : (
                           <span className="text-neutral-500 text-[11px]">
-                            Hover over any bar to view registration details
+                            Hover over the curve or nodes to view daily registrations
                           </span>
                         )}
                         <span className="text-[10px] text-neutral-500 font-mono">
@@ -693,68 +745,130 @@ export default function AdminPage() {
                         </span>
                       </div>
 
-                      {/* Chart Container */}
-                      <div className="h-40 flex items-end gap-1.5 sm:gap-2.5 px-3 pt-6 pb-2 border border-neutral-800/80 bg-black/50 rounded-lg relative overflow-hidden">
-                        {/* Subtle Background Guide Lines */}
-                        <div className="absolute inset-0 pointer-events-none flex flex-col justify-between px-3 py-3 opacity-25">
-                          <div className="border-b border-neutral-700/60 w-full" />
-                          <div className="border-b border-neutral-700/60 w-full" />
-                          <div className="border-b border-neutral-700/60 w-full" />
+                      {/* Line Chart SVG Container */}
+                      <div className="border border-neutral-800/80 bg-black/60 rounded-xl p-3 relative overflow-hidden">
+                        <svg
+                          viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+                          className="w-full h-44 overflow-visible"
+                        >
+                          <defs>
+                            {/* Area Gradient */}
+                            <linearGradient id="userAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#10b981" stopOpacity="0.38" />
+                              <stop offset="60%" stopColor="#10b981" stopOpacity="0.10" />
+                              <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
+                            </linearGradient>
+
+                            {/* Line Stroke Gradient */}
+                            <linearGradient id="userLineGrad" x1="0" y1="0" x2="1" y2="0">
+                              <stop offset="0%" stopColor="#10b981" />
+                              <stop offset="50%" stopColor="#14b8a6" />
+                              <stop offset="100%" stopColor="#34d399" />
+                            </linearGradient>
+
+                            {/* Drop Shadow Glow */}
+                            <filter id="lineGlow" x="-20%" y="-20%" width="140%" height="140%">
+                              <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#10b981" floodOpacity="0.45" />
+                            </filter>
+                          </defs>
+
+                          {/* Horizontal Grid Baseline & Guides */}
+                          <line x1={padX} y1={padTop} x2={svgWidth - padX} y2={padTop} stroke="#262626" strokeDasharray="4 4" strokeWidth="1" />
+                          <line x1={padX} y1={(padTop + padBottom) / 2} x2={svgWidth - padX} y2={(padTop + padBottom) / 2} stroke="#262626" strokeDasharray="4 4" strokeWidth="1" />
+                          <line x1={padX} y1={padBottom} x2={svgWidth - padX} y2={padBottom} stroke="#262626" strokeWidth="1" />
+
+                          {/* Smooth Area Gradient Fill */}
+                          {areaPath && (
+                            <path
+                              d={areaPath}
+                              fill="url(#userAreaGrad)"
+                              className="transition-all duration-300"
+                            />
+                          )}
+
+                          {/* Glowing Smooth Curve Line */}
+                          {linePath && (
+                            <path
+                              d={linePath}
+                              fill="none"
+                              stroke="url(#userLineGrad)"
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              filter="url(#lineGlow)"
+                              className="transition-all duration-300"
+                            />
+                          )}
+
+                          {/* Interactive Points and Vertical Guidelines */}
+                          {linePoints.map((pt, idx) => {
+                            const isHovered = hoveredDay?.date === pt.date;
+                            const isToday = idx === linePoints.length - 1;
+
+                            return (
+                              <g key={pt.date} className="cursor-pointer">
+                                {/* Vertical Guideline on Hover */}
+                                {isHovered && (
+                                  <line
+                                    x1={pt.x}
+                                    y1={padTop}
+                                    x2={pt.x}
+                                    y2={padBottom}
+                                    stroke="#10b981"
+                                    strokeWidth="1.5"
+                                    strokeDasharray="3 3"
+                                    strokeOpacity="0.8"
+                                  />
+                                )}
+
+                                {/* Outer Halo for Hovered / Today Node */}
+                                {(isHovered || isToday) && (
+                                  <circle
+                                    cx={pt.x}
+                                    cy={pt.y}
+                                    r={isHovered ? 9 : 6}
+                                    fill="#10b981"
+                                    fillOpacity={isHovered ? 0.35 : 0.15}
+                                    className="transition-all duration-200"
+                                  />
+                                )}
+
+                                {/* Visible Circle Node */}
+                                <circle
+                                  cx={pt.x}
+                                  cy={pt.y}
+                                  r={isHovered ? 5 : pt.count > 0 ? 4 : 3}
+                                  fill={isHovered ? "#ffffff" : pt.count > 0 ? "#10b981" : "#171717"}
+                                  stroke={isHovered ? "#10b981" : pt.count > 0 ? "#ffffff" : "#404040"}
+                                  strokeWidth={isHovered ? 2.5 : pt.count > 0 ? 1.5 : 1}
+                                  className="transition-all duration-150"
+                                />
+
+                                {/* Invisible Large Hit Target for Seamless Hover */}
+                                <circle
+                                  cx={pt.x}
+                                  cy={pt.y}
+                                  r={18}
+                                  fill="transparent"
+                                  onMouseEnter={() => setHoveredDay(pt)}
+                                  onMouseLeave={() => setHoveredDay(null)}
+                                />
+                              </g>
+                            );
+                          })}
+                        </svg>
+
+                        {/* Date Labels Axis along Bottom */}
+                        <div className="flex items-center justify-between px-3 pt-2 text-[10px] text-neutral-500 font-mono">
+                          {dailyUsers.map((item, idx) => {
+                            const showLabel = userGraphDays === 7 ? true : idx % 2 === 0 || idx === dailyUsers.length - 1;
+                            return (
+                              <span key={item.date} className="text-center truncate">
+                                {showLabel ? item.label : ""}
+                              </span>
+                            );
+                          })}
                         </div>
-
-                        {dailyUsers.map((item, idx) => {
-                          const isHovered = hoveredDay?.date === item.date;
-                          const isToday = idx === dailyUsers.length - 1;
-                          const heightPct = item.count === 0 ? 6 : Math.max(14, Math.round((item.count / maxUsersInWindow) * 100));
-
-                          return (
-                            <div
-                              key={item.date}
-                              onMouseEnter={() => setHoveredDay(item)}
-                              onMouseLeave={() => setHoveredDay(null)}
-                              className="flex-1 h-full flex flex-col items-center justify-end relative group cursor-pointer"
-                            >
-                              {/* Hover / Active Number Indicator */}
-                              {item.count > 0 && (
-                                <span
-                                  className={`text-[10px] font-mono mb-1 transition-opacity ${
-                                    isHovered || isToday
-                                      ? "opacity-100 text-emerald-300 font-bold"
-                                      : "opacity-0 group-hover:opacity-100 text-neutral-400"
-                                  }`}
-                                >
-                                  {item.count}
-                                </span>
-                              )}
-
-                              {/* Bar Graphic */}
-                              <div
-                                style={{ height: `${heightPct}%` }}
-                                className={`w-full max-w-[28px] rounded-t-md transition-all duration-200 ${
-                                  item.count > 0
-                                    ? isHovered
-                                      ? "bg-gradient-to-t from-emerald-600 to-teal-300 shadow-md shadow-emerald-500/30 brightness-110"
-                                      : isToday
-                                      ? "bg-gradient-to-t from-emerald-600/80 to-emerald-400 ring-1 ring-emerald-400/40"
-                                      : "bg-gradient-to-t from-emerald-700/60 to-emerald-500/80 group-hover:from-emerald-600 group-hover:to-teal-300"
-                                    : "bg-neutral-800/40 group-hover:bg-neutral-800/80"
-                                }`}
-                              />
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      {/* Date Labels Axis */}
-                      <div className="flex items-center gap-1.5 sm:gap-2.5 px-3 pt-2 text-[10px] text-neutral-500 font-mono">
-                        {dailyUsers.map((item, idx) => {
-                          const showLabel = userGraphDays === 7 ? true : idx % 2 === 0 || idx === dailyUsers.length - 1;
-                          return (
-                            <div key={item.date} className="flex-1 text-center truncate">
-                              {showLabel ? item.label : ""}
-                            </div>
-                          );
-                        })}
                       </div>
                     </div>
 
