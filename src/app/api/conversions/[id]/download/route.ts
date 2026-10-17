@@ -1,0 +1,74 @@
+import { NextRequest, NextResponse } from "next/server";
+import { connectDB } from "@/lib/db/connection";
+import { ConversionJob } from "@/lib/db/models/ConversionJob";
+import { getStorage } from "@/lib/storage";
+import { errorResponse } from "@/lib/errors";
+import fs from "fs";
+
+export const dynamic = "force-dynamic";
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    await connectDB();
+
+    const jobId = params.id;
+    const job = await ConversionJob.findById(jobId);
+
+    if (!job) {
+      return errorResponse("NOT_FOUND", "Conversion job not found.", 404);
+    }
+
+    if (job.status !== "completed" || !job.output?.storageKey) {
+      return errorResponse(
+        "INVALID_STATE",
+        "The audio output is not yet ready for download.",
+        409
+      );
+    }
+
+    const storage = getStorage();
+    const filePath = storage.getPath(job.output.storageKey);
+
+    if (!fs.existsSync(filePath)) {
+      return errorResponse(
+        "JOB_EXPIRED",
+        "The generated MP3 file has expired and is no longer available.",
+        410
+      );
+    }
+
+    const stat = fs.statSync(filePath);
+    const fileStream = fs.createReadStream(filePath);
+
+    const safeFilename = encodeURIComponent(job.output.filename || "audio.mp3");
+
+    // Convert node read stream to web readable stream for Next.js response
+    const webStream = new ReadableStream({
+      start(controller) {
+        fileStream.on("data", (chunk) => controller.enqueue(chunk));
+        fileStream.on("end", () => controller.close());
+        fileStream.on("error", (err) => controller.error(err));
+      },
+    });
+
+    return new Response(webStream, {
+      status: 200,
+      headers: {
+        "Content-Type": "audio/mpeg",
+        "Content-Disposition": `attachment; filename="${job.output.filename}"; filename*=UTF-8''${safeFilename}`,
+        "Content-Length": stat.size.toString(),
+        "Cache-Control": "private, no-cache, no-store, must-revalidate",
+      },
+    });
+  } catch (err: unknown) {
+    console.error("Download route error:", err);
+    return errorResponse(
+      "INTERNAL_ERROR",
+      "Failed to stream the requested MP3 download.",
+      500
+    );
+  }
+}

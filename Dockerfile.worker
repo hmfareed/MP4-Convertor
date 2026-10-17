@@ -1,0 +1,12 @@
+FROM oven/bun:1.2-alpine
+
+# Install FFmpeg and FFprobe in worker container
+RUN apk add --no-cache ffmpeg
+
+WORKDIR /app
+COPY package.json bun.lock* ./
+RUN bun install --frozen-lockfile
+
+COPY . .
+
+CMD ["bun", "run", "src/worker/index.ts"]

@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: mp4-to-mp3-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: mp4-to-mp3-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: mp4-to-mp3-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - APP_URL=http://localhost:3000
+      - MONGODB_URI=mongodb://mongo:27017/mp4tomp3
+      - REDIS_URL=redis://redis:6379
+      - STORAGE_DRIVER=local
+      - STORAGE_LOCAL_PATH=/data/storage
+      - SESSION_SECRET=production-secret-must-be-changed
+    volumes:
+      - app-storage:/data/storage
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - app-network
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: mp4-to-mp3-worker
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongo:27017/mp4tomp3
+      - REDIS_URL=redis://redis:6379
+      - STORAGE_DRIVER=local
+      - STORAGE_LOCAL_PATH=/data/storage
+      - WORKER_CONCURRENCY=2
+      - FFMPEG_THREADS=2
+    volumes:
+      - app-storage:/data/storage
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - app-network
+
+volumes:
+  mongo-data:
+  redis-data:
+  app-storage:
+
+networks:
+  app-network:
+    driver: bridge

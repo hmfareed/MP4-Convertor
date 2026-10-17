@@ -1,0 +1,54 @@
+import { Worker } from "bullmq";
+import { connectDB } from "@/lib/db/connection";
+import { getRedisConnection } from "@/lib/queue/redis";
+import { CONVERSION_QUEUE_NAME, ConversionQueuePayload } from "@/lib/queue/conversion-queue";
+import { processConversionJob } from "@/worker/processors/conversion";
+import { env } from "@/lib/config/env";
+
+async function startWorker() {
+  console.log("=========================================");
+  console.log("   MP4 to MP3 Conversion Worker Engine   ");
+  console.log("=========================================");
+
+  await connectDB();
+  console.log("[Worker] Connected to MongoDB.");
+
+  const redis = getRedisConnection();
+  console.log("[Worker] Connected to Redis.");
+
+  const worker = new Worker<ConversionQueuePayload>(
+    CONVERSION_QUEUE_NAME,
+    async (job) => {
+      console.log(`[Worker] Received conversion job: ${job.data.jobId}`);
+      await processConversionJob(job);
+    },
+    {
+      connection: redis,
+      concurrency: env.WORKER_CONCURRENCY,
+    }
+  );
+
+  worker.on("completed", (job) => {
+    console.log(`[Worker] Job ${job.data.jobId} completed successfully.`);
+  });
+
+  worker.on("failed", (job, err) => {
+    console.error(`[Worker] Job ${job?.data?.jobId} failed:`, err.message);
+  });
+
+  console.log(`[Worker] Listening on queue '${CONVERSION_QUEUE_NAME}' with concurrency ${env.WORKER_CONCURRENCY}...`);
+
+  const shutdown = async () => {
+    console.log("[Worker] Shutting down gracefully...");
+    await worker.close();
+    process.exit(0);
+  };
+
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
+}
+
+startWorker().catch((err) => {
+  console.error("[Worker] Fatal startup error:", err);
+  process.exit(1);
+});

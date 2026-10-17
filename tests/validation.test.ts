@@ -61,7 +61,6 @@ describe("Conversion Settings Schema", () => {
     expect(isValidBitrate(192)).toBe(true);
     expect(isValidBitrate(256)).toBe(true);
     expect(isValidBitrate(320)).toBe(true);
-    // @ts-expect-error invalid bitrate test
     expect(isValidBitrate(64)).toBe(false);
   });
 

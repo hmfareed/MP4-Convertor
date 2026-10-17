@@ -1,0 +1,125 @@
+import { NextRequest, NextResponse } from "next/server";
+import { connectDB } from "@/lib/db/connection";
+import { ConversionJob } from "@/lib/db/models/ConversionJob";
+import { Upload } from "@/lib/db/models/Upload";
+import { enqueueConversionJob } from "@/lib/queue/conversion-queue";
+import { errorResponse } from "@/lib/errors";
+import { isValidBitrate } from "@/lib/validation/converter";
+import { env } from "@/lib/config/env";
+import { cookies } from "next/headers";
+import crypto from "crypto";
+import { z } from "zod";
+
+export const dynamic = "force-dynamic";
+
+const createConversionSchema = z.object({
+  uploadId: z.string().min(1, "Upload ID is required"),
+  bitrate: z.number().refine(isValidBitrate, "Invalid bitrate option"),
+  trimStartSec: z.number().optional(),
+  trimEndSec: z.number().optional(),
+});
+
+export async function POST(req: NextRequest) {
+  try {
+    await connectDB();
+
+    const cookieStore = cookies();
+    let guestToken = cookieStore.get("mp4_guest_token")?.value;
+    if (!guestToken) {
+      guestToken = crypto.randomUUID();
+    }
+    const guestTokenHash = crypto.createHash("sha256").update(guestToken).digest("hex");
+
+    const body = await req.json().catch(() => null);
+    const parsed = createConversionSchema.safeParse(body);
+    if (!parsed.success) {
+      return errorResponse(
+        "VALIDATION_FAILED",
+        parsed.error.errors[0]?.message || "Invalid conversion parameters.",
+        400
+      );
+    }
+
+    const { uploadId, bitrate, trimStartSec, trimEndSec } = parsed.data;
+
+    // Idempotency support
+    const idempotencyKey =
+      req.headers.get("idempotency-key") ||
+      `idem_${uploadId}_${bitrate}_${trimStartSec || 0}_${trimEndSec || 0}`;
+
+    // Check for existing job with same idempotency key and owner
+    const existingJob = await ConversionJob.findOne({
+      ownerId: guestTokenHash,
+      idempotencyKey,
+    });
+
+    if (existingJob) {
+      return NextResponse.json({
+        jobId: existingJob._id.toString(),
+        status: existingJob.status,
+        progress: existingJob.progressPercent,
+        message: "Existing conversion returned via idempotency key.",
+      });
+    }
+
+    // Verify upload exists
+    const upload = await Upload.findById(uploadId);
+    if (!upload) {
+      return errorResponse(
+        "NOT_FOUND",
+        "The uploaded video was not found or has expired.",
+        404
+      );
+    }
+
+    const expiresAt = new Date(Date.now() + env.GUEST_RETENTION_HOURS * 3600 * 1000);
+
+    // Create conversion job in MongoDB
+    const job = await ConversionJob.create({
+      ownerType: "guest",
+      ownerId: guestTokenHash,
+      guestTokenHash,
+      uploadId: upload._id,
+      originalFilename: upload.originalNameSafe,
+      fileSizeBytes: upload.sizeBytes,
+      status: "queued",
+      settings: {
+        bitrateKbps: bitrate,
+        trimStartSec,
+        trimEndSec,
+      },
+      idempotencyKey,
+      attempt: 1,
+      progressPercent: 0,
+      queuedAt: new Date(),
+      expiresAt,
+    });
+
+    // Enqueue job in BullMQ
+    await enqueueConversionJob(job._id.toString());
+
+    const response = NextResponse.json({
+      jobId: job._id.toString(),
+      status: "queued",
+      progress: 0,
+    });
+
+    // Set guest token cookie if new
+    response.cookies.set("mp4_guest_token", guestToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 3600,
+      path: "/",
+    });
+
+    return response;
+  } catch (err: unknown) {
+    console.error("Create conversion error:", err);
+    return errorResponse(
+      "INTERNAL_ERROR",
+      "An unexpected error occurred while scheduling the conversion.",
+      500
+    );
+  }
+}
