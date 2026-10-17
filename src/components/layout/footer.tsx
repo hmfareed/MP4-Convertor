@@ -98,7 +98,7 @@ export function Footer() {
 
         {/* Bottom Bar: Copyright and Socials */}
         <div className="pt-8 border-t border-slate-800/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© {currentYear} MP4 to MP3. All rights reserved.</p>
+          <p>© {currentYear} Audiq. All rights reserved.</p>
 
           <div className="flex items-center space-x-5 text-slate-400">
             <a

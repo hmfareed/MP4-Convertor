@@ -8,11 +8,11 @@ export function AboutSection() {
     <section id="about" className="py-16 px-4 max-w-5xl mx-auto scroll-mt-20">
       <div className="text-center max-w-2xl mx-auto mb-12">
         <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-3">
-          About MP4 to MP3 Converter
+          About Audiq
         </h2>
         <p className="text-sm sm:text-base text-slate-400">
-          A dedicated, high-performance web tool designed for extracting clear,
-          high-quality audio from MP4 video recordings with zero unnecessary overhead.
+          Audiq is a dedicated, high-performance platform engineered for extracting crystal-clear,
+          high-fidelity MP3 audio from your MP4 videos with zero unnecessary overhead.
         </p>
       </div>
 

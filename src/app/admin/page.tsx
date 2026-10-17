@@ -326,10 +326,9 @@ export default function AdminPage() {
           <div className="px-4 py-4 border-b border-slate-800/80 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Logo size="sm" />
-              <div className="flex flex-col">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-white">Admin Console</span>
-                <span className="text-[9px] text-purple-400 font-medium">Control Center</span>
-              </div>
+              <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-purple-300 bg-purple-500/20 border border-purple-500/30 rounded-md">
+                Admin
+              </span>
             </div>
             <div className="hidden md:block">
               <span className="flex h-2 w-2 relative">

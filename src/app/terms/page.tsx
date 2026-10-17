@@ -29,7 +29,7 @@ export default function TermsPage() {
           <section className="space-y-2">
             <h2 className="text-lg font-semibold text-white">1. Service Description</h2>
             <p>
-              MP4 to MP3 provides an online automated utility allowing users to upload MP4 video files and extract audio tracks into MP3 format. The service is provided on an &ldquo;as is&rdquo; and &ldquo;as available&rdquo; basis.
+              Audiq provides an online automated utility allowing users to upload MP4 video files and extract audio tracks into MP3 format. The service is provided on an &ldquo;as is&rdquo; and &ldquo;as available&rdquo; basis.
             </p>
           </section>
 
@@ -50,7 +50,7 @@ export default function TermsPage() {
           <section className="space-y-2">
             <h2 className="text-lg font-semibold text-white">4. Availability & Disclaimers</h2>
             <p>
-              We reserve the right to modify, suspend, or discontinue the service with or without notice. In no event shall MP4 to MP3 be liable for any direct, indirect, incidental, or consequential damages resulting from the use of the conversion service.
+              We reserve the right to modify, suspend, or discontinue the service with or without notice. In no event shall Audiq be liable for any direct, indirect, incidental, or consequential damages resulting from the use of the conversion service.
             </p>
           </section>
         </div>

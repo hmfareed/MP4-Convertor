@@ -7,10 +7,14 @@ import { Footer } from "@/components/layout/footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "MP4 to MP3 Converter — Fast, Secure, and High Quality",
+  title: "Audiq — Fast, Secure MP4 to MP3 Audio Converter",
   description:
-    "Easily convert your MP4 videos to high-quality MP3 audio files. Fast background processing, configurable bitrates, and privacy-first temporary storage.",
-  keywords: ["mp4 to mp3", "audio converter", "video to audio", "mp3 extractor", "ffmpeg audio"],
+    "Easily extract crystal-clear MP3 audio from MP4 videos with Audiq. Fast background processing, configurable bitrates, audio trimming, and privacy-first temporary storage.",
+  keywords: ["audiq", "mp4 to mp3", "audio converter", "video to audio", "mp3 extractor", "audio trimming", "ffmpeg audio"],
+  icons: {
+    icon: "/audiq-icon.png",
+    apple: "/audiq-icon.png",
+  },
 };
 
 export default function RootLayout({

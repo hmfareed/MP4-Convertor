@@ -1,54 +1,64 @@
 import React from "react";
 import Link from "next/link";
-import { Music2, Film } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
   className?: string;
   size?: "sm" | "md" | "lg";
+  iconOnly?: boolean;
+  href?: string;
 }
 
-export function Logo({ className, size = "md" }: LogoProps) {
-  const iconSizes = {
-    sm: "h-7 w-7",
-    md: "h-9 w-9",
-    lg: "h-11 w-11",
+export function Logo({
+  className,
+  size = "md",
+  iconOnly = false,
+  href = "/",
+}: LogoProps) {
+  const iconDimensions = {
+    sm: { w: 26, h: 26, box: "h-7 w-7", text: "text-base" },
+    md: { w: 34, h: 34, box: "h-9 w-9", text: "text-xl" },
+    lg: { w: 42, h: 42, box: "h-11 w-11", text: "text-2xl" },
   };
 
-  const textSizes = {
-    sm: "text-base",
-    md: "text-xl",
-    lg: "text-2xl",
-  };
+  const dim = iconDimensions[size];
 
   return (
     <Link
-      href="/"
+      href={href}
       className={cn(
-        "inline-flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded-lg",
+        "inline-flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded-lg transition-transform hover:opacity-95",
         className
       )}
-      aria-label="MP4 to MP3 Converter Home"
+      aria-label="Audiq — Video to Audio Converter"
     >
       <div
         className={cn(
-          "relative flex items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-500 p-0.5 shadow-md shadow-purple-900/30 group-hover:shadow-purple-700/50 transition-all duration-200",
-          iconSizes[size]
+          "relative flex items-center justify-center rounded-xl overflow-hidden shadow-md shadow-purple-950/40 group-hover:shadow-purple-700/50 transition-all duration-200 border border-purple-500/20 bg-[#05091f]",
+          dim.box
         )}
       >
-        <div className="flex h-full w-full items-center justify-center rounded-[10px] bg-[#0c101c]/90 relative overflow-hidden">
-          <Film className="h-4 w-4 text-purple-400 absolute -bottom-1 -left-1 opacity-40 transform -rotate-12" />
-          <Music2 className="h-4 w-4 text-white relative z-10 drop-shadow" />
-        </div>
+        <Image
+          src="/audiq-icon.png"
+          alt="Audiq Logo"
+          width={dim.w}
+          height={dim.h}
+          className="h-full w-full object-cover"
+          priority
+        />
       </div>
-      <span
-        className={cn(
-          "font-bold tracking-tight text-white transition-colors group-hover:text-slate-100",
-          textSizes[size]
-        )}
-      >
-        MP4 to MP3
-      </span>
+
+      {!iconOnly && (
+        <span
+          className={cn(
+            "font-extrabold tracking-tight text-white transition-colors group-hover:text-slate-100",
+            dim.text
+          )}
+        >
+          Audiq
+        </span>
+      )}
     </Link>
   );
 }
