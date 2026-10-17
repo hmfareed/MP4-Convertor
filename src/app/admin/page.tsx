@@ -244,33 +244,44 @@ export default function AdminPage() {
     );
   }
 
-  // NAVIGATION ITEMS DEFINITION
+  // NAVIGATION ITEMS DEFINITION WITH VIBRANT COLORS
   const navItems = [
     {
       id: "overview" as const,
       label: "Overview",
       icon: LayoutDashboard,
+      iconColor: "text-purple-400",
+      activeBg: "bg-purple-600/15 text-purple-200 border-purple-500/30",
       badge: null,
     },
     {
       id: "jobs" as const,
-      label: "Job Management",
+      label: "Jobs",
       icon: Layers,
+      iconColor: "text-blue-400",
+      activeBg: "bg-blue-600/15 text-blue-200 border-blue-500/30",
       badge: metrics?.totalJobs ?? null,
     },
     {
       id: "users" as const,
-      label: "User Accounts",
+      label: "Users",
       icon: Users,
+      iconColor: "text-emerald-400",
+      activeBg: "bg-emerald-600/15 text-emerald-200 border-emerald-500/30",
       badge: metrics?.totalUsers ?? null,
     },
     {
       id: "settings" as const,
-      label: "System Settings",
+      label: "Settings",
       icon: Sliders,
+      iconColor: "text-amber-400",
+      activeBg: "bg-amber-600/15 text-amber-200 border-amber-500/30",
       badge: null,
     },
   ];
+
+  const activeNav = navItems.find((n) => n.id === activeTab) || navItems[0];
+  const ActiveIcon = activeNav.icon;
 
   const getSectionTitle = () => {
     switch (activeTab) {
@@ -304,20 +315,20 @@ export default function AdminPage() {
         </button>
       </div>
 
-      {/* LEFT SIDEBAR (STICKY ON DESKTOP, DRAWER ON MOBILE) */}
+      {/* SLIM LEFT SIDEBAR (w-52 = 208px) */}
       <aside
-        className={`fixed md:sticky top-0 left-0 z-40 h-screen w-64 lg:w-72 bg-[#090e1c] border-r border-slate-800/80 flex flex-col justify-between transition-transform duration-200 ease-in-out md:translate-x-0 ${
+        className={`fixed md:sticky top-0 left-0 z-40 h-screen w-52 bg-[#090e1c] border-r border-slate-800/80 flex flex-col justify-between transition-transform duration-200 ease-in-out md:translate-x-0 ${
           mobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
         {/* Top: Logo & Branding */}
         <div>
-          <div className="px-6 py-5 border-b border-slate-800/80 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
+          <div className="px-4 py-4 border-b border-slate-800/80 flex items-center justify-between">
+            <div className="flex items-center gap-2">
               <Logo size="sm" />
               <div className="flex flex-col">
-                <span className="text-xs font-bold uppercase tracking-wider text-white">Admin Console</span>
-                <span className="text-[10px] text-purple-400 font-medium">Control Center</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-white">Admin Console</span>
+                <span className="text-[9px] text-purple-400 font-medium">Control Center</span>
               </div>
             </div>
             <div className="hidden md:block">
@@ -328,10 +339,10 @@ export default function AdminPage() {
             </div>
           </div>
 
-          {/* Nav List */}
-          <div className="px-3 py-6 space-y-1.5">
-            <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-              Navigation
+          {/* Nav List with Colorful Section Icons */}
+          <div className="px-2.5 py-4 space-y-1">
+            <div className="px-2.5 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              Sections
             </div>
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -343,21 +354,21 @@ export default function AdminPage() {
                     setActiveTab(item.id);
                     setMobileSidebarOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                     isActive
-                      ? "bg-purple-600/15 text-purple-300 border border-purple-500/30 shadow-sm shadow-purple-900/20"
-                      : "text-slate-400 hover:text-white hover:bg-slate-800/50 border border-transparent"
+                      ? `${item.activeBg} border font-semibold shadow-sm`
+                      : "text-slate-300 hover:text-white hover:bg-slate-800/50 border border-transparent"
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`h-4 w-4 ${isActive ? "text-purple-400" : "text-slate-400"}`} />
-                    <span>{item.label}</span>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Icon className={`h-4 w-4 ${item.iconColor} flex-shrink-0`} />
+                    <span className="truncate">{item.label}</span>
                   </div>
                   {item.badge !== null && (
                     <span
-                      className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${
+                      className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full flex-shrink-0 ${
                         isActive
-                          ? "bg-purple-500/20 text-purple-200"
+                          ? "bg-purple-500/30 text-purple-200"
                           : "bg-slate-800 text-slate-400"
                       }`}
                     >
@@ -370,20 +381,20 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* Bottom Sidebar: Exit to App & Admin Card */}
-        <div className="p-4 border-t border-slate-800/80 space-y-3">
+        {/* Bottom Sidebar: Return to App & Compact Admin Profile Card */}
+        <div className="p-3 border-t border-slate-800/80 space-y-2.5">
           <Link
             href="/"
-            className="flex items-center gap-2 px-3 py-2 text-xs text-slate-400 hover:text-white rounded-lg hover:bg-slate-800/40 transition-colors"
+            className="flex items-center gap-2 px-2.5 py-1.5 text-xs text-slate-400 hover:text-white rounded-lg hover:bg-slate-800/40 transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            <span>Return to Converter</span>
+            <span className="truncate">Exit to App</span>
           </Link>
 
           {currentAdmin && (
-            <div className="rounded-xl border border-slate-800/80 bg-[#0d1424] p-3 flex items-center justify-between">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center font-bold text-xs text-white flex-shrink-0">
+            <div className="rounded-xl border border-slate-800/80 bg-[#0d1424] p-2.5 flex items-center justify-between">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="h-7 w-7 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center font-bold text-xs text-white flex-shrink-0">
                   {currentAdmin.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="min-w-0">
@@ -393,10 +404,10 @@ export default function AdminPage() {
               </div>
               <button
                 onClick={handleLogout}
-                className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+                className="p-1 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors flex-shrink-0"
                 title="Sign Out"
               >
-                <LogOut className="h-4 w-4" />
+                <LogOut className="h-3.5 w-3.5" />
               </button>
             </div>
           )}
@@ -415,7 +426,10 @@ export default function AdminPage() {
       <div className="flex-1 flex flex-col min-w-0">
         {/* DEDICATED ADMIN HEADER */}
         <header className="sticky top-0 z-20 h-16 border-b border-slate-800/80 bg-[#080c14]/90 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className={`p-1.5 rounded-lg bg-slate-850/80 border border-slate-800 ${activeNav.iconColor}`}>
+              <ActiveIcon className="h-4 w-4" />
+            </div>
             <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
               {getSectionTitle()}
             </h2>
@@ -447,39 +461,57 @@ export default function AdminPage() {
           {/* TAB 1: OVERVIEW */}
           {activeTab === "overview" && (
             <div className="space-y-6">
-              {/* Key Metric Cards */}
+              {/* Key Metric Cards with Distinctive Section Icons */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-4 space-y-1">
-                  <span className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">Total Volume</span>
+                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">Total Volume</span>
+                    <Layers className="h-3.5 w-3.5 text-purple-400" />
+                  </div>
                   <p className="text-2xl font-bold text-white">{metrics?.totalJobs ?? 0}</p>
                 </div>
 
-                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-4 space-y-1">
-                  <span className="text-[10px] uppercase font-semibold text-emerald-400 tracking-wider">Success Rate</span>
+                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-semibold text-emerald-400 tracking-wider">Success Rate</span>
+                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                  </div>
                   <p className="text-2xl font-bold text-emerald-400">{metrics?.successRate ?? 100}%</p>
                 </div>
 
-                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-4 space-y-1">
-                  <span className="text-[10px] uppercase font-semibold text-blue-400 tracking-wider">Active in Queue</span>
+                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-semibold text-blue-400 tracking-wider">Active Queue</span>
+                    <Activity className="h-3.5 w-3.5 text-blue-400" />
+                  </div>
                   <p className="text-2xl font-bold text-blue-400">
                     {(metrics?.queueWaiting ?? 0) + (metrics?.queueActive ?? 0)}
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-4 space-y-1">
-                  <span className="text-[10px] uppercase font-semibold text-amber-400 tracking-wider">Avg Latency</span>
+                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-semibold text-amber-400 tracking-wider">Avg Latency</span>
+                    <Clock className="h-3.5 w-3.5 text-amber-400" />
+                  </div>
                   <p className="text-2xl font-bold text-amber-300">{metrics?.avgProcessingSec ?? 0}s</p>
                 </div>
 
-                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-4 space-y-1">
-                  <span className="text-[10px] uppercase font-semibold text-purple-400 tracking-wider">Total Storage</span>
+                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-semibold text-purple-400 tracking-wider">Storage</span>
+                    <HardDrive className="h-3.5 w-3.5 text-purple-400" />
+                  </div>
                   <p className="text-2xl font-bold text-purple-300">
                     {formatBytes(metrics?.totalStorageBytes ?? 0)}
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-4 space-y-1">
-                  <span className="text-[10px] uppercase font-semibold text-indigo-400 tracking-wider">Registered Users</span>
+                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-semibold text-emerald-400 tracking-wider">Users</span>
+                    <Users className="h-3.5 w-3.5 text-emerald-400" />
+                  </div>
                   <p className="text-2xl font-bold text-white">{metrics?.totalUsers ?? 0}</p>
                 </div>
               </div>
@@ -538,6 +570,11 @@ export default function AdminPage() {
           {/* TAB 2: JOBS */}
           {activeTab === "jobs" && (
             <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Layers className="h-4 w-4 text-blue-400" />
+                <h3 className="text-sm font-semibold text-white">Conversion Queue & Job Records</h3>
+              </div>
+
               {/* Search & Filter Bar */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="relative flex-1 max-w-sm w-full">
@@ -662,95 +699,108 @@ export default function AdminPage() {
 
           {/* TAB 3: USERS */}
           {activeTab === "users" && (
-            <div className="rounded-xl border border-slate-800 bg-[#0d1322] overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-300">
-                <thead className="bg-[#0b101c] text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
-                  <tr>
-                    <th className="p-3">User</th>
-                    <th className="p-3">Email</th>
-                    <th className="p-3">Role</th>
-                    <th className="p-3">Status</th>
-                    <th className="p-3">Joined</th>
-                    <th className="p-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800/60">
-                  {users.length === 0 ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Users className="h-4 w-4 text-emerald-400" />
+                <h3 className="text-sm font-semibold text-white">Registered Users & Account Controls</h3>
+              </div>
+
+              <div className="rounded-xl border border-slate-800 bg-[#0d1322] overflow-x-auto">
+                <table className="w-full text-left text-xs text-slate-300">
+                  <thead className="bg-[#0b101c] text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
                     <tr>
-                      <td colSpan={6} className="p-8 text-center text-slate-500">
-                        No user accounts found.
-                      </td>
+                      <th className="p-3">User</th>
+                      <th className="p-3">Email</th>
+                      <th className="p-3">Role</th>
+                      <th className="p-3">Status</th>
+                      <th className="p-3">Joined</th>
+                      <th className="p-3 text-right">Actions</th>
                     </tr>
-                  ) : (
-                    users.map((u) => (
-                      <tr key={u._id} className="hover:bg-slate-800/30">
-                        <td className="p-3 font-semibold text-white">{u.name}</td>
-                        <td className="p-3 text-slate-400">{u.email}</td>
-                        <td className="p-3">
-                          <Badge variant={u.role === "admin" ? "gradient" : "outline"} className="text-[10px]">
-                            {u.role}
-                          </Badge>
-                        </td>
-                        <td className="p-3">
-                          <Badge variant={u.status === "active" ? "success" : "destructive"} className="text-[10px]">
-                            {u.status}
-                          </Badge>
-                        </td>
-                        <td className="p-3 text-slate-500">
-                          {new Date(u.createdAt).toLocaleDateString()}
-                        </td>
-                        <td className="p-3 text-right space-x-2">
-                          <button
-                            onClick={() => handleUserToggleRole(u)}
-                            className="text-[11px] text-purple-400 hover:underline"
-                          >
-                            {u.role === "admin" ? "Demote" : "Make Admin"}
-                          </button>
-                          <button
-                            onClick={() => handleUserToggleStatus(u)}
-                            className={`text-[11px] hover:underline ${
-                              u.status === "active" ? "text-amber-400" : "text-emerald-400"
-                            }`}
-                          >
-                            {u.status === "active" ? "Suspend" : "Activate"}
-                          </button>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60">
+                    {users.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="p-8 text-center text-slate-500">
+                          No user accounts found.
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ) : (
+                      users.map((u) => (
+                        <tr key={u._id} className="hover:bg-slate-800/30">
+                          <td className="p-3 font-semibold text-white">{u.name}</td>
+                          <td className="p-3 text-slate-400">{u.email}</td>
+                          <td className="p-3">
+                            <Badge variant={u.role === "admin" ? "gradient" : "outline"} className="text-[10px]">
+                              {u.role}
+                            </Badge>
+                          </td>
+                          <td className="p-3">
+                            <Badge variant={u.status === "active" ? "success" : "destructive"} className="text-[10px]">
+                              {u.status}
+                            </Badge>
+                          </td>
+                          <td className="p-3 text-slate-500">
+                            {new Date(u.createdAt).toLocaleDateString()}
+                          </td>
+                          <td className="p-3 text-right space-x-2">
+                            <button
+                              onClick={() => handleUserToggleRole(u)}
+                              className="text-[11px] text-purple-400 hover:underline"
+                            >
+                              {u.role === "admin" ? "Demote" : "Make Admin"}
+                            </button>
+                            <button
+                              onClick={() => handleUserToggleStatus(u)}
+                              className={`text-[11px] hover:underline ${
+                                u.status === "active" ? "text-amber-400" : "text-emerald-400"
+                              }`}
+                            >
+                              {u.status === "active" ? "Suspend" : "Activate"}
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 
           {/* TAB 4: SYSTEM SETTINGS */}
           {activeTab === "settings" && (
-            <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-6 space-y-4 max-w-2xl text-xs">
-              <h3 className="text-sm font-semibold text-white">Active System Configuration</h3>
-              <div className="space-y-3 divide-y divide-slate-800">
-                <div className="flex justify-between items-center pt-2">
-                  <span className="text-slate-400">Maximum Upload Size</span>
-                  <span className="font-mono text-white">500 MB (524,288,000 bytes)</span>
-                </div>
-                <div className="flex justify-between items-center pt-2">
-                  <span className="text-slate-400">Media Duration Limit</span>
-                  <span className="font-mono text-white">3,600 seconds (1 hour)</span>
-                </div>
-                <div className="flex justify-between items-center pt-2">
-                  <span className="text-slate-400">Worker Concurrency</span>
-                  <span className="font-mono text-white">2 concurrent jobs per worker</span>
-                </div>
-                <div className="flex justify-between items-center pt-2">
-                  <span className="text-slate-400">Conversion Timeout</span>
-                  <span className="font-mono text-white">900 seconds (15 minutes)</span>
-                </div>
-                <div className="flex justify-between items-center pt-2">
-                  <span className="text-slate-400">Guest Retention Policy</span>
-                  <span className="font-mono text-white">24 hours</span>
-                </div>
-                <div className="flex justify-between items-center pt-2">
-                  <span className="text-slate-400">Registered User Retention Policy</span>
-                  <span className="font-mono text-white">168 hours (7 days)</span>
+            <div className="space-y-4 max-w-2xl">
+              <div className="flex items-center gap-2 mb-1">
+                <Sliders className="h-4 w-4 text-amber-400" />
+                <h3 className="text-sm font-semibold text-white">Active System Configuration</h3>
+              </div>
+
+              <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-6 space-y-4 text-xs">
+                <div className="space-y-3 divide-y divide-slate-800">
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-slate-400">Maximum Upload Size</span>
+                    <span className="font-mono text-white">500 MB (524,288,000 bytes)</span>
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-slate-400">Media Duration Limit</span>
+                    <span className="font-mono text-white">3,600 seconds (1 hour)</span>
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-slate-400">Worker Concurrency</span>
+                    <span className="font-mono text-white">2 concurrent jobs per worker</span>
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-slate-400">Conversion Timeout</span>
+                    <span className="font-mono text-white">900 seconds (15 minutes)</span>
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-slate-400">Guest Retention Policy</span>
+                    <span className="font-mono text-white">24 hours</span>
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-slate-400">Registered User Retention Policy</span>
+                    <span className="font-mono text-white">168 hours (7 days)</span>
+                  </div>
                 </div>
               </div>
             </div>
