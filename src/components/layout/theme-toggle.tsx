@@ -2,13 +2,36 @@
 
 import React, { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-import { Sun, Moon, Laptop } from "lucide-react";
+import { Sun, Moon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+
+/**
+ * System theme icon matching user specification:
+ * Circular outline with filled right-half semi-circle.
+ */
+function SystemThemeIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 18a6 6 0 0 0 0-12v12z" fill="currentColor" />
+    </svg>
+  );
+}
 
 /**
  * Pixel-accurate Light Mode miniature window preview matching the UI design:
@@ -182,7 +205,7 @@ export function ThemeToggle() {
           ) : currentTheme === "dark" ? (
             <Moon className="h-4 w-4 text-blue-400" />
           ) : (
-            <Laptop className="h-4 w-4 text-neutral-400" />
+            <SystemThemeIcon className="h-4 w-4 text-neutral-600 dark:text-neutral-300" />
           )}
         </button>
       </DropdownMenuTrigger>
