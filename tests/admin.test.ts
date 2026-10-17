@@ -59,4 +59,31 @@ describe("Phase 6 — Admin Dashboard & Role Management", () => {
     expect(typeof failedJobs).toBe("number");
     expect(completedJobs).toBeLessThanOrEqual(totalJobs);
   });
+
+  it("aggregates users by specific date and month for calendar KPI", async () => {
+    const today = new Date();
+    const todayStr = `${today.getUTCFullYear()}-${String(today.getUTCMonth() + 1).padStart(2, "0")}-${String(
+      today.getUTCDate()
+    ).padStart(2, "0")}`;
+    const monthStr = `${today.getUTCFullYear()}-${String(today.getUTCMonth() + 1).padStart(2, "0")}`;
+
+    const [year, month, day] = todayStr.split("-").map(Number);
+    const startOfDay = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+    const endOfDay = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
+
+    const countToday = await User.countDocuments({ createdAt: { $gte: startOfDay, $lte: endOfDay } });
+    expect(typeof countToday).toBe("number");
+    expect(countToday).toBeGreaterThanOrEqual(1); // Standard user created in previous test
+
+    const startOfMonth = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0, 0));
+    const endOfMonth = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
+
+    const monthlyAgg = await User.aggregate([
+      { $match: { createdAt: { $gte: startOfMonth, $lte: endOfMonth } } },
+      { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt", timezone: "UTC" } }, count: { $sum: 1 } } },
+    ]);
+
+    expect(Array.isArray(monthlyAgg)).toBe(true);
+    expect(monthlyAgg.length).toBeGreaterThanOrEqual(1);
+  });
 });

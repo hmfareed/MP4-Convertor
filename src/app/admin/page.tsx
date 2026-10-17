@@ -39,6 +39,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Logo } from "@/components/layout/logo";
+import { UserCalendarKPI } from "@/components/admin/user-calendar-kpi";
 import { formatBytes, formatDuration, formatTimeAgo } from "@/lib/utils";
 import { JobStatus } from "@/types/conversion";
 
@@ -124,6 +125,7 @@ export default function AdminPage() {
   const [jobStatusFilter, setJobStatusFilter] = useState("all");
   const [userGraphDays, setUserGraphDays] = useState<7 | 14>(14);
   const [hoveredDay, setHoveredDay] = useState<{ date: string; label: string; count: number } | null>(null);
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState<string | null>(null);
 
   const loadData = async (filterOverride?: string, searchOverride?: string) => {
     setIsLoading(true);
@@ -601,31 +603,15 @@ export default function AdminPage() {
                     </div>
                   </button>
 
-                  {/* Current Users */}
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("users")}
-                    className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1 text-left hover:border-emerald-500/50 hover:bg-[#121212] transition-all cursor-pointer group"
-                    title="Manage users"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] uppercase font-semibold text-emerald-400 group-hover:text-emerald-300 tracking-wider transition-colors">
-                        Current Users
-                      </span>
-                      <UserCheck className="h-3.5 w-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
-                    </div>
-                    <div className="flex items-baseline justify-between">
-                      <div>
-                        <p className="text-2xl font-bold text-white">
-                          {metrics?.activeUsers ?? metrics?.totalUsers ?? 0}
-                        </p>
-                        <span className="text-[10px] text-emerald-400/80">
-                          +{metrics?.newUsersToday ?? 0} today
-                        </span>
-                      </div>
-                      <ChevronRight className="h-3.5 w-3.5 text-neutral-600 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all" />
-                    </div>
-                  </button>
+                  {/* Current Users / Calendar Date KPI */}
+                  <UserCalendarKPI
+                    totalActiveUsers={metrics?.activeUsers ?? metrics?.totalUsers ?? 0}
+                    newUsersToday={metrics?.newUsersToday ?? 0}
+                    usersPerDay={metrics?.usersPerDay ?? []}
+                    selectedDate={selectedCalendarDate}
+                    onSelectDate={(date) => setSelectedCalendarDate(date)}
+                    onNavigateToUsers={() => setActiveTab("users")}
+                  />
 
                   {/* Active Queue */}
                   <button
@@ -725,7 +711,7 @@ export default function AdminPage() {
 
                     {/* Graph Canvas / Smooth SVG Line & Area Curve */}
                     <div className="relative pt-2 pb-1">
-                      {/* Hover Status Bar */}
+                      {/* Hover / Selected Status Bar */}
                       <div className="h-6 flex items-center justify-between text-xs px-1 mb-1">
                         {hoveredDay ? (
                           <div className="flex items-center gap-2 text-emerald-300 font-medium">
@@ -735,9 +721,29 @@ export default function AdminPage() {
                               {hoveredDay.count} new {hoveredDay.count === 1 ? "user" : "users"}
                             </span>
                           </div>
+                        ) : selectedCalendarDate ? (
+                          (() => {
+                            const found = dailyUsers.find((d) => d.date === selectedCalendarDate);
+                            return (
+                              <div className="flex items-center gap-2 text-emerald-300 font-medium">
+                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                                <span>Selected {found ? found.label : selectedCalendarDate}:</span>
+                                <span className="font-bold text-white font-mono">
+                                  {found ? `${found.count} new users` : "Viewing in KPI"}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedCalendarDate(null)}
+                                  className="text-[10px] text-neutral-400 hover:text-white underline ml-1 cursor-pointer"
+                                >
+                                  (Clear)
+                                </button>
+                              </div>
+                            );
+                          })()
                         ) : (
                           <span className="text-neutral-500 text-[11px]">
-                            Hover over the curve or nodes to view daily registrations
+                            Hover over the curve or click a date to view registrations
                           </span>
                         )}
                         <span className="text-[10px] text-neutral-500 font-mono">
@@ -802,33 +808,39 @@ export default function AdminPage() {
 
                           {/* Interactive Points and Vertical Guidelines */}
                           {linePoints.map((pt, idx) => {
+                            const isSelected = selectedCalendarDate === pt.date;
                             const isHovered = hoveredDay?.date === pt.date;
                             const isToday = idx === linePoints.length - 1;
+                            const showGuide = isHovered || isSelected;
 
                             return (
-                              <g key={pt.date} className="cursor-pointer">
-                                {/* Vertical Guideline on Hover */}
-                                {isHovered && (
+                              <g
+                                key={pt.date}
+                                className="cursor-pointer"
+                                onClick={() => setSelectedCalendarDate(isSelected ? null : pt.date)}
+                              >
+                                {/* Vertical Guideline on Hover or Selected */}
+                                {showGuide && (
                                   <line
                                     x1={pt.x}
                                     y1={padTop}
                                     x2={pt.x}
                                     y2={padBottom}
                                     stroke="#10b981"
-                                    strokeWidth="1.5"
-                                    strokeDasharray="3 3"
-                                    strokeOpacity="0.8"
+                                    strokeWidth={isSelected ? "2" : "1.5"}
+                                    strokeDasharray={isSelected ? undefined : "3 3"}
+                                    strokeOpacity={isSelected ? "1" : "0.8"}
                                   />
                                 )}
 
-                                {/* Outer Halo for Hovered / Today Node */}
-                                {(isHovered || isToday) && (
+                                {/* Outer Halo for Hovered / Selected / Today Node */}
+                                {(isHovered || isSelected || isToday) && (
                                   <circle
                                     cx={pt.x}
                                     cy={pt.y}
-                                    r={isHovered ? 9 : 6}
+                                    r={isSelected ? 10 : isHovered ? 9 : 6}
                                     fill="#10b981"
-                                    fillOpacity={isHovered ? 0.35 : 0.15}
+                                    fillOpacity={isSelected ? 0.45 : isHovered ? 0.35 : 0.15}
                                     className="transition-all duration-200"
                                   />
                                 )}
@@ -837,10 +849,10 @@ export default function AdminPage() {
                                 <circle
                                   cx={pt.x}
                                   cy={pt.y}
-                                  r={isHovered ? 5 : pt.count > 0 ? 4 : 3}
-                                  fill={isHovered ? "#ffffff" : pt.count > 0 ? "#10b981" : "#171717"}
-                                  stroke={isHovered ? "#10b981" : pt.count > 0 ? "#ffffff" : "#404040"}
-                                  strokeWidth={isHovered ? 2.5 : pt.count > 0 ? 1.5 : 1}
+                                  r={isSelected ? 5.5 : isHovered ? 5 : pt.count > 0 ? 4 : 3}
+                                  fill={isSelected || isHovered ? "#ffffff" : pt.count > 0 ? "#10b981" : "#171717"}
+                                  stroke={isSelected || isHovered ? "#10b981" : pt.count > 0 ? "#ffffff" : "#404040"}
+                                  strokeWidth={isSelected || isHovered ? 2.5 : pt.count > 0 ? 1.5 : 1}
                                   className="transition-all duration-150"
                                 />
 
@@ -1263,74 +1275,97 @@ export default function AdminPage() {
           )}
 
           {/* TAB 3: USERS */}
-          {activeTab === "users" && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-1">
-                <Users className="h-4 w-4 text-emerald-400" />
-                <h3 className="text-sm font-semibold text-white">Registered Users & Account Controls</h3>
-              </div>
+          {activeTab === "users" && (() => {
+            const filteredUsers = selectedCalendarDate
+              ? users.filter((u) => u.createdAt.startsWith(selectedCalendarDate))
+              : users;
 
-              <div className="rounded-xl border border-neutral-800 bg-[#0a0a0a] overflow-x-auto">
-                <table className="w-full text-left text-xs text-neutral-300">
-                  <thead className="bg-black text-neutral-400 uppercase text-[10px] tracking-wider border-b border-neutral-800">
-                    <tr>
-                      <th className="p-3">User</th>
-                      <th className="p-3">Email</th>
-                      <th className="p-3">Role</th>
-                      <th className="p-3">Status</th>
-                      <th className="p-3">Joined</th>
-                      <th className="p-3 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-neutral-800/70">
-                    {users.length === 0 ? (
+            return (
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-emerald-400" />
+                    <h3 className="text-sm font-semibold text-white">Registered Users & Account Controls</h3>
+                  </div>
+
+                  {selectedCalendarDate && (
+                    <div className="flex items-center gap-2 text-xs bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-lg text-emerald-300">
+                      <span>Filtered by date: <strong>{selectedCalendarDate}</strong> ({filteredUsers.length} found)</span>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedCalendarDate(null)}
+                        className="text-neutral-400 hover:text-white underline cursor-pointer text-[11px]"
+                      >
+                        Show All
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="rounded-xl border border-neutral-800 bg-[#0a0a0a] overflow-x-auto">
+                  <table className="w-full text-left text-xs text-neutral-300">
+                    <thead className="bg-black text-neutral-400 uppercase text-[10px] tracking-wider border-b border-neutral-800">
                       <tr>
-                        <td colSpan={6} className="p-8 text-center text-neutral-500">
-                          No user accounts found.
-                        </td>
+                        <th className="p-3">User</th>
+                        <th className="p-3">Email</th>
+                        <th className="p-3">Role</th>
+                        <th className="p-3">Status</th>
+                        <th className="p-3">Joined</th>
+                        <th className="p-3 text-right">Actions</th>
                       </tr>
-                    ) : (
-                      users.map((u) => (
-                        <tr key={u._id} className="hover:bg-neutral-900/40">
-                          <td className="p-3 font-semibold text-white">{u.name}</td>
-                          <td className="p-3 text-neutral-400">{u.email}</td>
-                          <td className="p-3">
-                            <Badge variant={u.role === "admin" ? "gradient" : "outline"} className="text-[10px]">
-                              {u.role}
-                            </Badge>
-                          </td>
-                          <td className="p-3">
-                            <Badge variant={u.status === "active" ? "success" : "destructive"} className="text-[10px]">
-                              {u.status}
-                            </Badge>
-                          </td>
-                          <td className="p-3 text-neutral-500">
-                            {new Date(u.createdAt).toLocaleDateString()}
-                          </td>
-                          <td className="p-3 text-right space-x-2">
-                            <button
-                              onClick={() => handleUserToggleRole(u)}
-                              className="text-[11px] text-purple-400 hover:underline"
-                            >
-                              {u.role === "admin" ? "Demote" : "Make Admin"}
-                            </button>
-                            <button
-                              onClick={() => handleUserToggleStatus(u)}
-                              className={`text-[11px] hover:underline ${
-                                u.status === "active" ? "text-amber-400" : "text-emerald-400"
-                              }`}
-                            >
-                              {u.status === "active" ? "Suspend" : "Activate"}
-                            </button>
+                    </thead>
+                    <tbody className="divide-y divide-neutral-800/70">
+                      {filteredUsers.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="p-8 text-center text-neutral-500">
+                            {selectedCalendarDate
+                              ? `No user accounts registered on ${selectedCalendarDate}.`
+                              : "No user accounts found."}
                           </td>
                         </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
+                      ) : (
+                        filteredUsers.map((u) => (
+                          <tr key={u._id} className="hover:bg-neutral-900/40">
+                            <td className="p-3 font-semibold text-white">{u.name}</td>
+                            <td className="p-3 text-neutral-400">{u.email}</td>
+                            <td className="p-3">
+                              <Badge variant={u.role === "admin" ? "gradient" : "outline"} className="text-[10px]">
+                                {u.role}
+                              </Badge>
+                            </td>
+                            <td className="p-3">
+                              <Badge variant={u.status === "active" ? "success" : "destructive"} className="text-[10px]">
+                                {u.status}
+                              </Badge>
+                            </td>
+                            <td className="p-3 text-neutral-500">
+                              {new Date(u.createdAt).toLocaleDateString()}
+                            </td>
+                            <td className="p-3 text-right space-x-2">
+                              <button
+                                onClick={() => handleUserToggleRole(u)}
+                                className="text-[11px] text-purple-400 hover:underline"
+                              >
+                                {u.role === "admin" ? "Demote" : "Make Admin"}
+                              </button>
+                              <button
+                                onClick={() => handleUserToggleStatus(u)}
+                                className={`text-[11px] hover:underline ${
+                                  u.status === "active" ? "text-amber-400" : "text-emerald-400"
+                                }`}
+                              >
+                                {u.status === "active" ? "Suspend" : "Activate"}
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* TAB 4: SYSTEM SETTINGS */}
           {activeTab === "settings" && (
