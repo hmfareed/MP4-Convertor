@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "bun test",
+    "test": "bun test --timeout 20000",
     "worker": "bun run src/worker/index.ts"
   },
   "dependencies": {

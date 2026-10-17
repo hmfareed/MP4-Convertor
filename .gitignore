@@ -18,6 +18,8 @@ bun.lockb
 # Misc
 .DS_Store
 *.pem
+/data/
+/temp/
 
 # Debug
 npm-debug.log*

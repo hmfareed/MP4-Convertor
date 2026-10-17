@@ -9,6 +9,7 @@ import {
   Menu,
   X,
   Shield,
+  ShieldCheck,
   FileText,
   LogIn,
   UserPlus,
@@ -219,6 +220,14 @@ export function Navbar() {
                         <span>Settings</span>
                       </Link>
                     </DropdownMenuItem>
+                    {user.role === "admin" && (
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin" className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300">
+                          <ShieldCheck className="h-4 w-4 text-indigo-400" />
+                          <span>Admin Dashboard</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={handleLogout}
@@ -384,7 +393,17 @@ export function Navbar() {
                 </Button>
               </div>
             ) : (
-              <div className="pt-2 border-t border-slate-800/80">
+              <div className="pt-2 border-t border-slate-800/80 space-y-1">
+                {user.role === "admin" && (
+                  <Link
+                    href="/admin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-3 py-1.5 text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-2"
+                  >
+                    <ShieldCheck className="h-3.5 w-3.5 text-indigo-400" />
+                    <span>Admin Dashboard</span>
+                  </Link>
+                )}
                 <Link
                   href="/settings"
                   onClick={() => setMobileMenuOpen(false)}
