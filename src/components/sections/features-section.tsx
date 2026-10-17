@@ -24,7 +24,7 @@ const features: FeatureItem[] = [
     description:
       "High-speed background queue processing powered by FFmpeg and BullMQ delivers reliable, swift audio extraction.",
     icon: Zap,
-    iconColor: "text-amber-400",
+    iconColor: "text-amber-500 dark:text-amber-400",
     iconBg: "bg-amber-500/10",
     iconBorder: "border-amber-500/20",
   },
@@ -33,7 +33,7 @@ const features: FeatureItem[] = [
     description:
       "Granular bitrate control from 96 kbps up to 320 kbps. Tailor the balance between compact file sizes and high fidelity.",
     icon: Sliders,
-    iconColor: "text-purple-400",
+    iconColor: "text-purple-600 dark:text-purple-400",
     iconBg: "bg-purple-500/10",
     iconBorder: "border-purple-500/20",
   },
@@ -42,7 +42,7 @@ const features: FeatureItem[] = [
     description:
       "Media is stored in isolated temporary buffers and strictly auto-purged within 24 hours. No unauthorized tracking.",
     icon: Shield,
-    iconColor: "text-emerald-400",
+    iconColor: "text-emerald-600 dark:text-emerald-400",
     iconBg: "bg-emerald-500/10",
     iconBorder: "border-emerald-500/20",
   },
@@ -51,7 +51,7 @@ const features: FeatureItem[] = [
     description:
       "Direct browser audio preview and single-click authorized downloads with clean sanitized MP3 file headers.",
     icon: Download,
-    iconColor: "text-sky-400",
+    iconColor: "text-sky-600 dark:text-sky-400",
     iconBg: "bg-sky-500/10",
     iconBorder: "border-sky-500/20",
   },
@@ -60,7 +60,7 @@ const features: FeatureItem[] = [
     description:
       "Convenient access to your recent conversions during your active session, with persistent history for registered users.",
     icon: History,
-    iconColor: "text-rose-400",
+    iconColor: "text-rose-600 dark:text-rose-400",
     iconBg: "bg-rose-500/10",
     iconBorder: "border-rose-500/20",
   },
@@ -69,7 +69,7 @@ const features: FeatureItem[] = [
     description:
       "Meticulously tuned for touch screens, mobile browsers, tablets, laptops, and ultra-wide desktop monitors.",
     icon: Smartphone,
-    iconColor: "text-indigo-400",
+    iconColor: "text-indigo-600 dark:text-indigo-400",
     iconBg: "bg-indigo-500/10",
     iconBorder: "border-indigo-500/20",
   },
@@ -79,10 +79,10 @@ export function FeaturesSection() {
   return (
     <section id="features" className="py-16 px-4 max-w-5xl mx-auto scroll-mt-20">
       <div className="text-center max-w-2xl mx-auto mb-12">
-        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-3">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 dark:text-white mb-3">
           Designed for Speed & Simplicity
         </h2>
-        <p className="text-sm sm:text-base text-neutral-400">
+        <p className="text-sm sm:text-base text-neutral-600 dark:text-neutral-400">
           Everything you need to convert MP4 videos into high-quality MP3 tracks
           without unnecessary bloat, watermarks, or account walls.
         </p>
@@ -94,7 +94,7 @@ export function FeaturesSection() {
           return (
             <div
               key={feature.title}
-              className="rounded-2xl border border-neutral-800/80 bg-[#0a0a0a] p-6 transition-all duration-200 hover:border-neutral-700 hover:bg-[#121212] flex flex-col justify-between group"
+              className="rounded-2xl border border-neutral-200 dark:border-neutral-800/80 bg-white dark:bg-[#0a0a0a] p-6 transition-all duration-200 hover:border-neutral-300 dark:hover:border-neutral-700 hover:bg-neutral-50/50 dark:hover:bg-[#121212] flex flex-col justify-between group shadow-sm"
             >
               <div className="space-y-3">
                 <div
@@ -102,10 +102,10 @@ export function FeaturesSection() {
                 >
                   <Icon className="h-5 w-5" />
                 </div>
-                <h3 className="text-base font-semibold text-white">
+                <h3 className="text-base font-semibold text-neutral-900 dark:text-white">
                   {feature.title}
                 </h3>
-                <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+                <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
                   {feature.description}
                 </p>
               </div>

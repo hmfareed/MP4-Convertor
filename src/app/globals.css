@@ -4,6 +4,38 @@
 
 @layer base {
   :root {
+    --background: 0 0% 100%; /* #FFFFFF Crisp Pure White */
+    --foreground: 222 47% 11%; /* #0f172a Deep Slate Text */
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 221 83% 53%; /* #2563EB Deep Blue */
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222 47% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%; /* #e2e8f0 Soft Light Border */
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221 83% 53%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
     --background: 0 0% 0%; /* #000000 Pure AMOLED Black */
     --foreground: 0 0% 98%;
 
@@ -13,7 +45,7 @@
     --popover: 0 0% 4%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 262 83% 58%;
+    --primary: 221 83% 53%;
     --primary-foreground: 0 0% 98%;
 
     --secondary: 0 0% 9%;
@@ -30,9 +62,7 @@
 
     --border: 0 0% 15%; /* #262626 Neutral-800 */
     --input: 0 0% 15%;
-    --ring: 262 83% 58%;
-
-    --radius: 0.75rem;
+    --ring: 221 83% 53%;
   }
 }
 
@@ -41,9 +71,8 @@
     @apply border-border;
   }
   body {
-    @apply bg-black text-foreground antialiased min-h-screen selection:bg-purple-600/30 selection:text-white;
+    @apply bg-background text-foreground antialiased min-h-screen selection:bg-blue-600/30 selection:text-white transition-colors duration-150;
     font-feature-settings: "rlig" 1, "calt" 1;
-    background-color: #000000;
   }
 }
 

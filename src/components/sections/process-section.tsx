@@ -17,36 +17,36 @@ const steps: StepItem[] = [
     title: "1. Upload",
     description: "Select your MP4 file from your device or drag & drop it.",
     icon: Zap,
-    colorClass: "text-purple-400",
-    bgClass: "bg-purple-950/30",
-    borderClass: "border-purple-500/30",
+    colorClass: "text-purple-600 dark:text-purple-400",
+    bgClass: "bg-purple-50 dark:bg-purple-950/30",
+    borderClass: "border-purple-200 dark:border-purple-500/30",
   },
   {
     number: "2",
     title: "2. Convert",
     description: "We'll process your file and extract the audio with high fidelity.",
     icon: Settings,
-    colorClass: "text-blue-400",
-    bgClass: "bg-blue-950/30",
-    borderClass: "border-blue-500/30",
+    colorClass: "text-blue-600 dark:text-blue-400",
+    bgClass: "bg-blue-50 dark:bg-blue-950/30",
+    borderClass: "border-blue-200 dark:border-blue-500/30",
   },
   {
     number: "3",
     title: "3. Download",
     description: "Get your MP3 file instantly and enjoy your crystal-clear audio!",
     icon: Music,
-    colorClass: "text-emerald-400",
-    bgClass: "bg-emerald-950/30",
-    borderClass: "border-emerald-500/30",
+    colorClass: "text-emerald-600 dark:text-emerald-400",
+    bgClass: "bg-emerald-50 dark:bg-emerald-950/30",
+    borderClass: "border-emerald-200 dark:border-emerald-500/30",
   },
   {
     number: "4",
     title: "100% Secure",
     description: "Private file handling. Temporary storage with automatic 24h deletion.",
     icon: ShieldCheck,
-    colorClass: "text-pink-400",
-    bgClass: "bg-pink-950/30",
-    borderClass: "border-pink-500/30",
+    colorClass: "text-pink-600 dark:text-pink-400",
+    bgClass: "bg-pink-50 dark:bg-pink-950/30",
+    borderClass: "border-pink-200 dark:border-pink-500/30",
   },
 ];
 
@@ -63,18 +63,18 @@ export function ProcessSection() {
             >
               {/* Circular Icon */}
               <div
-                className={`flex h-14 w-14 items-center justify-center rounded-full border ${step.bgClass} ${step.borderClass} ${step.colorClass} mb-4 shadow-lg`}
+                className={`flex h-14 w-14 items-center justify-center rounded-full border ${step.bgClass} ${step.borderClass} ${step.colorClass} mb-4 shadow-sm dark:shadow-lg`}
               >
                 <Icon className="h-6 w-6" />
               </div>
 
               {/* Title */}
-              <h3 className="text-base font-semibold text-white mb-2">
+              <h3 className="text-base font-semibold text-neutral-900 dark:text-white mb-2">
                 {step.title}
               </h3>
 
               {/* Description */}
-              <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed max-w-[220px]">
+              <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed max-w-[220px]">
                 {step.description}
               </p>
             </div>

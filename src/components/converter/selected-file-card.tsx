@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { FileVideo, Trash2, RefreshCw, Clock, HardDrive, CheckCircle2 } from "lucide-react";
+import { FileVideo, Trash2, RefreshCw, Clock, HardDrive } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatBytes, formatDuration } from "@/lib/utils";
@@ -21,18 +21,18 @@ export function SelectedFileCard({
   disabled = false,
 }: SelectedFileCardProps) {
   return (
-    <div className="w-full rounded-xl border border-neutral-800 bg-[#0a0a0a] p-4 sm:p-5 transition-all">
+    <div className="w-full rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#0a0a0a] p-4 sm:p-5 transition-all shadow-sm">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         {/* Left: Icon & File Details */}
         <div className="flex items-center gap-3.5 min-w-0 w-full sm:w-auto">
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-neutral-900 border border-neutral-800 text-purple-400">
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-purple-50 dark:bg-neutral-900 border border-purple-200 dark:border-neutral-800 text-purple-600 dark:text-purple-400">
             <FileVideo className="h-6 w-6" />
           </div>
 
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <p
-                className="font-medium text-white text-sm sm:text-base truncate max-w-[240px] sm:max-w-xs md:max-w-md"
+                className="font-medium text-neutral-900 dark:text-white text-sm sm:text-base truncate max-w-[240px] sm:max-w-xs md:max-w-md"
                 title={fileMeta.name}
               >
                 {fileMeta.name}
@@ -42,20 +42,20 @@ export function SelectedFileCard({
               </Badge>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-slate-400">
+            <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-neutral-500 dark:text-slate-400">
               <span className="flex items-center gap-1">
-                <HardDrive className="h-3.5 w-3.5 text-slate-500" />
+                <HardDrive className="h-3.5 w-3.5 text-neutral-400 dark:text-slate-500" />
                 {formatBytes(fileMeta.size)}
               </span>
 
               {fileMeta.duration !== undefined && fileMeta.duration > 0 && (
                 <span className="flex items-center gap-1">
-                  <Clock className="h-3.5 w-3.5 text-slate-500" />
+                  <Clock className="h-3.5 w-3.5 text-neutral-400 dark:text-slate-500" />
                   {formatDuration(fileMeta.duration)}
                 </span>
               )}
 
-              <span className="text-slate-500">• MP4 Video</span>
+              <span className="text-neutral-400 dark:text-slate-500">• MP4 Video</span>
             </div>
           </div>
         </div>
@@ -68,7 +68,7 @@ export function SelectedFileCard({
             size="sm"
             onClick={onReplace}
             disabled={disabled}
-            className="h-8 gap-1.5 text-xs text-slate-300 hover:text-white"
+            className="h-8 gap-1.5 text-xs text-neutral-700 dark:text-slate-300 hover:text-neutral-900 dark:hover:text-white"
             title="Replace selected file"
           >
             <RefreshCw className="h-3.5 w-3.5" />
@@ -81,7 +81,7 @@ export function SelectedFileCard({
             size="sm"
             onClick={onRemove}
             disabled={disabled}
-            className="h-8 w-8 p-0 text-slate-400 hover:text-rose-400 hover:bg-rose-950/20"
+            className="h-8 w-8 p-0 text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20"
             title="Remove selected file"
             aria-label="Remove file"
           >

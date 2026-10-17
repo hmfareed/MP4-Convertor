@@ -159,25 +159,25 @@ export function Dropzone({
           onClick={triggerFileInput}
           onKeyDown={handleKeyDown}
           className={cn(
-            "relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 sm:p-12 text-center transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-purple-500",
+            "relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 sm:p-12 text-center transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
             isDragOver
-              ? "border-purple-500 bg-purple-500/10 shadow-lg shadow-purple-500/10 scale-[1.005]"
-              : "border-neutral-800 hover:border-neutral-700 bg-black hover:bg-[#080808]",
+              ? "border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-500/10 scale-[1.005]"
+              : "border-neutral-300 hover:border-neutral-400 dark:border-neutral-800 dark:hover:border-neutral-700 bg-neutral-50/70 hover:bg-neutral-100/70 dark:bg-black dark:hover:bg-[#080808]",
             errorMessage && "border-rose-500/60 bg-rose-500/5",
             disabled && "cursor-not-allowed opacity-50 pointer-events-none"
           )}
         >
           {/* Cloud Icon with Subtle Neutral Ring */}
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-neutral-900 border border-neutral-800 text-neutral-300 shadow-md group-hover:scale-105 transition-transform">
-            <UploadCloud className="h-8 w-8 text-neutral-300" />
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-300 shadow-md group-hover:scale-105 transition-transform">
+            <UploadCloud className="h-8 w-8 text-neutral-600 dark:text-neutral-300" />
           </div>
 
           {/* Heading */}
-          <h3 className="text-base sm:text-lg font-semibold text-white mb-1.5">
+          <h3 className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-white mb-1.5">
             {isDragOver ? "Drop your MP4 file here" : "Drag & drop your MP4 file here"}
           </h3>
 
-          <p className="text-xs sm:text-sm text-neutral-400 mb-5">
+          <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 mb-5">
             or select a file from your device
           </p>
 

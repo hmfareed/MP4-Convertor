@@ -47,7 +47,7 @@ export function Logo({
       {!iconOnly && (
         <span
           className={cn(
-            "font-extrabold tracking-tight text-white transition-colors group-hover:text-slate-100",
+            "font-extrabold tracking-tight text-neutral-900 dark:text-white transition-colors group-hover:text-neutral-700 dark:group-hover:text-slate-100",
             dim.text
           )}
         >

@@ -17,13 +17,13 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="w-full border-t border-neutral-800/80 bg-black text-neutral-400 py-12">
+    <footer className="w-full border-t border-neutral-200 dark:border-neutral-800/80 bg-neutral-50 dark:bg-black text-neutral-600 dark:text-neutral-400 py-12 transition-colors">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10">
           {/* Logo & Description */}
           <div className="md:col-span-2 space-y-3">
             <Logo size="md" />
-            <p className="text-sm text-slate-400 max-w-sm pt-1">
+            <p className="text-sm text-neutral-600 dark:text-slate-400 max-w-sm pt-1">
               Video to Audio Made Simple. Extract crystal-clear MP3 audio tracks
               from your MP4 videos quickly, privately, and reliably.
             </p>
@@ -31,14 +31,14 @@ export function Footer() {
 
           {/* Quick Links */}
           <div className="space-y-3">
-            <h4 className="text-sm font-semibold text-white tracking-wider uppercase">
+            <h4 className="text-sm font-semibold text-neutral-900 dark:text-white tracking-wider uppercase">
               Quick Links
             </h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   href="/"
-                  className="hover:text-white transition-colors"
+                  className="hover:text-neutral-900 dark:hover:text-white transition-colors"
                 >
                   Home
                 </Link>
@@ -46,7 +46,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/#about"
-                  className="hover:text-white transition-colors"
+                  className="hover:text-neutral-900 dark:hover:text-white transition-colors"
                 >
                   About
                 </Link>
@@ -54,7 +54,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/#features"
-                  className="hover:text-white transition-colors"
+                  className="hover:text-neutral-900 dark:hover:text-white transition-colors"
                 >
                   Features
                 </Link>
@@ -62,7 +62,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/conversions"
-                  className="hover:text-white transition-colors"
+                  className="hover:text-neutral-900 dark:hover:text-white transition-colors"
                 >
                   My Conversions
                 </Link>
@@ -72,14 +72,14 @@ export function Footer() {
 
           {/* Legal */}
           <div className="space-y-3">
-            <h4 className="text-sm font-semibold text-white tracking-wider uppercase">
+            <h4 className="text-sm font-semibold text-neutral-900 dark:text-white tracking-wider uppercase">
               Legal & Privacy
             </h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   href="/privacy"
-                  className="hover:text-white transition-colors"
+                  className="hover:text-neutral-900 dark:hover:text-white transition-colors"
                 >
                   Privacy Policy
                 </Link>
@@ -87,7 +87,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/terms"
-                  className="hover:text-white transition-colors"
+                  className="hover:text-neutral-900 dark:hover:text-white transition-colors"
                 >
                   Terms of Service
                 </Link>
@@ -97,15 +97,15 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar: Copyright and Socials */}
-        <div className="pt-8 border-t border-neutral-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
+        <div className="pt-8 border-t border-neutral-200 dark:border-neutral-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
           <p>© {currentYear} Audiq. All rights reserved.</p>
 
-          <div className="flex items-center space-x-5 text-slate-400">
+          <div className="flex items-center space-x-5 text-neutral-500 dark:text-slate-400">
             <a
               href="https://twitter.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-white transition-colors p-1"
+              className="hover:text-neutral-900 dark:hover:text-white transition-colors p-1"
               aria-label="Twitter / X"
             >
               <Twitter className="h-4 w-4" />
@@ -114,7 +114,7 @@ export function Footer() {
               href="https://github.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-white transition-colors p-1"
+              className="hover:text-neutral-900 dark:hover:text-white transition-colors p-1"
               aria-label="GitHub"
             >
               <Github className="h-4 w-4" />
@@ -123,7 +123,7 @@ export function Footer() {
               href="https://linkedin.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-white transition-colors p-1"
+              className="hover:text-neutral-900 dark:hover:text-white transition-colors p-1"
               aria-label="LinkedIn"
             >
               <Linkedin className="h-4 w-4" />
@@ -132,7 +132,7 @@ export function Footer() {
               href="https://youtube.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-white transition-colors p-1"
+              className="hover:text-neutral-900 dark:hover:text-white transition-colors p-1"
               aria-label="YouTube"
             >
               <Youtube className="h-4 w-4" />

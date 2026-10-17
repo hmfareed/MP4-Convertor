@@ -95,19 +95,19 @@ export function ConversionSettings({
   };
 
   return (
-    <div className="pt-4 border-t border-neutral-800/80 space-y-4">
+    <div className="pt-4 border-t border-neutral-200 dark:border-neutral-800/80 space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-end">
         {/* Output Format */}
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-neutral-300 block">
+          <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 block">
             Output Format
           </label>
-          <div className="flex h-11 w-full items-center justify-between rounded-xl border border-neutral-800 bg-black px-3.5 py-2 text-sm text-white">
+          <div className="flex h-11 w-full items-center justify-between rounded-xl border border-neutral-300 dark:border-neutral-800 bg-neutral-50 dark:bg-black px-3.5 py-2 text-sm text-neutral-900 dark:text-white">
             <span className="flex items-center gap-2">
-              <Music className="h-4 w-4 text-purple-400" />
+              <Music className="h-4 w-4 text-purple-600 dark:text-purple-400" />
               <span className="font-medium">MP3</span>
             </span>
-            <span className="text-[11px] text-neutral-400 font-mono bg-neutral-900 border border-neutral-800 px-2 py-0.5 rounded">
+            <span className="text-[11px] text-neutral-600 dark:text-neutral-400 font-mono bg-neutral-200/70 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 px-2 py-0.5 rounded">
               Fixed
             </span>
           </div>
@@ -118,7 +118,7 @@ export function ConversionSettings({
           <div className="flex items-center justify-between">
             <label
               htmlFor="bitrate-select"
-              className="text-xs font-semibold text-slate-300 block"
+              className="text-xs font-semibold text-neutral-700 dark:text-slate-300 block"
             >
               Quality
             </label>
@@ -128,8 +128,8 @@ export function ConversionSettings({
               disabled={disabled || !hasFile}
               className={`text-xs flex items-center gap-1 transition-colors ${
                 showTrim
-                  ? "text-purple-400 font-semibold"
-                  : "text-slate-400 hover:text-white"
+                  ? "text-purple-600 dark:text-purple-400 font-semibold"
+                  : "text-neutral-500 hover:text-neutral-900 dark:text-slate-400 dark:hover:text-white"
               }`}
             >
               <Scissors className="h-3 w-3" />
@@ -148,8 +148,8 @@ export function ConversionSettings({
               {BITRATE_OPTIONS.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value.toString()}>
                   <div className="flex flex-col text-left py-0.5">
-                    <span className="font-medium text-white">{opt.label}</span>
-                    <span className="text-[11px] text-slate-400">
+                    <span className="font-medium text-neutral-900 dark:text-white">{opt.label}</span>
+                    <span className="text-[11px] text-neutral-500 dark:text-slate-400">
                       {opt.description}
                     </span>
                   </div>
@@ -189,13 +189,13 @@ export function ConversionSettings({
 
       {/* Expandable Audio Trimming Control Card */}
       {showTrim && hasFile && (
-        <div className="rounded-xl border border-neutral-800 bg-[#0a0a0a] p-4 space-y-4 animate-in fade-in slide-in-from-top-2">
+        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/60 dark:bg-[#0a0a0a] p-4 space-y-4 animate-in fade-in slide-in-from-top-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-white flex items-center gap-1.5">
-              <Scissors className="h-3.5 w-3.5 text-purple-400" />
+            <span className="text-xs font-semibold text-neutral-900 dark:text-white flex items-center gap-1.5">
+              <Scissors className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
               <span>Select Audio Trim Window</span>
             </span>
-            <span className="text-[11px] font-mono text-neutral-300 bg-neutral-900 border border-neutral-800 px-2 py-0.5 rounded-full flex items-center gap-1">
+            <span className="text-[11px] font-mono text-neutral-700 dark:text-neutral-300 bg-neutral-200/80 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 px-2 py-0.5 rounded-full flex items-center gap-1">
               <Clock className="h-3 w-3" />
               Segment: {formatDuration(currentStart)} - {formatDuration(currentEnd)} ({formatDuration(currentEnd - currentStart)})
             </span>
@@ -214,25 +214,25 @@ export function ConversionSettings({
 
           <div className="grid grid-cols-2 gap-3 text-xs">
             <div className="space-y-1">
-              <label className="text-neutral-400">Start Time (seconds):</label>
+              <label className="text-neutral-600 dark:text-neutral-400">Start Time (seconds):</label>
               <input
                 type="number"
                 min={0}
                 max={currentEnd - 1}
                 value={currentStart}
                 onChange={handleStartInputChange}
-                className="w-full h-8 px-2.5 rounded-lg border border-neutral-800 bg-neutral-900 text-white font-mono text-xs focus:outline-none focus:ring-1 focus:ring-purple-500"
+                className="w-full h-8 px-2.5 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white font-mono text-xs focus:outline-none focus:ring-1 focus:ring-purple-500"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-neutral-400">End Time (seconds):</label>
+              <label className="text-neutral-600 dark:text-neutral-400">End Time (seconds):</label>
               <input
                 type="number"
                 min={currentStart + 1}
                 max={totalDuration}
                 value={currentEnd}
                 onChange={handleEndInputChange}
-                className="w-full h-8 px-2.5 rounded-lg border border-neutral-800 bg-neutral-900 text-white font-mono text-xs focus:outline-none focus:ring-1 focus:ring-purple-500"
+                className="w-full h-8 px-2.5 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white font-mono text-xs focus:outline-none focus:ring-1 focus:ring-purple-500"
               />
             </div>
           </div>

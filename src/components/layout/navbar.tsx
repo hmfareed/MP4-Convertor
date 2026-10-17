@@ -18,6 +18,7 @@ import {
   WifiOff,
 } from "lucide-react";
 import { Logo } from "@/components/layout/logo";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -126,8 +127,8 @@ export function Navbar() {
         className={cn(
           "sticky top-0 z-40 w-full transition-all duration-200 border-b",
           scrolled
-            ? "bg-black/90 backdrop-blur-md border-neutral-800/80 shadow-lg shadow-black/40"
-            : "bg-black/60 backdrop-blur-sm border-neutral-800/80"
+            ? "bg-white/90 dark:bg-black/90 backdrop-blur-md border-neutral-200 dark:border-neutral-800/80 shadow-sm dark:shadow-lg dark:shadow-black/40"
+            : "bg-white/70 dark:bg-black/60 backdrop-blur-sm border-neutral-200 dark:border-neutral-800/80"
         )}
       >
         <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -142,13 +143,13 @@ export function Navbar() {
               href="/"
               onClick={() => setActiveSection("home")}
               className={cn(
-                "relative py-1 transition-colors hover:text-white",
-                isHomeActive ? "text-white font-semibold" : "text-slate-400"
+                "relative py-1 transition-colors hover:text-neutral-900 dark:hover:text-white",
+                isHomeActive ? "text-neutral-900 dark:text-white font-semibold" : "text-neutral-600 dark:text-slate-400"
               )}
             >
               Home
               {isHomeActive && (
-                <span className="absolute bottom-[-1.25rem] left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full" />
+                <span className="absolute bottom-[-1.25rem] left-0 right-0 h-[2px] bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full" />
               )}
             </Link>
 
@@ -156,13 +157,13 @@ export function Navbar() {
               href="/#about"
               onClick={() => setActiveSection("about")}
               className={cn(
-                "relative py-1 transition-colors hover:text-white",
-                isAboutActive ? "text-white font-semibold" : "text-slate-400"
+                "relative py-1 transition-colors hover:text-neutral-900 dark:hover:text-white",
+                isAboutActive ? "text-neutral-900 dark:text-white font-semibold" : "text-neutral-600 dark:text-slate-400"
               )}
             >
               About
               {isAboutActive && (
-                <span className="absolute bottom-[-1.25rem] left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full" />
+                <span className="absolute bottom-[-1.25rem] left-0 right-0 h-[2px] bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full" />
               )}
             </Link>
 
@@ -170,37 +171,27 @@ export function Navbar() {
               href="/#features"
               onClick={() => setActiveSection("features")}
               className={cn(
-                "relative py-1 transition-colors hover:text-white",
-                isFeaturesActive ? "text-white font-semibold" : "text-slate-400"
+                "relative py-1 transition-colors hover:text-neutral-900 dark:hover:text-white",
+                isFeaturesActive ? "text-neutral-900 dark:text-white font-semibold" : "text-neutral-600 dark:text-slate-400"
               )}
             >
               Features
               {isFeaturesActive && (
-                <span className="absolute bottom-[-1.25rem] left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full" />
+                <span className="absolute bottom-[-1.25rem] left-0 right-0 h-[2px] bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full" />
               )}
             </Link>
           </nav>
 
           {/* Right Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Link
-              href="/conversions"
-              className={cn(
-                "flex items-center gap-2 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors",
-                isConversionsActive
-                  ? "text-white bg-neutral-900 border border-neutral-800"
-                  : "text-neutral-300 hover:text-white hover:bg-neutral-900/60"
-              )}
-            >
-              <History className="h-4 w-4 text-purple-400" />
-              <span>My Conversions</span>
-            </Link>
+          <div className="hidden md:flex items-center space-x-3">
+            {/* Theme Toggle (Light, Dark, Match browser) */}
+            <ThemeToggle />
 
             {/* Profile Dropdown Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-900/90 text-neutral-300 hover:text-white hover:bg-neutral-800 border border-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 transition-all font-semibold text-xs"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-900/90 text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200 dark:hover:bg-neutral-800 border border-neutral-200 dark:border-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 transition-all font-semibold text-xs"
                   aria-label="User account menu"
                 >
                   {user ? user.name.charAt(0).toUpperCase() : <User className="h-4 w-4" />}
@@ -210,26 +201,26 @@ export function Navbar() {
                 {user ? (
                   <>
                     <DropdownMenuLabel className="flex flex-col space-y-0.5">
-                      <span className="text-white font-medium text-xs truncate">{user.name}</span>
-                      <span className="text-[11px] text-slate-400 truncate">{user.email}</span>
+                      <span className="text-neutral-900 dark:text-white font-medium text-xs truncate">{user.name}</span>
+                      <span className="text-[11px] text-neutral-500 dark:text-slate-400 truncate">{user.email}</span>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link href="/conversions" className="flex items-center gap-2">
-                        <History className="h-4 w-4 text-purple-400" />
+                        <History className="h-4 w-4 text-purple-500 dark:text-purple-400" />
                         <span>My Conversions</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/settings" className="flex items-center gap-2">
-                        <Settings className="h-4 w-4 text-slate-400" />
+                        <Settings className="h-4 w-4 text-neutral-500 dark:text-slate-400" />
                         <span>Settings</span>
                       </Link>
                     </DropdownMenuItem>
                     {user.role === "admin" && (
                       <DropdownMenuItem asChild>
-                        <Link href="/admin" className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300">
-                          <ShieldCheck className="h-4 w-4 text-indigo-400" />
+                        <Link href="/admin" className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300">
+                          <ShieldCheck className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                           <span>Admin Dashboard</span>
                         </Link>
                       </DropdownMenuItem>
@@ -237,7 +228,7 @@ export function Navbar() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={handleLogout}
-                      className="flex items-center gap-2 text-rose-400 hover:text-rose-300 cursor-pointer"
+                      className="flex items-center gap-2 text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 cursor-pointer"
                     >
                       <LogOut className="h-4 w-4" />
                       <span>Sign Out</span>
@@ -246,38 +237,38 @@ export function Navbar() {
                 ) : (
                   <>
                     <DropdownMenuLabel className="flex flex-col space-y-0.5">
-                      <span className="text-white font-medium text-xs">Guest Session</span>
-                      <span className="text-[11px] text-slate-400">Non-persistent mode</span>
+                      <span className="text-neutral-900 dark:text-white font-medium text-xs">Guest Session</span>
+                      <span className="text-[11px] text-neutral-500 dark:text-slate-400">Non-persistent mode</span>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link href="/conversions" className="flex items-center gap-2">
-                        <History className="h-4 w-4 text-purple-400" />
+                        <History className="h-4 w-4 text-purple-500 dark:text-purple-400" />
                         <span>Recent Conversions</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link href="/login" className="flex items-center gap-2">
-                        <LogIn className="h-4 w-4 text-blue-400" />
+                        <LogIn className="h-4 w-4 text-blue-500 dark:text-blue-400" />
                         <span>Sign In</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/register" className="flex items-center gap-2">
-                        <UserPlus className="h-4 w-4 text-indigo-400" />
+                        <UserPlus className="h-4 w-4 text-indigo-500 dark:text-indigo-400" />
                         <span>Create Account</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link href="/privacy" className="flex items-center gap-2 text-xs text-slate-400 hover:text-white">
+                      <Link href="/privacy" className="flex items-center gap-2 text-xs text-neutral-600 hover:text-neutral-900 dark:text-slate-400 dark:hover:text-white">
                         <Shield className="h-3.5 w-3.5" />
                         <span>Privacy Policy</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/terms" className="flex items-center gap-2 text-xs text-slate-400 hover:text-white">
+                      <Link href="/terms" className="flex items-center gap-2 text-xs text-neutral-600 hover:text-neutral-900 dark:text-slate-400 dark:hover:text-white">
                         <FileText className="h-3.5 w-3.5" />
                         <span>Terms of Service</span>
                       </Link>
@@ -288,18 +279,12 @@ export function Navbar() {
             </DropdownMenu>
           </div>
 
-          {/* Mobile Menu Toggle */}
+          {/* Mobile Actions: Theme Toggle + Hamburger Menu */}
           <div className="flex md:hidden items-center gap-2">
-            <Link
-              href="/conversions"
-              className="p-2 text-slate-300 hover:text-white rounded-lg focus:outline-none"
-              aria-label="My Conversions"
-            >
-              <History className="h-5 w-5 text-purple-400" />
-            </Link>
+            <ThemeToggle />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-slate-300 hover:text-white rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+              className="p-2 text-neutral-700 dark:text-slate-300 hover:text-neutral-900 dark:hover:text-white rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
             >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -307,18 +292,18 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Dropdown Menu */}
+        {/* Mobile Dropdown Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-b border-neutral-800 bg-black/95 backdrop-blur-lg px-4 pt-3 pb-5 space-y-2 animate-in slide-in-from-top-3">
+          <div className="md:hidden border-b border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-black/95 backdrop-blur-lg px-4 pt-3 pb-5 space-y-2 animate-in slide-in-from-top-3">
             {user && (
-              <div className="px-3 py-2 mb-2 rounded-lg bg-neutral-900/90 border border-neutral-800 flex items-center justify-between">
+              <div className="px-3 py-2 mb-2 rounded-lg bg-neutral-100 dark:bg-neutral-900/90 border border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-semibold text-white">{user.name}</p>
-                  <p className="text-[11px] text-neutral-400">{user.email}</p>
+                  <p className="text-xs font-semibold text-neutral-900 dark:text-white">{user.name}</p>
+                  <p className="text-[11px] text-neutral-500 dark:text-neutral-400">{user.email}</p>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="text-xs text-rose-400 hover:underline flex items-center gap-1"
+                  className="text-xs text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1"
                 >
                   <LogOut className="h-3 w-3" />
                   <span>Logout</span>
@@ -335,8 +320,8 @@ export function Navbar() {
               className={cn(
                 "block px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                 isHomeActive
-                  ? "bg-neutral-900 text-white border border-neutral-800 font-semibold"
-                  : "text-neutral-300 hover:text-white hover:bg-neutral-900/60"
+                  ? "bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-800 font-semibold"
+                  : "text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900/60"
               )}
             >
               Home
@@ -350,8 +335,8 @@ export function Navbar() {
               className={cn(
                 "block px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                 isAboutActive
-                  ? "bg-neutral-900 text-white border border-neutral-800 font-semibold"
-                  : "text-neutral-300 hover:text-white hover:bg-neutral-900/60"
+                  ? "bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-800 font-semibold"
+                  : "text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900/60"
               )}
             >
               About
@@ -365,8 +350,8 @@ export function Navbar() {
               className={cn(
                 "block px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                 isFeaturesActive
-                  ? "bg-neutral-900 text-white border border-neutral-800 font-semibold"
-                  : "text-neutral-300 hover:text-white hover:bg-neutral-900/60"
+                  ? "bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-800 font-semibold"
+                  : "text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900/60"
               )}
             >
               Features
@@ -377,16 +362,16 @@ export function Navbar() {
               className={cn(
                 "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                 isConversionsActive
-                  ? "bg-neutral-900 text-white border border-neutral-800 font-semibold"
-                  : "text-neutral-300 hover:text-white hover:bg-neutral-900/60"
+                  ? "bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-800 font-semibold"
+                  : "text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900/60"
               )}
             >
-              <History className="h-4 w-4 text-purple-400" />
+              <History className="h-4 w-4 text-purple-500 dark:text-purple-400" />
               <span>My Conversions</span>
             </Link>
 
             {!user ? (
-              <div className="pt-2 border-t border-slate-800/80 flex items-center gap-2">
+              <div className="pt-2 border-t border-neutral-200 dark:border-slate-800/80 flex items-center gap-2">
                 <Button asChild variant="outline" size="sm" className="w-1/2 text-xs">
                   <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
                     Sign In
@@ -399,21 +384,21 @@ export function Navbar() {
                 </Button>
               </div>
             ) : (
-              <div className="pt-2 border-t border-slate-800/80 space-y-1">
+              <div className="pt-2 border-t border-neutral-200 dark:border-slate-800/80 space-y-1">
                 {user.role === "admin" && (
                   <Link
                     href="/admin"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block px-3 py-1.5 text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-2"
+                    className="block px-3 py-1.5 text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold flex items-center gap-2"
                   >
-                    <ShieldCheck className="h-3.5 w-3.5 text-indigo-400" />
+                    <ShieldCheck className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
                     <span>Admin Dashboard</span>
                   </Link>
                 )}
                 <Link
                   href="/settings"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-1.5 text-xs text-slate-300 hover:text-white"
+                  className="block px-3 py-1.5 text-xs text-neutral-600 dark:text-slate-300 hover:text-neutral-900 dark:hover:text-white"
                 >
                   Account Settings
                 </Link>

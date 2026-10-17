@@ -328,8 +328,8 @@ export function ConverterPanel() {
 
   return (
     <div id="converter" className="w-full max-w-4xl mx-auto px-4 sm:px-6">
-      {/* Animated Multi-Color Rotating Border Shell with dark neutral base */}
-      <div className="relative rounded-2xl p-[2px] overflow-hidden shadow-2xl bg-neutral-800/80">
+      {/* Animated Multi-Color Rotating Border Shell with adaptive neutral base */}
+      <div className="relative rounded-2xl p-[2px] overflow-hidden shadow-2xl bg-neutral-200 dark:bg-neutral-800/80">
         {/* Soft rotating ambient aura for separated beams */}
         <div
           aria-hidden="true"
@@ -344,8 +344,8 @@ export function ConverterPanel() {
           style={{ background: MOVING_BORDER_BEAMS }}
         />
 
-        {/* Inner Card Container on Pure AMOLED Dark */}
-        <div className="relative rounded-[14px] bg-[#0a0a0a] overflow-hidden">
+        {/* Inner Card Container on Adaptive Background */}
+        <div className="relative rounded-[14px] bg-white dark:bg-[#0a0a0a] overflow-hidden">
           <CardContent className="p-6 sm:p-8 space-y-6">
           {/* Active Job State Render */}
           {activeJob && !previewState ? (
@@ -446,9 +446,9 @@ export function ConverterPanel() {
           )}
 
           {/* Component State Inspector */}
-          <div className="pt-4 border-t border-neutral-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-neutral-400">
-            <span className="flex items-center gap-1.5 font-medium text-neutral-300">
-              <SlidersHorizontal className="h-3.5 w-3.5 text-blue-400" />
+          <div className="pt-4 border-t border-neutral-200 dark:border-neutral-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-neutral-500 dark:text-neutral-400">
+            <span className="flex items-center gap-1.5 font-medium text-neutral-700 dark:text-neutral-300">
+              <SlidersHorizontal className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
               <span>Conversion State Components:</span>
             </span>
 
@@ -470,7 +470,7 @@ export function ConverterPanel() {
                   className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all capitalize ${
                     previewState === st
                       ? "bg-blue-600 text-white shadow-sm shadow-blue-900/40"
-                      : "bg-neutral-900/80 border border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-800"
+                      : "bg-neutral-100 dark:bg-neutral-900/80 border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200 dark:hover:bg-neutral-800"
                   }`}
                   title={`Preview ${st} component`}
                 >
