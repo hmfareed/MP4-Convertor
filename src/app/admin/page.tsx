@@ -29,11 +29,17 @@ import {
   Activity,
   Cpu,
   ChevronRight,
+  UserCheck,
+  UserPlus,
+  FileAudio,
+  TrendingUp,
+  Calendar,
+  ArrowUpRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Logo } from "@/components/layout/logo";
-import { formatBytes, formatDuration } from "@/lib/utils";
+import { formatBytes, formatDuration, formatTimeAgo } from "@/lib/utils";
 import { JobStatus } from "@/types/conversion";
 
 interface MetricsData {
@@ -42,12 +48,28 @@ interface MetricsData {
   failedJobs: number;
   cancelledJobs: number;
   activeJobs: number;
+  recentJobs24h?: number;
   totalUsers: number;
+  activeUsers?: number;
+  newUsersToday?: number;
   queueWaiting: number;
   queueActive: number;
   avgProcessingSec: number;
   totalStorageBytes: number;
   successRate: number;
+  usersPerDay?: Array<{
+    date: string;
+    label: string;
+    count: number;
+  }>;
+  recentJobs?: Array<{
+    id: string;
+    originalFilename: string;
+    status: JobStatus;
+    bitrateKbps: number;
+    durationSec?: number;
+    createdAt: string;
+  }>;
 }
 
 interface AdminJob {
@@ -100,6 +122,8 @@ export default function AdminPage() {
 
   const [jobSearch, setJobSearch] = useState("");
   const [jobStatusFilter, setJobStatusFilter] = useState("all");
+  const [userGraphDays, setUserGraphDays] = useState<7 | 14>(14);
+  const [hoveredDay, setHoveredDay] = useState<{ date: string; label: string; count: number } | null>(null);
 
   const loadData = async (filterOverride?: string, searchOverride?: string) => {
     setIsLoading(true);
@@ -471,94 +495,382 @@ export default function AdminPage() {
         {/* WORKSPACE CONTENT AREA */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-7xl w-full">
           {/* TAB 1: OVERVIEW */}
-          {activeTab === "overview" && (
-            <div className="space-y-6">
-              {/* Key Metric Cards with Distinctive Section Icons */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-                <button
-                  type="button"
-                  onClick={() => navigateToJobsWithFilter("all")}
-                  className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1 text-left hover:border-purple-500/50 hover:bg-[#121212] transition-all cursor-pointer group"
-                  title="View all jobs"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-semibold text-neutral-400 group-hover:text-purple-300 tracking-wider transition-colors">
-                      Total Volume
-                    </span>
-                    <Layers className="h-3.5 w-3.5 text-purple-400 group-hover:scale-110 transition-transform" />
-                  </div>
-                  <div className="flex items-baseline justify-between">
-                    <p className="text-2xl font-bold text-white">{metrics?.totalJobs ?? 0}</p>
-                    <ChevronRight className="h-3.5 w-3.5 text-neutral-600 group-hover:text-purple-400 group-hover:translate-x-0.5 transition-all" />
-                  </div>
-                </button>
+          {activeTab === "overview" && (() => {
+            const dailyUsers = metrics?.usersPerDay?.slice(-userGraphDays) || [];
+            const maxUsersInWindow = Math.max(1, ...dailyUsers.map((d) => d.count));
+            const totalNewInWindow = dailyUsers.reduce((sum, d) => sum + d.count, 0);
+            const peakDay = dailyUsers.reduce(
+              (peak, d) => (d.count > (peak?.count || 0) ? d : peak),
+              dailyUsers[0] || null
+            );
 
-                <div className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-semibold text-emerald-400 tracking-wider">Success Rate</span>
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-                  </div>
-                  <p className="text-2xl font-bold text-emerald-400">{metrics?.successRate ?? 100}%</p>
-                </div>
+            return (
+              <div className="space-y-6">
+                {/* 1. KEY KPI CARDS GRID */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 sm:gap-4">
+                  {/* Total Volume */}
+                  <button
+                    type="button"
+                    onClick={() => navigateToJobsWithFilter("all")}
+                    className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1 text-left hover:border-purple-500/50 hover:bg-[#121212] transition-all cursor-pointer group"
+                    title="View all jobs"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] uppercase font-semibold text-neutral-400 group-hover:text-purple-300 tracking-wider transition-colors">
+                        Total Volume
+                      </span>
+                      <Layers className="h-3.5 w-3.5 text-purple-400 group-hover:scale-110 transition-transform" />
+                    </div>
+                    <div className="flex items-baseline justify-between">
+                      <p className="text-2xl font-bold text-white">{metrics?.totalJobs ?? 0}</p>
+                      <ChevronRight className="h-3.5 w-3.5 text-neutral-600 group-hover:text-purple-400 group-hover:translate-x-0.5 transition-all" />
+                    </div>
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => navigateToJobsWithFilter("queued")}
-                  className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1 text-left hover:border-blue-500/50 hover:bg-[#121212] transition-all cursor-pointer group"
-                  title="View queued & active jobs"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-semibold text-blue-400 group-hover:text-blue-300 tracking-wider transition-colors">
-                      Active Queue
-                    </span>
-                    <Activity className="h-3.5 w-3.5 text-blue-400 group-hover:scale-110 transition-transform" />
+                  {/* Recent Jobs (24h) */}
+                  <button
+                    type="button"
+                    onClick={() => navigateToJobsWithFilter("all")}
+                    className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1 text-left hover:border-blue-500/50 hover:bg-[#121212] transition-all cursor-pointer group"
+                    title="View recent jobs"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] uppercase font-semibold text-blue-400 group-hover:text-blue-300 tracking-wider transition-colors">
+                        Recent Jobs
+                      </span>
+                      <FileAudio className="h-3.5 w-3.5 text-blue-400 group-hover:scale-110 transition-transform" />
+                    </div>
+                    <div className="flex items-baseline justify-between">
+                      <div>
+                        <p className="text-2xl font-bold text-blue-400">{metrics?.recentJobs24h ?? 0}</p>
+                        <span className="text-[10px] text-neutral-500">Last 24 hours</span>
+                      </div>
+                      <ChevronRight className="h-3.5 w-3.5 text-neutral-600 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all" />
+                    </div>
+                  </button>
+
+                  {/* Current Users */}
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("users")}
+                    className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1 text-left hover:border-emerald-500/50 hover:bg-[#121212] transition-all cursor-pointer group"
+                    title="Manage users"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] uppercase font-semibold text-emerald-400 group-hover:text-emerald-300 tracking-wider transition-colors">
+                        Current Users
+                      </span>
+                      <UserCheck className="h-3.5 w-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                    </div>
+                    <div className="flex items-baseline justify-between">
+                      <div>
+                        <p className="text-2xl font-bold text-white">
+                          {metrics?.activeUsers ?? metrics?.totalUsers ?? 0}
+                        </p>
+                        <span className="text-[10px] text-emerald-400/80">
+                          +{metrics?.newUsersToday ?? 0} today
+                        </span>
+                      </div>
+                      <ChevronRight className="h-3.5 w-3.5 text-neutral-600 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all" />
+                    </div>
+                  </button>
+
+                  {/* Active Queue */}
+                  <button
+                    type="button"
+                    onClick={() => navigateToJobsWithFilter("queued")}
+                    className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1 text-left hover:border-blue-500/50 hover:bg-[#121212] transition-all cursor-pointer group"
+                    title="View queued & active jobs"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] uppercase font-semibold text-blue-400 group-hover:text-blue-300 tracking-wider transition-colors">
+                        Active Queue
+                      </span>
+                      <Activity className="h-3.5 w-3.5 text-blue-400 group-hover:scale-110 transition-transform" />
+                    </div>
+                    <div className="flex items-baseline justify-between">
+                      <div>
+                        <p className="text-2xl font-bold text-blue-400">
+                          {(metrics?.queueWaiting ?? 0) + (metrics?.queueActive ?? 0)}
+                        </p>
+                        <span className="text-[10px] text-neutral-500">BullMQ pipeline</span>
+                      </div>
+                      <ChevronRight className="h-3.5 w-3.5 text-neutral-600 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all" />
+                    </div>
+                  </button>
+
+                  {/* Success Rate */}
+                  <div className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] uppercase font-semibold text-emerald-400 tracking-wider">Success Rate</span>
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                    </div>
+                    <p className="text-2xl font-bold text-emerald-400">{metrics?.successRate ?? 100}%</p>
+                    <span className="text-[10px] text-neutral-500">Completed jobs</span>
                   </div>
-                  <div className="flex items-baseline justify-between">
-                    <p className="text-2xl font-bold text-blue-400">
-                      {(metrics?.queueWaiting ?? 0) + (metrics?.queueActive ?? 0)}
+
+                  {/* Avg Latency */}
+                  <div className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] uppercase font-semibold text-amber-400 tracking-wider">Avg Latency</span>
+                      <Clock className="h-3.5 w-3.5 text-amber-400" />
+                    </div>
+                    <p className="text-2xl font-bold text-amber-300">{metrics?.avgProcessingSec ?? 0}s</p>
+                    <span className="text-[10px] text-neutral-500">Encoding speed</span>
+                  </div>
+
+                  {/* Storage */}
+                  <div className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] uppercase font-semibold text-purple-400 tracking-wider">Storage</span>
+                      <HardDrive className="h-3.5 w-3.5 text-purple-400" />
+                    </div>
+                    <p className="text-2xl font-bold text-purple-300 truncate">
+                      {formatBytes(metrics?.totalStorageBytes ?? 0)}
                     </p>
-                    <ChevronRight className="h-3.5 w-3.5 text-neutral-600 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all" />
+                    <span className="text-[10px] text-neutral-500">Total disk volume</span>
                   </div>
-                </button>
-
-                <div className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-semibold text-amber-400 tracking-wider">Avg Latency</span>
-                    <Clock className="h-3.5 w-3.5 text-amber-400" />
-                  </div>
-                  <p className="text-2xl font-bold text-amber-300">{metrics?.avgProcessingSec ?? 0}s</p>
                 </div>
 
-                <div className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-semibold text-purple-400 tracking-wider">Storage</span>
-                    <HardDrive className="h-3.5 w-3.5 text-purple-400" />
+                {/* 2. ANALYTICS ROW: USERS PER DAY GRAPH & RECENT JOBS FEED */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                  {/* USERS PER DAY GRAPH */}
+                  <div className="lg:col-span-7 rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-5 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                          <UserPlus className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-semibold text-white">Users Registered Per Day</h3>
+                          <p className="text-[11px] text-neutral-400">
+                            Account registration velocity • {totalNewInWindow} total in window
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1 bg-black/60 border border-neutral-800 rounded-lg p-0.5 text-xs self-start sm:self-auto">
+                        <button
+                          type="button"
+                          onClick={() => setUserGraphDays(7)}
+                          className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer ${
+                            userGraphDays === 7 ? "bg-emerald-600 text-white shadow-sm" : "text-neutral-400 hover:text-white"
+                          }`}
+                        >
+                          7 Days
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setUserGraphDays(14)}
+                          className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer ${
+                            userGraphDays === 14 ? "bg-emerald-600 text-white shadow-sm" : "text-neutral-400 hover:text-white"
+                          }`}
+                        >
+                          14 Days
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Graph Canvas / Columns */}
+                    <div className="relative pt-2 pb-1">
+                      {/* Hover Status Bar */}
+                      <div className="h-6 flex items-center justify-between text-xs px-1 mb-1">
+                        {hoveredDay ? (
+                          <div className="flex items-center gap-2 text-emerald-300 font-medium">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                            <span>{hoveredDay.label}:</span>
+                            <span className="font-bold text-white font-mono">
+                              {hoveredDay.count} new {hoveredDay.count === 1 ? "user" : "users"}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-neutral-500 text-[11px]">
+                            Hover over any bar to view registration details
+                          </span>
+                        )}
+                        <span className="text-[10px] text-neutral-500 font-mono">
+                          Peak: {maxUsersInWindow} / day
+                        </span>
+                      </div>
+
+                      {/* Chart Container */}
+                      <div className="h-40 flex items-end gap-1.5 sm:gap-2.5 px-3 pt-6 pb-2 border border-neutral-800/80 bg-black/50 rounded-lg relative overflow-hidden">
+                        {/* Subtle Background Guide Lines */}
+                        <div className="absolute inset-0 pointer-events-none flex flex-col justify-between px-3 py-3 opacity-25">
+                          <div className="border-b border-neutral-700/60 w-full" />
+                          <div className="border-b border-neutral-700/60 w-full" />
+                          <div className="border-b border-neutral-700/60 w-full" />
+                        </div>
+
+                        {dailyUsers.map((item, idx) => {
+                          const isHovered = hoveredDay?.date === item.date;
+                          const isToday = idx === dailyUsers.length - 1;
+                          const heightPct = item.count === 0 ? 6 : Math.max(14, Math.round((item.count / maxUsersInWindow) * 100));
+
+                          return (
+                            <div
+                              key={item.date}
+                              onMouseEnter={() => setHoveredDay(item)}
+                              onMouseLeave={() => setHoveredDay(null)}
+                              className="flex-1 h-full flex flex-col items-center justify-end relative group cursor-pointer"
+                            >
+                              {/* Hover / Active Number Indicator */}
+                              {item.count > 0 && (
+                                <span
+                                  className={`text-[10px] font-mono mb-1 transition-opacity ${
+                                    isHovered || isToday
+                                      ? "opacity-100 text-emerald-300 font-bold"
+                                      : "opacity-0 group-hover:opacity-100 text-neutral-400"
+                                  }`}
+                                >
+                                  {item.count}
+                                </span>
+                              )}
+
+                              {/* Bar Graphic */}
+                              <div
+                                style={{ height: `${heightPct}%` }}
+                                className={`w-full max-w-[28px] rounded-t-md transition-all duration-200 ${
+                                  item.count > 0
+                                    ? isHovered
+                                      ? "bg-gradient-to-t from-emerald-600 to-teal-300 shadow-md shadow-emerald-500/30 brightness-110"
+                                      : isToday
+                                      ? "bg-gradient-to-t from-emerald-600/80 to-emerald-400 ring-1 ring-emerald-400/40"
+                                      : "bg-gradient-to-t from-emerald-700/60 to-emerald-500/80 group-hover:from-emerald-600 group-hover:to-teal-300"
+                                    : "bg-neutral-800/40 group-hover:bg-neutral-800/80"
+                                }`}
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Date Labels Axis */}
+                      <div className="flex items-center gap-1.5 sm:gap-2.5 px-3 pt-2 text-[10px] text-neutral-500 font-mono">
+                        {dailyUsers.map((item, idx) => {
+                          const showLabel = userGraphDays === 7 ? true : idx % 2 === 0 || idx === dailyUsers.length - 1;
+                          return (
+                            <div key={item.date} className="flex-1 text-center truncate">
+                              {showLabel ? item.label : ""}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Summary Metric Counters */}
+                    <div className="grid grid-cols-3 gap-3 pt-3 border-t border-neutral-800/60 text-xs">
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] text-neutral-500 uppercase tracking-wider">In Window</span>
+                        <p className="text-sm font-bold text-white font-mono">{totalNewInWindow} users</p>
+                      </div>
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] text-neutral-500 uppercase tracking-wider">Daily Avg</span>
+                        <p className="text-sm font-bold text-emerald-400 font-mono">
+                          {(totalNewInWindow / userGraphDays).toFixed(1)} / day
+                        </p>
+                      </div>
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] text-neutral-500 uppercase tracking-wider">Peak Day</span>
+                        <p className="text-sm font-bold text-teal-300 font-mono truncate">
+                          {peakDay && peakDay.count > 0 ? `${peakDay.label} (${peakDay.count})` : "—"}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-2xl font-bold text-purple-300">
-                    {formatBytes(metrics?.totalStorageBytes ?? 0)}
-                  </p>
+
+                  {/* RECENT JOBS LIVE FEED */}
+                  <div className="lg:col-span-5 rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-5 space-y-3 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between pb-2 border-b border-neutral-800/60">
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400">
+                            <FileAudio className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-semibold text-white">Recent Conversions</h3>
+                            <p className="text-[11px] text-neutral-400">Latest jobs processed</p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => navigateToJobsWithFilter("all")}
+                          className="text-xs text-purple-400 hover:text-purple-300 transition-colors font-medium flex items-center gap-1 cursor-pointer"
+                        >
+                          <span>View All ({metrics?.totalJobs ?? 0})</span>
+                          <ChevronRight className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Job Items */}
+                      <div className="space-y-1 pt-2">
+                        {!metrics?.recentJobs || metrics.recentJobs.length === 0 ? (
+                          <div className="py-8 text-center text-xs text-neutral-500">
+                            No conversion jobs recorded yet.
+                          </div>
+                        ) : (
+                          metrics.recentJobs.map((job) => (
+                            <button
+                              key={job.id}
+                              type="button"
+                              onClick={() => {
+                                setJobSearch(job.originalFilename);
+                                setActiveTab("jobs");
+                              }}
+                              className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-neutral-900 transition-colors group cursor-pointer text-left"
+                              title={`Inspect job ${job.id}`}
+                            >
+                              <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                                <FileAudio className="h-3.5 w-3.5 text-neutral-500 group-hover:text-blue-400 flex-shrink-0 transition-colors" />
+                                <div className="min-w-0">
+                                  <p className="text-xs font-medium text-white truncate max-w-[170px] sm:max-w-xs">
+                                    {job.originalFilename}
+                                  </p>
+                                  <div className="flex items-center gap-2 text-[10px] text-neutral-500 font-mono">
+                                    <span>{job.bitrateKbps}k</span>
+                                    {job.durationSec ? <span>• {formatDuration(job.durationSec)}</span> : null}
+                                    <span>• {formatTimeAgo(job.createdAt)}</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-1.5 flex-shrink-0">
+                                <Badge
+                                  variant={
+                                    job.status === "completed"
+                                      ? "success"
+                                      : job.status === "failed"
+                                      ? "destructive"
+                                      : job.status === "processing"
+                                      ? "info"
+                                      : "outline"
+                                  }
+                                  className="text-[9px] px-1.5 py-0 capitalize font-mono"
+                                >
+                                  {job.status}
+                                </Badge>
+                                <ChevronRight className="h-3 w-3 text-neutral-600 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                              </div>
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-neutral-800/60 flex items-center justify-between text-[11px] text-neutral-500">
+                      <span>Queue status: {metrics?.activeJobs ?? 0} active</span>
+                      <button
+                        type="button"
+                        onClick={() => navigateToJobsWithFilter("completed")}
+                        className="text-emerald-400 hover:text-emerald-300 transition-colors font-medium cursor-pointer"
+                      >
+                        {metrics?.completedJobs ?? 0} completed &rarr;
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("users")}
-                  className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1 text-left hover:border-emerald-500/50 hover:bg-[#121212] transition-all cursor-pointer group"
-                  title="Manage users"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-semibold text-emerald-400 group-hover:text-emerald-300 tracking-wider transition-colors">
-                      Users
-                    </span>
-                    <Users className="h-3.5 w-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
-                  </div>
-                  <div className="flex items-baseline justify-between">
-                    <p className="text-2xl font-bold text-white">{metrics?.totalUsers ?? 0}</p>
-                    <ChevronRight className="h-3.5 w-3.5 text-neutral-600 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all" />
-                  </div>
-                </button>
-              </div>
-
-              {/* Infrastructure Breakdown Cards */}
+                {/* 3. INFRASTRUCTURE BREAKDOWN CARDS */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-5 space-y-3">
                   <div className="flex items-center justify-between">
@@ -687,7 +999,8 @@ export default function AdminPage() {
                 </div>
               </div>
             </div>
-          )}
+          );
+        })()}
 
           {/* TAB 2: JOBS */}
           {activeTab === "jobs" && (

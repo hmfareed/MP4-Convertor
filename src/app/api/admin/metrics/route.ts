@@ -13,21 +13,82 @@ export async function GET() {
     await connectDB();
     await requireAdmin();
 
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const todayStart = new Date();
+    todayStart.setUTCHours(0, 0, 0, 0);
+
+    const fourteenDaysAgo = new Date();
+    fourteenDaysAgo.setUTCDate(fourteenDaysAgo.getUTCDate() - 13);
+    fourteenDaysAgo.setUTCHours(0, 0, 0, 0);
+
     const [
       totalJobs,
       completedJobs,
       failedJobs,
       cancelledJobs,
       activeJobs,
+      recentJobs24h,
       totalUsers,
+      activeUsers,
+      newUsersToday,
+      rawDailyUsers,
+      recentJobsDocs,
     ] = await Promise.all([
       ConversionJob.countDocuments(),
       ConversionJob.countDocuments({ status: "completed" }),
       ConversionJob.countDocuments({ status: "failed" }),
       ConversionJob.countDocuments({ status: "cancelled" }),
       ConversionJob.countDocuments({ status: { $in: ["queued", "processing"] } }),
+      ConversionJob.countDocuments({ createdAt: { $gte: oneDayAgo } }),
       User.countDocuments(),
+      User.countDocuments({ status: "active" }),
+      User.countDocuments({ createdAt: { $gte: todayStart } }),
+      User.aggregate([
+        {
+          $match: {
+            createdAt: { $gte: fourteenDaysAgo },
+          },
+        },
+        {
+          $group: {
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt", timezone: "UTC" } },
+            count: { $sum: 1 },
+          },
+        },
+      ]),
+      ConversionJob.find()
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .select("_id originalFilename status settings output createdAt"),
     ]);
+
+    // Build complete continuous daily series for the last 14 days
+    const dailyMap = new Map<string, number>();
+    rawDailyUsers.forEach((item: { _id: string; count: number }) => {
+      if (item._id) dailyMap.set(item._id, item.count);
+    });
+
+    const usersPerDay: Array<{ date: string; label: string; count: number }> = [];
+    const now = new Date();
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - i));
+      const dateStr = d.toISOString().split("T")[0];
+      const label = d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+      usersPerDay.push({
+        date: dateStr,
+        label,
+        count: dailyMap.get(dateStr) || 0,
+      });
+    }
+
+    const recentJobs = recentJobsDocs.map((j) => ({
+      id: j._id.toString(),
+      originalFilename: j.originalFilename,
+      status: j.status,
+      bitrateKbps: j.settings?.bitrateKbps ?? 192,
+      durationSec: j.output?.durationSec,
+      createdAt: j.createdAt.toISOString(),
+    }));
 
     // BullMQ live queue counts
     let queueWaiting = 0;
@@ -69,7 +130,10 @@ export async function GET() {
         failedJobs,
         cancelledJobs,
         activeJobs,
+        recentJobs24h,
         totalUsers,
+        activeUsers,
+        newUsersToday,
         queueWaiting,
         queueActive,
         avgProcessingSec: Math.round(avgProcessingMs / 100) / 10,
@@ -78,6 +142,8 @@ export async function GET() {
           totalJobs > 0
             ? Math.round((completedJobs / totalJobs) * 100)
             : 100,
+        usersPerDay,
+        recentJobs,
       },
     });
   } catch (err: unknown) {
