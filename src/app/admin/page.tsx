@@ -235,20 +235,20 @@ export default function AdminPage() {
   // ACCESS DENIED VIEW
   if (isAuthorized === false) {
     return (
-      <div className="min-h-screen bg-[#070b14] flex flex-col items-center justify-center px-4">
-        <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-[#0d1424] p-8 text-center shadow-2xl">
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-2xl border border-neutral-800 bg-[#0a0a0a] p-8 text-center shadow-2xl">
           <div className="h-14 w-14 rounded-2xl bg-rose-500/10 text-rose-400 border border-rose-500/30 flex items-center justify-center mx-auto mb-4">
             <ShieldAlert className="h-7 w-7" />
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>
-          <p className="text-xs text-slate-400 mb-6 leading-relaxed">
+          <p className="text-xs text-neutral-400 mb-6 leading-relaxed">
             This area requires administrator privileges. Please sign in with your administrator account to access the control panel.
           </p>
           <div className="flex flex-col gap-2.5 w-full">
             <Button asChild variant="gradient" size="sm" className="w-full">
               <Link href="/login?redirect=/admin">Sign In to Admin Account</Link>
             </Button>
-            <Button asChild variant="outline" size="sm" className="w-full text-slate-400">
+            <Button asChild variant="outline" size="sm" className="w-full text-neutral-400 border-neutral-800 hover:bg-neutral-900">
               <Link href="/">Return to Homepage</Link>
             </Button>
           </div>
@@ -310,9 +310,9 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-black text-neutral-100 flex flex-col md:flex-row selection:bg-purple-600/30">
       {/* MOBILE HEADER BAR */}
-      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-[#0a0f1e] border-b border-slate-800">
+      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-black border-b border-neutral-800">
         <div className="flex items-center gap-2">
           <Logo size="sm" />
           <Badge variant="gradient" className="text-[10px] uppercase font-bold py-0.5">
@@ -321,7 +321,7 @@ export default function AdminPage() {
         </div>
         <button
           onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-          className="p-1.5 rounded-lg border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white"
+          className="p-1.5 rounded-lg border border-neutral-800 bg-neutral-900 text-neutral-300 hover:text-white"
           aria-label="Toggle Navigation"
         >
           {mobileSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -330,13 +330,13 @@ export default function AdminPage() {
 
       {/* SLIM LEFT SIDEBAR (w-52 = 208px) */}
       <aside
-        className={`fixed md:sticky top-0 left-0 z-40 h-screen w-52 bg-[#090e1c] border-r border-slate-800/80 flex flex-col justify-between transition-transform duration-200 ease-in-out md:translate-x-0 ${
+        className={`fixed md:sticky top-0 left-0 z-40 h-screen w-52 bg-black border-r border-neutral-800/80 flex flex-col justify-between transition-transform duration-200 ease-in-out md:translate-x-0 ${
           mobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
         {/* Top: Logo & Branding */}
         <div>
-          <div className="px-4 py-4 border-b border-slate-800/80 flex items-center justify-between">
+          <div className="px-4 py-4 border-b border-neutral-800/80 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Logo size="sm" />
               <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-purple-300 bg-purple-500/20 border border-purple-500/30 rounded-md">
@@ -353,7 +353,7 @@ export default function AdminPage() {
 
           {/* Nav List with Colorful Section Icons */}
           <div className="px-2.5 py-4 space-y-1">
-            <div className="px-2.5 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+            <div className="px-2.5 pb-2 text-[10px] font-bold uppercase tracking-wider text-neutral-500">
               Sections
             </div>
             {navItems.map((item) => {
@@ -369,7 +369,7 @@ export default function AdminPage() {
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                     isActive
                       ? `${item.activeBg} border font-semibold shadow-sm`
-                      : "text-slate-300 hover:text-white hover:bg-slate-800/50 border border-transparent"
+                      : "text-neutral-400 hover:text-white hover:bg-neutral-900 border border-transparent"
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
@@ -381,7 +381,7 @@ export default function AdminPage() {
                       className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full flex-shrink-0 ${
                         isActive
                           ? "bg-purple-500/30 text-purple-200"
-                          : "bg-slate-800 text-slate-400"
+                          : "bg-neutral-900 text-neutral-400 border border-neutral-800"
                       }`}
                     >
                       {item.badge}
@@ -394,29 +394,29 @@ export default function AdminPage() {
         </div>
 
         {/* Bottom Sidebar: Return to App & Compact Admin Profile Card */}
-        <div className="p-3 border-t border-slate-800/80 space-y-2.5">
+        <div className="p-3 border-t border-neutral-800/80 space-y-2.5">
           <Link
             href="/"
-            className="flex items-center gap-2 px-2.5 py-1.5 text-xs text-slate-400 hover:text-white rounded-lg hover:bg-slate-800/40 transition-colors"
+            className="flex items-center gap-2 px-2.5 py-1.5 text-xs text-neutral-400 hover:text-white rounded-lg hover:bg-neutral-900 transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             <span className="truncate">Exit to App</span>
           </Link>
 
           {currentAdmin && (
-            <div className="rounded-xl border border-slate-800/80 bg-[#0d1424] p-2.5 flex items-center justify-between">
+            <div className="rounded-xl border border-neutral-800 bg-[#0a0a0a] p-2.5 flex items-center justify-between">
               <div className="flex items-center gap-2 min-w-0">
                 <div className="h-7 w-7 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center font-bold text-xs text-white flex-shrink-0">
                   {currentAdmin.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs font-semibold text-white truncate">{currentAdmin.name}</p>
-                  <p className="text-[10px] text-slate-400 truncate">{currentAdmin.email}</p>
+                  <p className="text-[10px] text-neutral-400 truncate">{currentAdmin.email}</p>
                 </div>
               </div>
               <button
                 onClick={handleLogout}
-                className="p-1 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors flex-shrink-0"
+                className="p-1 text-neutral-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors flex-shrink-0"
                 title="Sign Out"
               >
                 <LogOut className="h-3.5 w-3.5" />
@@ -430,16 +430,16 @@ export default function AdminPage() {
       {mobileSidebarOpen && (
         <div
           onClick={() => setMobileSidebarOpen(false)}
-          className="md:hidden fixed inset-0 z-30 bg-black/60 backdrop-blur-sm"
+          className="md:hidden fixed inset-0 z-30 bg-black/70 backdrop-blur-sm"
         />
       )}
 
       {/* MAIN RIGHT COLUMN */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 bg-black">
         {/* DEDICATED ADMIN HEADER */}
-        <header className="sticky top-0 z-20 h-16 border-b border-slate-800/80 bg-[#080c14]/90 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between">
+        <header className="sticky top-0 z-20 h-16 border-b border-neutral-800/80 bg-black/90 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className={`p-1.5 rounded-lg bg-slate-850/80 border border-slate-800 ${activeNav.iconColor}`}>
+            <div className={`p-1.5 rounded-lg bg-neutral-900 border border-neutral-800 ${activeNav.iconColor}`}>
               <ActiveIcon className="h-4 w-4" />
             </div>
             <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
@@ -460,7 +460,7 @@ export default function AdminPage() {
               size="sm"
               onClick={() => loadData()}
               disabled={isLoading}
-              className="h-9 gap-1.5 text-xs text-slate-300 hover:text-white border-slate-700 bg-[#0d1424]"
+              className="h-9 gap-1.5 text-xs text-neutral-300 hover:text-white border-neutral-800 bg-[#0a0a0a] hover:bg-neutral-900"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? "animate-spin text-purple-400" : ""}`} />
               <span className="hidden sm:inline">Refresh Data</span>
@@ -478,22 +478,22 @@ export default function AdminPage() {
                 <button
                   type="button"
                   onClick={() => navigateToJobsWithFilter("all")}
-                  className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1 text-left hover:border-purple-500/50 hover:bg-[#11192e] transition-all cursor-pointer group"
+                  className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1 text-left hover:border-purple-500/50 hover:bg-[#121212] transition-all cursor-pointer group"
                   title="View all jobs"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-semibold text-slate-400 group-hover:text-purple-300 tracking-wider transition-colors">
+                    <span className="text-[10px] uppercase font-semibold text-neutral-400 group-hover:text-purple-300 tracking-wider transition-colors">
                       Total Volume
                     </span>
                     <Layers className="h-3.5 w-3.5 text-purple-400 group-hover:scale-110 transition-transform" />
                   </div>
                   <div className="flex items-baseline justify-between">
                     <p className="text-2xl font-bold text-white">{metrics?.totalJobs ?? 0}</p>
-                    <ChevronRight className="h-3.5 w-3.5 text-slate-600 group-hover:text-purple-400 group-hover:translate-x-0.5 transition-all" />
+                    <ChevronRight className="h-3.5 w-3.5 text-neutral-600 group-hover:text-purple-400 group-hover:translate-x-0.5 transition-all" />
                   </div>
                 </button>
 
-                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1">
+                <div className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] uppercase font-semibold text-emerald-400 tracking-wider">Success Rate</span>
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
@@ -504,7 +504,7 @@ export default function AdminPage() {
                 <button
                   type="button"
                   onClick={() => navigateToJobsWithFilter("queued")}
-                  className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1 text-left hover:border-blue-500/50 hover:bg-[#11192e] transition-all cursor-pointer group"
+                  className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1 text-left hover:border-blue-500/50 hover:bg-[#121212] transition-all cursor-pointer group"
                   title="View queued & active jobs"
                 >
                   <div className="flex items-center justify-between">
@@ -517,11 +517,11 @@ export default function AdminPage() {
                     <p className="text-2xl font-bold text-blue-400">
                       {(metrics?.queueWaiting ?? 0) + (metrics?.queueActive ?? 0)}
                     </p>
-                    <ChevronRight className="h-3.5 w-3.5 text-slate-600 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all" />
+                    <ChevronRight className="h-3.5 w-3.5 text-neutral-600 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all" />
                   </div>
                 </button>
 
-                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1">
+                <div className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] uppercase font-semibold text-amber-400 tracking-wider">Avg Latency</span>
                     <Clock className="h-3.5 w-3.5 text-amber-400" />
@@ -529,7 +529,7 @@ export default function AdminPage() {
                   <p className="text-2xl font-bold text-amber-300">{metrics?.avgProcessingSec ?? 0}s</p>
                 </div>
 
-                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1">
+                <div className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] uppercase font-semibold text-purple-400 tracking-wider">Storage</span>
                     <HardDrive className="h-3.5 w-3.5 text-purple-400" />
@@ -542,7 +542,7 @@ export default function AdminPage() {
                 <button
                   type="button"
                   onClick={() => setActiveTab("users")}
-                  className="rounded-xl border border-slate-800 bg-[#0d1322] p-3.5 space-y-1 text-left hover:border-emerald-500/50 hover:bg-[#11192e] transition-all cursor-pointer group"
+                  className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1 text-left hover:border-emerald-500/50 hover:bg-[#121212] transition-all cursor-pointer group"
                   title="Manage users"
                 >
                   <div className="flex items-center justify-between">
@@ -553,130 +553,130 @@ export default function AdminPage() {
                   </div>
                   <div className="flex items-baseline justify-between">
                     <p className="text-2xl font-bold text-white">{metrics?.totalUsers ?? 0}</p>
-                    <ChevronRight className="h-3.5 w-3.5 text-slate-600 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all" />
+                    <ChevronRight className="h-3.5 w-3.5 text-neutral-600 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all" />
                   </div>
                 </button>
               </div>
 
               {/* Infrastructure Breakdown Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-5 space-y-3">
+                <div className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-5 space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-white flex items-center gap-2">
                       <Server className="h-4 w-4 text-purple-400" />
                       <span>Job Status Breakdown</span>
                     </h3>
-                    <span className="text-[10px] text-slate-500">Click to filter</span>
+                    <span className="text-[10px] text-neutral-500">Click to filter</span>
                   </div>
                   <div className="space-y-1 text-xs">
                     <button
                       type="button"
                       onClick={() => navigateToJobsWithFilter("completed")}
-                      className="w-full flex justify-between items-center py-2 px-2.5 -mx-2.5 rounded-lg hover:bg-slate-800/60 border-b border-slate-800/60 text-left transition-all group cursor-pointer"
+                      className="w-full flex justify-between items-center py-2 px-2.5 -mx-2.5 rounded-lg hover:bg-neutral-900 border-b border-neutral-800/70 text-left transition-all group cursor-pointer"
                       title="View completed conversions"
                     >
                       <div className="flex items-center gap-2">
                         <span className="h-2 w-2 rounded-full bg-emerald-400 ring-2 ring-emerald-400/20" />
-                        <span className="text-slate-300 group-hover:text-white transition-colors">Completed conversions</span>
+                        <span className="text-neutral-300 group-hover:text-white transition-colors">Completed conversions</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <span className="font-semibold text-emerald-400">{metrics?.completedJobs ?? 0}</span>
-                        <ChevronRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                        <ChevronRight className="h-3.5 w-3.5 text-neutral-600 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
                       </div>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => navigateToJobsWithFilter("failed")}
-                      className="w-full flex justify-between items-center py-2 px-2.5 -mx-2.5 rounded-lg hover:bg-slate-800/60 border-b border-slate-800/60 text-left transition-all group cursor-pointer"
+                      className="w-full flex justify-between items-center py-2 px-2.5 -mx-2.5 rounded-lg hover:bg-neutral-900 border-b border-neutral-800/70 text-left transition-all group cursor-pointer"
                       title="View failed conversions"
                     >
                       <div className="flex items-center gap-2">
                         <span className="h-2 w-2 rounded-full bg-rose-400 ring-2 ring-rose-400/20" />
-                        <span className="text-slate-300 group-hover:text-white transition-colors">Failed conversions</span>
+                        <span className="text-neutral-300 group-hover:text-white transition-colors">Failed conversions</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <span className="font-semibold text-rose-400">{metrics?.failedJobs ?? 0}</span>
-                        <ChevronRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                        <ChevronRight className="h-3.5 w-3.5 text-neutral-600 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
                       </div>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => navigateToJobsWithFilter("cancelled")}
-                      className="w-full flex justify-between items-center py-2 px-2.5 -mx-2.5 rounded-lg hover:bg-slate-800/60 border-b border-slate-800/60 text-left transition-all group cursor-pointer"
+                      className="w-full flex justify-between items-center py-2 px-2.5 -mx-2.5 rounded-lg hover:bg-neutral-900 border-b border-neutral-800/70 text-left transition-all group cursor-pointer"
                       title="View cancelled conversions"
                     >
                       <div className="flex items-center gap-2">
-                        <span className="h-2 w-2 rounded-full bg-slate-400 ring-2 ring-slate-400/20" />
-                        <span className="text-slate-300 group-hover:text-white transition-colors">Cancelled conversions</span>
+                        <span className="h-2 w-2 rounded-full bg-neutral-400 ring-2 ring-neutral-400/20" />
+                        <span className="text-neutral-300 group-hover:text-white transition-colors">Cancelled conversions</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="font-semibold text-slate-300">{metrics?.cancelledJobs ?? 0}</span>
-                        <ChevronRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                        <span className="font-semibold text-neutral-300">{metrics?.cancelledJobs ?? 0}</span>
+                        <ChevronRight className="h-3.5 w-3.5 text-neutral-600 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
                       </div>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => navigateToJobsWithFilter("processing")}
-                      className="w-full flex justify-between items-center py-2 px-2.5 -mx-2.5 rounded-lg hover:bg-slate-800/60 text-left transition-all group cursor-pointer"
+                      className="w-full flex justify-between items-center py-2 px-2.5 -mx-2.5 rounded-lg hover:bg-neutral-900 text-left transition-all group cursor-pointer"
                       title="View currently processing jobs"
                     >
                       <div className="flex items-center gap-2">
                         <span className="h-2 w-2 rounded-full bg-blue-400 ring-2 ring-blue-400/20 animate-pulse" />
-                        <span className="text-slate-300 group-hover:text-white transition-colors">Currently processing</span>
+                        <span className="text-neutral-300 group-hover:text-white transition-colors">Currently processing</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <span className="font-semibold text-blue-400">{metrics?.activeJobs ?? 0}</span>
-                        <ChevronRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                        <ChevronRight className="h-3.5 w-3.5 text-neutral-600 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
                       </div>
                     </button>
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-5 space-y-3">
+                <div className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-5 space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-white flex items-center gap-2">
                       <Activity className="h-4 w-4 text-blue-400" />
                       <span>BullMQ & Worker Engine</span>
                     </h3>
-                    <span className="text-[10px] text-slate-500">Queue engine</span>
+                    <span className="text-[10px] text-neutral-500">Queue engine</span>
                   </div>
                   <div className="space-y-1 text-xs">
                     <button
                       type="button"
                       onClick={() => navigateToJobsWithFilter("queued")}
-                      className="w-full flex justify-between items-center py-2 px-2.5 -mx-2.5 rounded-lg hover:bg-slate-800/60 border-b border-slate-800/60 text-left transition-all group cursor-pointer"
+                      className="w-full flex justify-between items-center py-2 px-2.5 -mx-2.5 rounded-lg hover:bg-neutral-900 border-b border-neutral-800/70 text-left transition-all group cursor-pointer"
                       title="View jobs waiting in queue"
                     >
                       <div className="flex items-center gap-2">
                         <span className="h-2 w-2 rounded-full bg-amber-400 ring-2 ring-amber-400/20" />
-                        <span className="text-slate-300 group-hover:text-white transition-colors">Waiting in BullMQ queue</span>
+                        <span className="text-neutral-300 group-hover:text-white transition-colors">Waiting in BullMQ queue</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <span className="font-semibold text-white">{metrics?.queueWaiting ?? 0}</span>
-                        <ChevronRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                        <ChevronRight className="h-3.5 w-3.5 text-neutral-600 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
                       </div>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => navigateToJobsWithFilter("processing")}
-                      className="w-full flex justify-between items-center py-2 px-2.5 -mx-2.5 rounded-lg hover:bg-slate-800/60 border-b border-slate-800/60 text-left transition-all group cursor-pointer"
+                      className="w-full flex justify-between items-center py-2 px-2.5 -mx-2.5 rounded-lg hover:bg-neutral-900 border-b border-neutral-800/70 text-left transition-all group cursor-pointer"
                       title="View active worker tasks"
                     >
                       <div className="flex items-center gap-2">
                         <span className="h-2 w-2 rounded-full bg-indigo-400 ring-2 ring-indigo-400/20 animate-pulse" />
-                        <span className="text-slate-300 group-hover:text-white transition-colors">Active worker tasks</span>
+                        <span className="text-neutral-300 group-hover:text-white transition-colors">Active worker tasks</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <span className="font-semibold text-indigo-400">{metrics?.queueActive ?? 0}</span>
-                        <ChevronRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                        <ChevronRight className="h-3.5 w-3.5 text-neutral-600 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
                       </div>
                     </button>
 
-                    <div className="flex justify-between items-center py-2 px-2.5 -mx-2.5 text-slate-400">
+                    <div className="flex justify-between items-center py-2 px-2.5 -mx-2.5 text-neutral-400">
                       <div className="flex items-center gap-2">
                         <span className="h-2 w-2 rounded-full bg-emerald-400 ring-2 ring-emerald-400/20" />
                         <span>Watchdog scanner & retention</span>
@@ -716,14 +716,14 @@ export default function AdminPage() {
               {/* Search & Filter Bar */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="relative flex-1 max-w-sm w-full">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-neutral-500" />
                   <input
                     type="text"
                     value={jobSearch}
                     onChange={(e) => setJobSearch(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && loadData()}
                     placeholder="Search by filename or ID..."
-                    className="w-full h-9 pl-9 pr-3 rounded-lg border border-slate-800 bg-[#0d1424] text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full h-9 pl-9 pr-3 rounded-lg border border-neutral-800 bg-[#0a0a0a] text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
                   />
                 </div>
 
@@ -735,7 +735,7 @@ export default function AdminPage() {
                       className={`px-2.5 py-1 rounded-md capitalize font-medium transition-colors ${
                         jobStatusFilter === st
                           ? "bg-purple-600 text-white"
-                          : "bg-slate-900 text-slate-400 hover:text-white"
+                          : "bg-[#0a0a0a] border border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-900"
                       }`}
                     >
                       {st}
@@ -745,9 +745,9 @@ export default function AdminPage() {
               </div>
 
               {/* Jobs Table */}
-              <div className="rounded-xl border border-slate-800 bg-[#0d1322] overflow-x-auto">
-                <table className="w-full text-left text-xs text-slate-300">
-                  <thead className="bg-[#0b101c] text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+              <div className="rounded-xl border border-neutral-800 bg-[#0a0a0a] overflow-x-auto">
+                <table className="w-full text-left text-xs text-neutral-300">
+                  <thead className="bg-black text-neutral-400 uppercase text-[10px] tracking-wider border-b border-neutral-800">
                     <tr>
                       <th className="p-3">File / Job ID</th>
                       <th className="p-3">Owner</th>
@@ -758,19 +758,19 @@ export default function AdminPage() {
                       <th className="p-3 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60">
+                  <tbody className="divide-y divide-neutral-800/70">
                     {jobs.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="p-8 text-center text-slate-500">
+                        <td colSpan={7} className="p-8 text-center text-neutral-500">
                           No conversion jobs found matching the current criteria.
                         </td>
                       </tr>
                     ) : (
                       jobs.map((job) => (
-                        <tr key={job.id} className="hover:bg-slate-800/30">
+                        <tr key={job.id} className="hover:bg-neutral-900/40">
                           <td className="p-3">
                             <div className="font-medium text-white truncate max-w-xs">{job.originalFilename}</div>
-                            <span className="font-mono text-[10px] text-slate-500">{job.id.slice(0, 10)}...</span>
+                            <span className="font-mono text-[10px] text-neutral-500">{job.id.slice(0, 10)}...</span>
                           </td>
                           <td className="p-3 capitalize">{job.ownerType}</td>
                           <td className="p-3 font-mono">{job.bitrateKbps}k</td>
@@ -802,7 +802,7 @@ export default function AdminPage() {
                               {(job.status === "failed" || job.status === "cancelled") && (
                                 <button
                                   onClick={() => handleJobRetry(job.id)}
-                                  className="p-1 text-slate-400 hover:text-purple-400"
+                                  className="p-1 text-neutral-400 hover:text-purple-400"
                                   title="Retry conversion"
                                 >
                                   <RotateCcw className="h-3.5 w-3.5" />
@@ -811,7 +811,7 @@ export default function AdminPage() {
                               {(job.status === "queued" || job.status === "processing") && (
                                 <button
                                   onClick={() => handleJobCancel(job.id)}
-                                  className="p-1 text-slate-400 hover:text-amber-400"
+                                  className="p-1 text-neutral-400 hover:text-amber-400"
                                   title="Cancel job"
                                 >
                                   <XCircle className="h-3.5 w-3.5" />
@@ -819,7 +819,7 @@ export default function AdminPage() {
                               )}
                               <button
                                 onClick={() => handleJobDelete(job.id)}
-                                className="p-1 text-slate-400 hover:text-rose-400"
+                                className="p-1 text-neutral-400 hover:text-rose-400"
                                 title="Delete job"
                               >
                                 <Trash2 className="h-3.5 w-3.5" />
@@ -843,9 +843,9 @@ export default function AdminPage() {
                 <h3 className="text-sm font-semibold text-white">Registered Users & Account Controls</h3>
               </div>
 
-              <div className="rounded-xl border border-slate-800 bg-[#0d1322] overflow-x-auto">
-                <table className="w-full text-left text-xs text-slate-300">
-                  <thead className="bg-[#0b101c] text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+              <div className="rounded-xl border border-neutral-800 bg-[#0a0a0a] overflow-x-auto">
+                <table className="w-full text-left text-xs text-neutral-300">
+                  <thead className="bg-black text-neutral-400 uppercase text-[10px] tracking-wider border-b border-neutral-800">
                     <tr>
                       <th className="p-3">User</th>
                       <th className="p-3">Email</th>
@@ -855,18 +855,18 @@ export default function AdminPage() {
                       <th className="p-3 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60">
+                  <tbody className="divide-y divide-neutral-800/70">
                     {users.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="p-8 text-center text-slate-500">
+                        <td colSpan={6} className="p-8 text-center text-neutral-500">
                           No user accounts found.
                         </td>
                       </tr>
                     ) : (
                       users.map((u) => (
-                        <tr key={u._id} className="hover:bg-slate-800/30">
+                        <tr key={u._id} className="hover:bg-neutral-900/40">
                           <td className="p-3 font-semibold text-white">{u.name}</td>
-                          <td className="p-3 text-slate-400">{u.email}</td>
+                          <td className="p-3 text-neutral-400">{u.email}</td>
                           <td className="p-3">
                             <Badge variant={u.role === "admin" ? "gradient" : "outline"} className="text-[10px]">
                               {u.role}
@@ -877,7 +877,7 @@ export default function AdminPage() {
                               {u.status}
                             </Badge>
                           </td>
-                          <td className="p-3 text-slate-500">
+                          <td className="p-3 text-neutral-500">
                             {new Date(u.createdAt).toLocaleDateString()}
                           </td>
                           <td className="p-3 text-right space-x-2">
@@ -913,30 +913,30 @@ export default function AdminPage() {
                 <h3 className="text-sm font-semibold text-white">Active System Configuration</h3>
               </div>
 
-              <div className="rounded-xl border border-slate-800 bg-[#0d1322] p-6 space-y-4 text-xs">
-                <div className="space-y-3 divide-y divide-slate-800">
+              <div className="rounded-xl border border-neutral-800 bg-[#0a0a0a] p-6 space-y-4 text-xs">
+                <div className="space-y-3 divide-y divide-neutral-800">
                   <div className="flex justify-between items-center pt-2">
-                    <span className="text-slate-400">Maximum Upload Size</span>
+                    <span className="text-neutral-400">Maximum Upload Size</span>
                     <span className="font-mono text-white">500 MB (524,288,000 bytes)</span>
                   </div>
                   <div className="flex justify-between items-center pt-2">
-                    <span className="text-slate-400">Media Duration Limit</span>
+                    <span className="text-neutral-400">Media Duration Limit</span>
                     <span className="font-mono text-white">3,600 seconds (1 hour)</span>
                   </div>
                   <div className="flex justify-between items-center pt-2">
-                    <span className="text-slate-400">Worker Concurrency</span>
+                    <span className="text-neutral-400">Worker Concurrency</span>
                     <span className="font-mono text-white">2 concurrent jobs per worker</span>
                   </div>
                   <div className="flex justify-between items-center pt-2">
-                    <span className="text-slate-400">Conversion Timeout</span>
+                    <span className="text-neutral-400">Conversion Timeout</span>
                     <span className="font-mono text-white">900 seconds (15 minutes)</span>
                   </div>
                   <div className="flex justify-between items-center pt-2">
-                    <span className="text-slate-400">Guest Retention Policy</span>
+                    <span className="text-neutral-400">Guest Retention Policy</span>
                     <span className="font-mono text-white">24 hours</span>
                   </div>
                   <div className="flex justify-between items-center pt-2">
-                    <span className="text-slate-400">Registered User Retention Policy</span>
+                    <span className="text-neutral-400">Registered User Retention Policy</span>
                     <span className="font-mono text-white">168 hours (7 days)</span>
                   </div>
                 </div>
