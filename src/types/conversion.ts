@@ -14,6 +14,8 @@ export type JobStatus =
 export interface ConversionSettings {
   format: OutputFormat;
   bitrate: AudioBitrate;
+  trimStartSec?: number;
+  trimEndSec?: number;
 }
 
 export interface SelectedFileMetadata {

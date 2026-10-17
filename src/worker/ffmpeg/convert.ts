@@ -34,7 +34,7 @@ export async function convertMp4ToMp3(options: ConvertOptions): Promise<void> {
 
   const args: string[] = ["-y", "-nostdin", "-protocol_whitelist", "file"];
 
-  // Optional trim start
+  // Optional trim start (fast input seeking)
   if (trimStartSec !== undefined && trimStartSec > 0) {
     args.push("-ss", trimStartSec.toString());
   }
@@ -42,9 +42,12 @@ export async function convertMp4ToMp3(options: ConvertOptions): Promise<void> {
   // Input file
   args.push("-i", inputPath);
 
-  // Optional trim end
+  // Optional trim duration
   if (trimEndSec !== undefined && trimEndSec > 0) {
-    args.push("-to", trimEndSec.toString());
+    const duration = trimStartSec !== undefined && trimStartSec > 0
+      ? Math.max(0.1, trimEndSec - trimStartSec)
+      : trimEndSec;
+    args.push("-t", duration.toString());
   }
 
   // Encoding params: drop video, use LAME MP3 encoder, set target bitrate, set thread limit

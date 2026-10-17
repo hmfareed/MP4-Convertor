@@ -150,13 +150,15 @@ export function ConverterPanel() {
               : null
           );
 
-          // 3. Request conversion job creation
+          // 3. Request conversion job creation with optional trim parameters
           const convRes = await fetch("/api/conversions", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               uploadId,
               bitrate: settings.bitrate,
+              trimStartSec: settings.trimStartSec,
+              trimEndSec: settings.trimEndSec,
             }),
           });
 
@@ -232,6 +234,31 @@ export function ConverterPanel() {
 
     xhr.open("POST", "/api/uploads");
     xhr.send(formData);
+  };
+
+  const handleRetryJob = async () => {
+    if (!activeJob || activeJob.id === "pending_upload") {
+      handleStartConversion();
+      return;
+    }
+
+    try {
+      setActiveJob((prev) => (prev ? { ...prev, status: "queued", progress: 0 } : null));
+
+      const res = await fetch(`/api/conversions/${activeJob.id}/retry`, {
+        method: "POST",
+      });
+
+      if (!res.ok) {
+        // If retry fails (e.g. upload expired), fallback to full re-conversion
+        handleStartConversion();
+        return;
+      }
+
+      startStatusPolling(activeJob.id);
+    } catch {
+      handleStartConversion();
+    }
   };
 
   const handleCancelJob = async () => {
@@ -320,7 +347,7 @@ export function ConverterPanel() {
               {activeJob.status === "failed" && (
                 <FailedState
                   job={activeJob}
-                  onRetry={handleStartConversion}
+                  onRetry={handleRetryJob}
                   onReset={handleReset}
                 />
               )}
@@ -388,6 +415,7 @@ export function ConverterPanel() {
                 onConvert={handleStartConversion}
                 disabled={!selectedFile}
                 hasFile={!!selectedFile}
+                detectedDuration={selectedFile?.duration}
               />
 
               {errorMessage && (

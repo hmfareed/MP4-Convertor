@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/db/connection";
 import { getRedisConnection } from "@/lib/queue/redis";
 import { CONVERSION_QUEUE_NAME, ConversionQueuePayload } from "@/lib/queue/conversion-queue";
 import { processConversionJob } from "@/worker/processors/conversion";
+import { runStuckJobWatchdog } from "@/worker/watchdog";
 import { env } from "@/lib/config/env";
 
 async function startWorker() {
@@ -38,8 +39,14 @@ async function startWorker() {
 
   console.log(`[Worker] Listening on queue '${CONVERSION_QUEUE_NAME}' with concurrency ${env.WORKER_CONCURRENCY}...`);
 
+  // Periodic Watchdog for recovering or failing stuck jobs
+  const watchdogInterval = setInterval(() => {
+    runStuckJobWatchdog().catch((err) => console.error("[Watchdog] Scan failed:", err));
+  }, 60000);
+
   const shutdown = async () => {
     console.log("[Worker] Shutting down gracefully...");
+    clearInterval(watchdogInterval);
     await worker.close();
     process.exit(0);
   };
