@@ -40,6 +40,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Logo } from "@/components/layout/logo";
 import { UserCalendarKPI } from "@/components/admin/user-calendar-kpi";
+import { AdminCalendarPopover } from "@/components/admin/admin-calendar-popover";
 import { formatBytes, formatDuration, formatTimeAgo } from "@/lib/utils";
 import { JobStatus } from "@/types/conversion";
 
@@ -687,32 +688,54 @@ export default function AdminPage() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1 bg-black/60 border border-neutral-800 rounded-lg p-0.5 text-xs self-start sm:self-auto">
-                        <button
-                          type="button"
-                          onClick={() => setUserGraphDays(7)}
-                          className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer ${
-                            userGraphDays === 7 ? "bg-emerald-600 text-white shadow-sm" : "text-neutral-400 hover:text-white"
-                          }`}
-                        >
-                          7 Days
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setUserGraphDays(14)}
-                          className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer ${
-                            userGraphDays === 14 ? "bg-emerald-600 text-white shadow-sm" : "text-neutral-400 hover:text-white"
-                          }`}
-                        >
-                          14 Days
-                        </button>
+                      <div className="flex items-center gap-2 self-start sm:self-auto">
+                        <div className="flex items-center gap-1 bg-black/60 border border-neutral-800 rounded-lg p-0.5 text-xs">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setUserGraphDays(7);
+                              setSelectedCalendarDate(null);
+                            }}
+                            className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer ${
+                              userGraphDays === 7 && !selectedCalendarDate
+                                ? "bg-emerald-600 text-white shadow-sm"
+                                : "text-neutral-400 hover:text-white"
+                            }`}
+                          >
+                            7 Days
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setUserGraphDays(14);
+                              setSelectedCalendarDate(null);
+                            }}
+                            className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer ${
+                              userGraphDays === 14 && !selectedCalendarDate
+                                ? "bg-emerald-600 text-white shadow-sm"
+                                : "text-neutral-400 hover:text-white"
+                            }`}
+                          >
+                            14 Days
+                          </button>
+                        </div>
+
+                        {/* Prominent Calendar Date Picker for this KPI card */}
+                        <AdminCalendarPopover
+                          selectedDate={selectedCalendarDate}
+                          onSelectDate={(date) => setSelectedCalendarDate(date)}
+                          usersPerDay={metrics?.usersPerDay ?? []}
+                          buttonLabel="Calendar"
+                          align="right"
+                          size="sm"
+                        />
                       </div>
                     </div>
 
                     {/* Graph Canvas / Smooth SVG Line & Area Curve */}
                     <div className="relative pt-2 pb-1">
                       {/* Hover / Selected Status Bar */}
-                      <div className="h-6 flex items-center justify-between text-xs px-1 mb-1">
+                      <div className="min-h-7 flex items-center justify-between text-xs px-1 mb-1.5 flex-wrap gap-2">
                         {hoveredDay ? (
                           <div className="flex items-center gap-2 text-emerald-300 font-medium">
                             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -725,25 +748,27 @@ export default function AdminPage() {
                           (() => {
                             const found = dailyUsers.find((d) => d.date === selectedCalendarDate);
                             return (
-                              <div className="flex items-center gap-2 text-emerald-300 font-medium">
-                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                                <span>Selected {found ? found.label : selectedCalendarDate}:</span>
-                                <span className="font-bold text-white font-mono">
-                                  {found ? `${found.count} new users` : "Viewing in KPI"}
+                              <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-emerald-300 font-medium shadow-sm">
+                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                <span>Selected Date: <strong>{found ? found.label : selectedCalendarDate}</strong></span>
+                                <span className="text-white font-bold font-mono">
+                                  — {found ? found.count : 0} {((found ? found.count : 0) === 1 ? "registered user" : "registered users")}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => setSelectedCalendarDate(null)}
                                   className="text-[10px] text-neutral-400 hover:text-white underline ml-1 cursor-pointer"
                                 >
-                                  (Clear)
+                                  (Reset)
                                 </button>
                               </div>
                             );
                           })()
                         ) : (
-                          <span className="text-neutral-500 text-[11px]">
-                            Hover over the curve or click a date to view registrations
+                          <span className="text-neutral-500 text-[11px] flex items-center gap-1.5">
+                            <span>Hover over curve or click</span>
+                            <span className="text-emerald-400 font-semibold">&apos;Calendar&apos;</span>
+                            <span>to select a specific date</span>
                           </span>
                         )}
                         <span className="text-[10px] text-neutral-500 font-mono">
