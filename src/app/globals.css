@@ -47,15 +47,28 @@
   }
 }
 
+@keyframes borderRotate {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+.animate-border-rotate {
+  animation: borderRotate 14s linear infinite;
+}
+
 /* Custom gradient text helper */
 .gradient-text {
-  @apply bg-gradient-to-r from-purple-400 via-violet-300 to-indigo-400 bg-clip-text text-transparent;
+  @apply bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent;
 }
 
 .gradient-btn {
-  @apply bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-500 text-white font-medium shadow-md shadow-purple-900/20 hover:from-purple-500 hover:via-indigo-500 hover:to-purple-400 active:scale-[0.98] transition-all duration-150;
+  @apply bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white font-medium shadow-lg shadow-blue-950/50 hover:from-blue-600 hover:via-blue-500 hover:to-indigo-600 active:scale-[0.98] transition-all duration-150;
 }
 
 .gradient-btn-secondary {
-  @apply bg-gradient-to-r from-purple-600/20 to-indigo-600/20 text-white border border-purple-500/30 hover:border-purple-500/60 transition-all duration-150;
+  @apply bg-gradient-to-r from-blue-700/20 to-indigo-700/20 text-white border border-blue-500/30 hover:border-blue-500/60 transition-all duration-150;
 }

@@ -324,11 +324,31 @@ export function ConverterPanel() {
 
   return (
     <div id="converter" className="w-full max-w-4xl mx-auto px-4 sm:px-6">
-      <Card className="border-neutral-800 bg-[#0a0a0a] shadow-2xl relative overflow-hidden">
-        {/* Subtle top gradient accent glow */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-600 via-indigo-500 to-purple-600" />
+      {/* Animated Multi-Color Rotating Border Shell */}
+      <div className="relative rounded-2xl p-[2px] overflow-hidden shadow-2xl">
+        {/* Soft rotating ambient aura */}
+        <div
+          aria-hidden="true"
+          className="absolute top-1/2 left-1/2 w-[220%] aspect-square -translate-x-1/2 -translate-y-1/2 animate-border-rotate opacity-35 blur-md pointer-events-none"
+          style={{
+            background:
+              "conic-gradient(from 0deg, #2563eb 0deg, #7c3aed 60deg, #ec4899 120deg, #f59e0b 180deg, #10b981 240deg, #06b6d4 300deg, #2563eb 360deg)",
+          }}
+        />
 
-        <CardContent className="p-6 sm:p-8 space-y-6">
+        {/* Sharp rotating multi-color border beam */}
+        <div
+          aria-hidden="true"
+          className="absolute top-1/2 left-1/2 w-[220%] aspect-square -translate-x-1/2 -translate-y-1/2 animate-border-rotate pointer-events-none"
+          style={{
+            background:
+              "conic-gradient(from 0deg, #2563eb 0deg, #7c3aed 60deg, #ec4899 120deg, #f59e0b 180deg, #10b981 240deg, #06b6d4 300deg, #2563eb 360deg)",
+          }}
+        />
+
+        {/* Inner Card Container on Pure AMOLED Dark */}
+        <div className="relative rounded-[14px] bg-[#0a0a0a] overflow-hidden">
+          <CardContent className="p-6 sm:p-8 space-y-6">
           {/* Active Job State Render */}
           {activeJob && !previewState ? (
             <div className="space-y-4">
@@ -430,7 +450,7 @@ export function ConverterPanel() {
           {/* Component State Inspector */}
           <div className="pt-4 border-t border-neutral-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-neutral-400">
             <span className="flex items-center gap-1.5 font-medium text-neutral-300">
-              <SlidersHorizontal className="h-3.5 w-3.5 text-purple-400" />
+              <SlidersHorizontal className="h-3.5 w-3.5 text-blue-400" />
               <span>Conversion State Components:</span>
             </span>
 
@@ -451,7 +471,7 @@ export function ConverterPanel() {
                   onClick={() => setPreviewState(previewState === st ? null : st)}
                   className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all capitalize ${
                     previewState === st
-                      ? "bg-purple-600 text-white shadow-sm shadow-purple-900/40"
+                      ? "bg-blue-600 text-white shadow-sm shadow-blue-900/40"
                       : "bg-neutral-900/80 border border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-800"
                   }`}
                   title={`Preview ${st} component`}
@@ -462,7 +482,8 @@ export function ConverterPanel() {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </div>
     </div>
-  );
+  </div>
+);
 }

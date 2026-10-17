@@ -92,7 +92,7 @@ export function AudioPlayer({ src, duration = 0 }: AudioPlayerProps) {
           type="button"
           size="icon"
           onClick={togglePlay}
-          className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-500 text-white shadow-md shadow-purple-900/30 hover:from-purple-500 hover:to-indigo-500"
+          className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white shadow-md shadow-blue-950/60 hover:from-blue-600 hover:via-blue-500 hover:to-indigo-600 active:scale-95 transition-all"
           aria-label={isPlaying ? "Pause audio preview" : "Play audio preview"}
         >
           {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5" />}

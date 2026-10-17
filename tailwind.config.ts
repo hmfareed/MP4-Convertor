@@ -77,11 +77,16 @@ const config: Config = {
           "0%, 100%": { opacity: "0.6", transform: "scale(1)" },
           "50%": { opacity: "1", transform: "scale(1.05)" },
         },
+        borderRotate: {
+          "0%": { transform: "translate(-50%, -50%) rotate(0deg)" },
+          "100%": { transform: "translate(-50%, -50%) rotate(360deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "pulse-glow": "pulseGlow 3s ease-in-out infinite",
+        "border-rotate": "borderRotate 14s linear infinite",
       },
     },
   },

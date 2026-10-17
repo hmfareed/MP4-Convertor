@@ -53,7 +53,7 @@ export function AboutSection() {
 
       {/* Start Converting Call to Action */}
       <div className="text-center">
-        <Button asChild variant="gradient" size="lg" className="rounded-xl font-semibold gap-2 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-500 hover:from-purple-500 hover:to-indigo-500 text-white shadow-lg shadow-purple-900/30">
+        <Button asChild variant="gradient" size="lg" className="rounded-xl font-semibold gap-2 bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 hover:from-blue-600 hover:via-blue-500 hover:to-indigo-600 text-white shadow-lg shadow-blue-950/60 active:scale-[0.98] transition-all">
           <Link href="/#converter">
             <span>Start Converting</span>
             <ArrowUpRight className="h-4 w-4" />
