@@ -1,6 +1,6 @@
 export type AudioBitrate = 96 | 128 | 192 | 256 | 320;
 
-export type OutputFormat = "mp3";
+export type OutputFormat = "mp3" | "wav" | "flac" | "aac" | "ogg" | "opus";
 
 export type JobStatus =
   | "uploading"

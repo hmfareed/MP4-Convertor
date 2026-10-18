@@ -15,6 +15,7 @@ export const dynamic = "force-dynamic";
 
 const createConversionSchema = z.object({
   uploadId: z.string().min(1, "Upload ID is required"),
+  format: z.enum(["mp3", "wav", "flac", "aac", "ogg", "opus"]).optional().default("mp3"),
   bitrate: z.number().refine(isValidBitrate, "Invalid bitrate option"),
   trimStartSec: z.number().optional(),
   trimEndSec: z.number().optional(),
@@ -53,12 +54,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { uploadId, bitrate, trimStartSec, trimEndSec, batchId } = parsed.data;
+    const { uploadId, format, bitrate, trimStartSec, trimEndSec, batchId } = parsed.data;
 
     // Idempotency support
     const idempotencyKey =
       req.headers.get("idempotency-key") ||
-      `idem_${uploadId}_${bitrate}_${trimStartSec || 0}_${trimEndSec || 0}`;
+      `idem_${uploadId}_${format}_${bitrate}_${trimStartSec || 0}_${trimEndSec || 0}`;
 
     // Check for existing job with same idempotency key and owner
     const existingJob = await ConversionJob.findOne({
@@ -99,6 +100,7 @@ export async function POST(req: NextRequest) {
       fileSizeBytes: upload.sizeBytes,
       status: "queued",
       settings: {
+        format,
         bitrateKbps: bitrate,
         trimStartSec,
         trimEndSec,
@@ -169,7 +171,10 @@ export async function GET(req: NextRequest) {
     const formatted = jobs.map((job) => ({
       id: job._id.toString(),
       originalFilename: job.originalFilename,
-      outputFilename: job.output?.filename || `${job.originalFilename.replace(/\.[^/.]+$/, "")}.mp3`,
+      outputFilename:
+        job.output?.filename ||
+        `${job.originalFilename.replace(/\.[^/.]+$/, "")}.${job.settings.format || "mp3"}`,
+      format: job.settings.format || "mp3",
       size: job.output?.sizeBytes || job.fileSizeBytes,
       duration: job.output?.durationSec || 0,
       bitrate: job.settings.bitrateKbps,

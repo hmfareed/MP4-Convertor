@@ -25,6 +25,7 @@ export async function GET(
       progress: job.progressPercent,
       originalFilename: job.originalFilename,
       outputFilename: job.output?.filename,
+      format: job.settings.format || "mp3",
       bitrate: job.settings.bitrateKbps,
       duration: job.output?.durationSec,
       fileSize: job.fileSizeBytes,

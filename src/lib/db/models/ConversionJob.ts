@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
-import { JobStatus } from "@/types/conversion";
+import { JobStatus, OutputFormat } from "@/types/conversion";
 
 export interface IConversionJob extends Document {
   ownerType: "guest" | "user";
@@ -11,6 +11,7 @@ export interface IConversionJob extends Document {
   fileSizeBytes: number;
   status: JobStatus;
   settings: {
+    format?: OutputFormat;
     bitrateKbps: number;
     trimStartSec?: number;
     trimEndSec?: number;
@@ -27,6 +28,7 @@ export interface IConversionJob extends Document {
   output?: {
     storageKey: string;
     filename: string;
+    format?: OutputFormat;
     sizeBytes: number;
     durationSec: number;
     bitrateKbps: number;
@@ -55,6 +57,11 @@ const ConversionJobSchema = new Schema<IConversionJob>(
       index: true,
     },
     settings: {
+      format: {
+        type: String,
+        enum: ["mp3", "wav", "flac", "aac", "ogg", "opus"],
+        default: "mp3",
+      },
       bitrateKbps: { type: Number, required: true },
       trimStartSec: { type: Number },
       trimEndSec: { type: Number },
@@ -71,6 +78,7 @@ const ConversionJobSchema = new Schema<IConversionJob>(
     output: {
       storageKey: { type: String },
       filename: { type: String },
+      format: { type: String, default: "mp3" },
       sizeBytes: { type: Number },
       durationSec: { type: Number },
       bitrateKbps: { type: Number },

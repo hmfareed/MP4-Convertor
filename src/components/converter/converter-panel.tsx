@@ -206,6 +206,7 @@ export function ConverterPanel() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               uploadId,
+              format: settings.format,
               bitrate: settings.bitrate,
               trimStartSec: settings.trimStartSec,
               trimEndSec: settings.trimEndSec,
@@ -341,6 +342,7 @@ export function ConverterPanel() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             uploadId: uploadData.uploadId,
+            format: settings.format,
             bitrate: settings.bitrate,
             batchId,
           }),

@@ -51,10 +51,14 @@ export async function GET(
       },
     });
 
+    const format = job.output.format || job.settings.format || "mp3";
+    const { getFormatConfig } = await import("@/lib/constants");
+    const formatConfig = getFormatConfig(format);
+
     return new Response(webStream, {
       status: 200,
       headers: {
-        "Content-Type": "audio/mpeg",
+        "Content-Type": formatConfig.mime,
         "Content-Length": stat.size.toString(),
         "Accept-Ranges": "bytes",
         "Cache-Control": "private, max-age=3600",

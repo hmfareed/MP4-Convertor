@@ -240,7 +240,9 @@ export function BatchConversionCard({
                         </span>
                       )}
                       <span className="font-mono text-[10px] text-neutral-400">
-                        {job.bitrate}k MP3
+                        {job.format === "wav" || job.format === "flac"
+                          ? (job.format || "audio").toUpperCase()
+                          : `${job.bitrate}k ${(job.format || "mp3").toUpperCase()}`}
                       </span>
                     </div>
 
@@ -282,7 +284,7 @@ export function BatchConversionCard({
                       size="sm"
                       onClick={() => handlePlayAudio(job)}
                       className="h-8 w-8 p-0 text-neutral-400 hover:text-white rounded-lg"
-                      title={isPlaying ? "Pause preview" : "Play MP3 preview"}
+                      title={isPlaying ? "Pause preview" : `Play ${(job.format || "audio").toUpperCase()} preview`}
                     >
                       {isPlaying ? (
                         <Pause className="h-3.5 w-3.5 text-blue-400" />
@@ -292,7 +294,7 @@ export function BatchConversionCard({
                     </Button>
                   )}
 
-                  {/* Individual Download MP3 */}
+                  {/* Individual Download Audio */}
                   {isCompleted && job.downloadUrl && (
                     <Button
                       asChild
@@ -300,9 +302,9 @@ export function BatchConversionCard({
                       size="sm"
                       className="h-8 px-2.5 text-xs border-neutral-300 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:text-white hover:bg-neutral-900 gap-1"
                     >
-                      <a href={job.downloadUrl} download={job.outputFilename || "audio.mp3"}>
+                      <a href={job.downloadUrl} download={job.outputFilename || `audio.${job.format || "mp3"}`}>
                         <Download className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">MP3</span>
+                        <span className="hidden sm:inline">{(job.format || "mp3").toUpperCase()}</span>
                       </a>
                     </Button>
                   )}

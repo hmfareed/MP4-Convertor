@@ -19,6 +19,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { AudioPlayer } from "@/components/converter/audio-player";
 import { formatBytes, formatDuration } from "@/lib/utils";
+import { getFormatConfig } from "@/lib/constants";
 import { ConversionJob } from "@/types/conversion";
 
 interface StateProps {
@@ -165,9 +166,12 @@ export function ProcessingState({ job, onCancel }: StateProps) {
 
 /** 4. Completed State Component */
 export function CompletedState({ job, onReset }: StateProps) {
+  const formatConfig = getFormatConfig(job.format || "mp3");
   const outputName =
     job.outputFilename ||
-    `${job.originalFilename.replace(/\.[^/.]+$/, "")}.mp3`;
+    `${job.originalFilename.replace(/\.[^/.]+$/, "")}${formatConfig.ext}`;
+  const formatLabel = formatConfig.label;
+  const isLossless = !!formatConfig.isLossless;
 
   const handleDownload = () => {
     if (job.downloadUrl) {
@@ -195,7 +199,7 @@ export function CompletedState({ job, onReset }: StateProps) {
               <h4 className="text-base font-semibold text-neutral-900 dark:text-white">
                 Conversion Complete!
               </h4>
-              <Badge variant="success">MP3 Ready</Badge>
+              <Badge variant="success">{formatLabel} Ready</Badge>
             </div>
             <p className="text-xs text-neutral-500 dark:text-slate-400">
               Audio stream successfully extracted and encoded
@@ -221,7 +225,7 @@ export function CompletedState({ job, onReset }: StateProps) {
       <div className="rounded-xl bg-neutral-100/80 dark:bg-slate-900/60 border border-neutral-200 dark:border-slate-800 p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5 min-w-0">
-            <FileAudio className="h-5 w-5 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+            <FileAudio className="h-5 w-5 text-blue-500 dark:text-blue-400 flex-shrink-0" />
             <span
               className="text-sm font-medium text-neutral-900 dark:text-white truncate max-w-[200px] sm:max-w-xs"
               title={outputName}
@@ -230,19 +234,21 @@ export function CompletedState({ job, onReset }: StateProps) {
             </span>
           </div>
           <span className="text-xs font-mono text-neutral-600 dark:text-slate-400">
-            {job.bitrate} kbps
+            {isLossless ? "Lossless Master" : `${job.bitrate} kbps`}
           </span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2 border-t border-neutral-200 dark:border-slate-800/80 text-xs text-neutral-600 dark:text-slate-400">
           <div>
             <span className="text-neutral-500 dark:text-slate-500 block text-[10px] uppercase">Format</span>
-            <span className="text-neutral-900 dark:text-white font-medium">MP3 (audio/mpeg)</span>
+            <span className="text-neutral-900 dark:text-white font-medium">
+              {formatLabel} ({formatConfig.mime})
+            </span>
           </div>
           <div>
             <span className="text-neutral-500 dark:text-slate-500 block text-[10px] uppercase">Est. Size</span>
             <span className="text-neutral-900 dark:text-white font-medium">
-              {formatBytes(Math.round(job.fileSize * 0.15))}
+              {formatBytes(Math.round(job.fileSize * (isLossless ? 0.45 : 0.15)))}
             </span>
           </div>
           {job.duration && job.duration > 0 ? (
@@ -276,7 +282,7 @@ export function CompletedState({ job, onReset }: StateProps) {
           className="w-full h-12 rounded-xl text-base font-semibold gap-2.5 shadow-xl shadow-blue-950/40 bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 hover:from-blue-600 hover:via-blue-500 hover:to-indigo-600 text-white"
         >
           <Download className="h-5 w-5 text-white" />
-          <span>Download MP3</span>
+          <span>Download {formatLabel}</span>
         </Button>
         <p className="text-center text-[11px] text-neutral-500 pt-2">
           File available for download for 24 hours per privacy retention policy.

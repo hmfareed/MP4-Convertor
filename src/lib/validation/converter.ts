@@ -5,10 +5,19 @@ import {
   SUPPORTED_EXTENSIONS,
   SUPPORTED_MIME_TYPES,
 } from "@/lib/constants";
-import { AudioBitrate } from "@/types/conversion";
+import { AudioBitrate, OutputFormat } from "@/types/conversion";
+
+export const SUPPORTED_AUDIO_FORMATS: OutputFormat[] = [
+  "mp3",
+  "wav",
+  "flac",
+  "aac",
+  "ogg",
+  "opus",
+];
 
 export const conversionSettingsSchema = z.object({
-  format: z.literal("mp3"),
+  format: z.enum(["mp3", "wav", "flac", "aac", "ogg", "opus"]).default("mp3"),
   bitrate: z.union([
     z.literal(96),
     z.literal(128),
@@ -62,4 +71,8 @@ export function validateSelectedFile(file: File): FileValidationResult {
 
 export function isValidBitrate(val: number): val is AudioBitrate {
   return [96, 128, 192, 256, 320].includes(val);
+}
+
+export function isValidFormat(val: string): val is OutputFormat {
+  return SUPPORTED_AUDIO_FORMATS.includes(val as OutputFormat);
 }

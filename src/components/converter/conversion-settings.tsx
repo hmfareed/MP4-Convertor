@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Music, ArrowRightLeft, Loader2, Scissors, Clock } from "lucide-react";
+import { Music, ArrowRightLeft, Loader2, Scissors, Clock, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -11,9 +11,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BITRATE_OPTIONS } from "@/lib/constants";
+import { BITRATE_OPTIONS, FORMAT_OPTIONS, getFormatConfig } from "@/lib/constants";
 import { formatDuration } from "@/lib/utils";
-import { AudioBitrate, ConversionSettings as IConversionSettings } from "@/types/conversion";
+import {
+  AudioBitrate,
+  OutputFormat,
+  ConversionSettings as IConversionSettings,
+} from "@/types/conversion";
 
 interface ConversionSettingsProps {
   settings: IConversionSettings;
@@ -41,6 +45,16 @@ export function ConversionSettings({
   const totalDuration = detectedDuration > 0 ? Math.round(detectedDuration) : 300;
   const currentStart = settings.trimStartSec ?? 0;
   const currentEnd = settings.trimEndSec ?? totalDuration;
+
+  const currentFormatConfig = getFormatConfig(settings.format || "mp3");
+  const isLossless = !!currentFormatConfig.isLossless;
+
+  const handleFormatChange = (val: string) => {
+    onSettingsChange({
+      ...settings,
+      format: val as OutputFormat,
+    });
+  };
 
   const handleBitrateChange = (val: string) => {
     const num = parseInt(val, 10) as AudioBitrate;
@@ -99,60 +113,46 @@ export function ConversionSettings({
   return (
     <div className="pt-4 border-t border-neutral-200 dark:border-neutral-800/80 space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-end">
-        {/* Output Format */}
+        {/* Output Format Select */}
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 block">
+          <label
+            htmlFor="format-select"
+            className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 block"
+          >
             Output Format
           </label>
-          <div className="flex h-11 w-full items-center justify-between rounded-xl border border-neutral-300 dark:border-neutral-800 bg-neutral-50 dark:bg-black px-3.5 py-2 text-sm text-neutral-900 dark:text-white">
-            <span className="flex items-center gap-2">
-              <Music className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-              <span className="font-medium">MP3</span>
-            </span>
-            <span className="text-[11px] text-neutral-600 dark:text-neutral-400 font-mono bg-neutral-200/70 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 px-2 py-0.5 rounded">
-              Fixed
-            </span>
-          </div>
-        </div>
-
-        {/* Quality / Bitrate */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <label
-              htmlFor="bitrate-select"
-              className="text-xs font-semibold text-neutral-700 dark:text-slate-300 block"
-            >
-              Quality
-            </label>
-            {fileCount <= 1 && (
-              <button
-                type="button"
-                onClick={handleToggleTrim}
-                disabled={disabled || !hasFile}
-                className={`text-xs flex items-center gap-1 transition-colors ${
-                  showTrim
-                    ? "text-purple-600 dark:text-purple-400 font-semibold"
-                    : "text-neutral-500 hover:text-neutral-900 dark:text-slate-400 dark:hover:text-white"
-                }`}
-              >
-                <Scissors className="h-3 w-3" />
-                <span>{showTrim ? "Trim Active" : "Trim Audio"}</span>
-              </button>
-            )}
-          </div>
           <Select
-            value={settings.bitrate.toString()}
-            onValueChange={handleBitrateChange}
+            value={settings.format}
+            onValueChange={handleFormatChange}
             disabled={disabled || isLoading}
           >
-            <SelectTrigger id="bitrate-select" aria-label="Select audio quality">
-              <SelectValue placeholder="Select quality" />
+            <SelectTrigger
+              id="format-select"
+              aria-label="Select output audio format"
+              className="h-11 rounded-xl bg-neutral-50 dark:bg-black border-neutral-300 dark:border-neutral-800"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <Music className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                <span className="font-semibold text-neutral-900 dark:text-white">
+                  {currentFormatConfig.label}
+                </span>
+                <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/40 border border-cyan-800/50 px-1.5 py-0.5 rounded ml-1 truncate">
+                  {currentFormatConfig.badge}
+                </span>
+              </div>
             </SelectTrigger>
             <SelectContent>
-              {BITRATE_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value.toString()}>
+              {FORMAT_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
                   <div className="flex flex-col text-left py-0.5">
-                    <span className="font-medium text-neutral-900 dark:text-white">{opt.label}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-neutral-900 dark:text-white">
+                        {opt.label}
+                      </span>
+                      <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/40 border border-cyan-800/50 px-1.5 py-0.2 rounded">
+                        {opt.badge}
+                      </span>
+                    </div>
                     <span className="text-[11px] text-neutral-500 dark:text-slate-400">
                       {opt.description}
                     </span>
@@ -163,7 +163,70 @@ export function ConversionSettings({
           </Select>
         </div>
 
-        {/* Convert to MP3 Button */}
+        {/* Quality / Bitrate */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <label
+              htmlFor="bitrate-select"
+              className="text-xs font-semibold text-neutral-700 dark:text-slate-300 block"
+            >
+              Quality / Bitrate
+            </label>
+            {fileCount <= 1 && (
+              <button
+                type="button"
+                onClick={handleToggleTrim}
+                disabled={disabled || !hasFile}
+                className={`text-xs flex items-center gap-1 transition-colors ${
+                  showTrim
+                    ? "text-blue-500 font-semibold"
+                    : "text-neutral-500 hover:text-neutral-900 dark:text-slate-400 dark:hover:text-white"
+                }`}
+              >
+                <Scissors className="h-3 w-3" />
+                <span>{showTrim ? "Trim Active" : "Trim Audio"}</span>
+              </button>
+            )}
+          </div>
+
+          {isLossless ? (
+            <div className="flex h-11 w-full items-center justify-between rounded-xl border border-neutral-300 dark:border-neutral-800 bg-neutral-50 dark:bg-black px-3.5 py-2 text-sm text-neutral-900 dark:text-white">
+              <span className="flex items-center gap-1.5 text-xs font-mono text-neutral-300">
+                <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
+                <span>Lossless (Master PCM / 1411k)</span>
+              </span>
+              <span className="text-[10px] text-neutral-400 font-mono bg-neutral-900 border border-neutral-800 px-1.5 py-0.5 rounded">
+                Auto
+              </span>
+            </div>
+          ) : (
+            <Select
+              value={settings.bitrate.toString()}
+              onValueChange={handleBitrateChange}
+              disabled={disabled || isLoading}
+            >
+              <SelectTrigger id="bitrate-select" aria-label="Select audio quality">
+                <SelectValue placeholder="Select quality" />
+              </SelectTrigger>
+              <SelectContent>
+                {BITRATE_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value.toString()}>
+                    <div className="flex flex-col text-left py-0.5">
+                      <span className="font-medium text-neutral-900 dark:text-white">
+                        {opt.label}
+                      </span>
+                      <span className="text-[11px] text-neutral-500 dark:text-slate-400">
+                        {opt.description}
+                      </span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        </div>
+
+        {/* Convert Button */}
         <div className="sm:col-span-2 md:col-span-1">
           <Button
             type="button"
@@ -172,7 +235,7 @@ export function ConversionSettings({
             onClick={onConvert}
             disabled={disabled || !hasFile || isLoading}
             className="w-full h-11 rounded-xl text-sm font-semibold gap-2 bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 hover:from-blue-600 hover:via-blue-500 hover:to-indigo-600 text-white shadow-lg shadow-blue-950/60 active:scale-[0.98] transition-all"
-            aria-label="Convert MP4 video to MP3"
+            aria-label={`Convert MP4 video to ${currentFormatConfig.label}`}
           >
             {isLoading ? (
               <>
@@ -184,10 +247,10 @@ export function ConversionSettings({
                 <ArrowRightLeft className="h-4 w-4 text-white" />
                 <span>
                   {fileCount > 1
-                    ? `Convert ${fileCount} Files to MP3`
+                    ? `Convert ${fileCount} Files to ${currentFormatConfig.label}`
                     : showTrim
-                    ? "Trim & Convert to MP3"
-                    : "Convert to MP3"}
+                    ? `Trim & Convert to ${currentFormatConfig.label}`
+                    : `Convert to ${currentFormatConfig.label}`}
                 </span>
               </>
             )}
@@ -200,7 +263,7 @@ export function ConversionSettings({
         <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/60 dark:bg-black p-4 space-y-4 animate-in fade-in slide-in-from-top-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-neutral-900 dark:text-white flex items-center gap-1.5">
-              <Scissors className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+              <Scissors className="h-3.5 w-3.5 text-blue-500" />
               <span>Select Audio Trim Window</span>
             </span>
             <span className="text-[11px] font-mono text-neutral-700 dark:text-neutral-300 bg-neutral-200/80 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -229,7 +292,7 @@ export function ConversionSettings({
                 max={currentEnd - 1}
                 value={currentStart}
                 onChange={handleStartInputChange}
-                className="w-full h-8 px-2.5 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white font-mono text-xs focus:outline-none focus:ring-1 focus:ring-purple-500"
+                className="w-full h-8 px-2.5 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white font-mono text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
             <div className="space-y-1">
@@ -240,7 +303,7 @@ export function ConversionSettings({
                 max={totalDuration}
                 value={currentEnd}
                 onChange={handleEndInputChange}
-                className="w-full h-8 px-2.5 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white font-mono text-xs focus:outline-none focus:ring-1 focus:ring-purple-500"
+                className="w-full h-8 px-2.5 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white font-mono text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
           </div>

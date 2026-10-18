@@ -8,7 +8,9 @@ import { Upload } from "@/lib/db/models/Upload";
 import { getStorage, generateStorageKey } from "@/lib/storage";
 import { transitionJobState } from "@/lib/jobs/state-machine";
 import { probeMedia } from "@/worker/ffmpeg/probe";
-import { convertMp4ToMp3 } from "@/worker/ffmpeg/convert";
+import { convertMp4ToAudio } from "@/worker/ffmpeg/convert";
+import { getFormatConfig } from "@/lib/constants";
+import { OutputFormat } from "@/types/conversion";
 import { ConversionQueuePayload } from "@/lib/queue/conversion-queue";
 import { env } from "@/lib/config/env";
 
@@ -60,7 +62,11 @@ export async function processConversionJob(job: Job<ConversionQueuePayload>): Pr
     fs.mkdirSync(tempOutputDir, { recursive: true });
   }
 
-  const tempOutputFilename = `temp_${jobId}_${Date.now()}.mp3`;
+  const targetFormat = (processingJob.settings.format || "mp3") as OutputFormat;
+  const formatConfig = getFormatConfig(targetFormat);
+  const extWithoutDot = formatConfig.ext.replace(/^\./, "");
+
+  const tempOutputFilename = `temp_${jobId}_${Date.now()}${formatConfig.ext}`;
   const tempOutputPath = path.join(tempOutputDir, tempOutputFilename);
 
   const startTime = Date.now();
@@ -77,10 +83,11 @@ export async function processConversionJob(job: Job<ConversionQueuePayload>): Pr
       throw new Error(`DURATION_TOO_LONG: Video duration exceeds the ${env.MAX_DURATION_SECONDS} seconds limit.`);
     }
 
-    // 2. Convert to MP3
-    await convertMp4ToMp3({
+    // 2. Convert to Target Audio Format
+    await convertMp4ToAudio({
       inputPath: inputFilePath,
       outputPath: tempOutputPath,
+      format: targetFormat,
       bitrateKbps: processingJob.settings.bitrateKbps,
       threads: env.FFMPEG_THREADS,
       timeoutSeconds: env.CONVERSION_TIMEOUT_SECONDS,
@@ -108,16 +115,16 @@ export async function processConversionJob(job: Job<ConversionQueuePayload>): Pr
     const outputStat = fs.statSync(tempOutputPath);
 
     if (outputStat.size <= 0) {
-      throw new Error("CORRUPTED_OUTPUT: Produced MP3 file is empty.");
+      throw new Error(`CORRUPTED_OUTPUT: Produced ${targetFormat.toUpperCase()} file is empty.`);
     }
 
     // 4. Move output to private storage
-    const outputStorageKey = generateStorageKey("audio", "mp3");
+    const outputStorageKey = generateStorageKey("audio", extWithoutDot);
     const outputReadStream = fs.createReadStream(tempOutputPath);
     await storage.put(outputStorageKey, outputReadStream);
 
     const safeBaseName = processingJob.originalFilename.replace(/\.[^/.]+$/, "");
-    const outputDisplayName = `${safeBaseName}.mp3`;
+    const outputDisplayName = `${safeBaseName}${formatConfig.ext}`;
 
     // 5. Transition to completed
     await transitionJobState(jobId, "processing", "completed", {
@@ -127,6 +134,7 @@ export async function processConversionJob(job: Job<ConversionQueuePayload>): Pr
       output: {
         storageKey: outputStorageKey,
         filename: outputDisplayName,
+        format: targetFormat,
         sizeBytes: outputStat.size,
         durationSec: postProbe.durationSeconds,
         bitrateKbps: processingJob.settings.bitrateKbps,

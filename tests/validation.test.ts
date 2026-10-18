@@ -65,17 +65,35 @@ describe("Conversion Settings Schema", () => {
   });
 
   it("validates settings with zod schema", () => {
-    const valid = conversionSettingsSchema.safeParse({
+    const validMp3 = conversionSettingsSchema.safeParse({
       format: "mp3",
       bitrate: 192,
     });
-    expect(valid.success).toBe(true);
+    expect(validMp3.success).toBe(true);
 
-    const invalid = conversionSettingsSchema.safeParse({
+    const validWav = conversionSettingsSchema.safeParse({
+      format: "wav",
+      bitrate: 192,
+    });
+    expect(validWav.success).toBe(true);
+
+    const validFlac = conversionSettingsSchema.safeParse({
+      format: "flac",
+      bitrate: 320,
+    });
+    expect(validFlac.success).toBe(true);
+
+    const invalidBitrate = conversionSettingsSchema.safeParse({
       format: "wav",
       bitrate: 500,
     });
-    expect(invalid.success).toBe(false);
+    expect(invalidBitrate.success).toBe(false);
+
+    const invalidFormat = conversionSettingsSchema.safeParse({
+      format: "unsupported_codec",
+      bitrate: 192,
+    });
+    expect(invalidFormat.success).toBe(false);
   });
 });
 

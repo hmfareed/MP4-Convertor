@@ -2,10 +2,12 @@ import { spawn, ChildProcess } from "child_process";
 import fs from "fs";
 import { getFFmpegPath } from "@/worker/ffmpeg/binaries";
 import { env } from "@/lib/config/env";
+import { OutputFormat } from "@/types/conversion";
 
 export interface ConvertOptions {
   inputPath: string;
   outputPath: string;
+  format?: OutputFormat;
   bitrateKbps: number;
   threads?: number;
   timeoutSeconds?: number;
@@ -16,10 +18,38 @@ export interface ConvertOptions {
   checkCancelled?: () => Promise<boolean>;
 }
 
-export async function convertMp4ToMp3(options: ConvertOptions): Promise<void> {
+export function getFfmpegAudioArgs(
+  format: OutputFormat = "mp3",
+  bitrateKbps: number = 192
+): string[] {
+  switch (format) {
+    case "wav":
+      // Lossless 16-bit uncompressed PCM
+      return ["-c:a", "pcm_s16le"];
+    case "flac":
+      // Lossless compressed FLAC
+      return ["-c:a", "flac"];
+    case "aac":
+      // AAC audio stream
+      return ["-c:a", "aac", "-b:a", `${bitrateKbps}k`];
+    case "ogg":
+      // OGG Vorbis stream
+      return ["-c:a", "libvorbis", "-b:a", `${bitrateKbps}k`];
+    case "opus":
+      // High-efficiency modern Opus
+      return ["-c:a", "libopus", "-b:a", `${bitrateKbps}k`];
+    case "mp3":
+    default:
+      // Standard LAME MP3
+      return ["-c:a", "libmp3lame", "-b:a", `${bitrateKbps}k`];
+  }
+}
+
+export async function convertMp4ToAudio(options: ConvertOptions): Promise<void> {
   const {
     inputPath,
     outputPath,
+    format = "mp3",
     bitrateKbps,
     threads = env.FFMPEG_THREADS,
     timeoutSeconds = env.CONVERSION_TIMEOUT_SECONDS,
@@ -44,19 +74,18 @@ export async function convertMp4ToMp3(options: ConvertOptions): Promise<void> {
 
   // Optional trim duration
   if (trimEndSec !== undefined && trimEndSec > 0) {
-    const duration = trimStartSec !== undefined && trimStartSec > 0
-      ? Math.max(0.1, trimEndSec - trimStartSec)
-      : trimEndSec;
+    const duration =
+      trimStartSec !== undefined && trimStartSec > 0
+        ? Math.max(0.1, trimEndSec - trimStartSec)
+        : trimEndSec;
     args.push("-t", duration.toString());
   }
 
-  // Encoding params: drop video, use LAME MP3 encoder, set target bitrate, set thread limit
+  // Encoding params: drop video, set audio codec args, thread limit, progress
+  const audioArgs = getFfmpegAudioArgs(format, bitrateKbps);
   args.push(
     "-vn",
-    "-c:a",
-    "libmp3lame",
-    "-b:a",
-    `${bitrateKbps}k`,
+    ...audioArgs,
     "-threads",
     threads.toString(),
     "-progress",
@@ -77,7 +106,9 @@ export async function convertMp4ToMp3(options: ConvertOptions): Promise<void> {
     const timeoutTimer = setTimeout(() => {
       if (!isFinished && proc) {
         proc.kill("SIGKILL");
-        reject(new Error("CONVERSION_TIMEOUT: FFmpeg processing exceeded time limit."));
+        reject(
+          new Error("CONVERSION_TIMEOUT: FFmpeg processing exceeded time limit.")
+        );
       }
     }, timeoutSeconds * 1000);
 
@@ -113,7 +144,10 @@ export async function convertMp4ToMp3(options: ConvertOptions): Promise<void> {
             const currentSeconds = us / 1000000;
             const percent = Math.min(
               99,
-              Math.max(1, Math.round((currentSeconds / totalDurationSeconds) * 100))
+              Math.max(
+                1,
+                Math.round((currentSeconds / totalDurationSeconds) * 100)
+              )
             );
             onProgress?.(percent);
           }
@@ -123,7 +157,10 @@ export async function convertMp4ToMp3(options: ConvertOptions): Promise<void> {
             const currentSeconds = ms / 1000;
             const percent = Math.min(
               99,
-              Math.max(1, Math.round((currentSeconds / totalDurationSeconds) * 100))
+              Math.max(
+                1,
+                Math.round((currentSeconds / totalDurationSeconds) * 100)
+              )
             );
             onProgress?.(percent);
           }
@@ -153,7 +190,13 @@ export async function convertMp4ToMp3(options: ConvertOptions): Promise<void> {
             // ignore
           }
         }
-        reject(new Error(`FFmpeg failed with exit code ${code}. Stderr: ${stderrData.slice(-500)}`));
+        reject(
+          new Error(
+            `FFmpeg failed with exit code ${code}. Stderr: ${stderrData.slice(
+              -500
+            )}`
+          )
+        );
       }
     });
 
@@ -166,3 +209,7 @@ export async function convertMp4ToMp3(options: ConvertOptions): Promise<void> {
     });
   });
 }
+
+// Backward compatible alias
+export const convertMp4ToMp3 = (options: ConvertOptions) =>
+  convertMp4ToAudio({ ...options, format: "mp3" });
