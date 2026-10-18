@@ -141,7 +141,13 @@ export function ConversionSettings({
                 </span>
               </div>
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent
+              side="bottom"
+              align="start"
+              sideOffset={6}
+              avoidCollisions={false}
+              className="max-h-72 overflow-y-auto"
+            >
               {FORMAT_OPTIONS.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value}>
                   <div className="flex flex-col text-left py-0.5">
@@ -208,7 +214,13 @@ export function ConversionSettings({
               <SelectTrigger id="bitrate-select" aria-label="Select audio quality">
                 <SelectValue placeholder="Select quality" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent
+                side="bottom"
+                align="start"
+                sideOffset={6}
+                avoidCollisions={false}
+                className="max-h-72 overflow-y-auto"
+              >
                 {BITRATE_OPTIONS.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value.toString()}>
                     <div className="flex flex-col text-left py-0.5">
