@@ -241,7 +241,7 @@ export function UserCalendarKPI({
         className={`rounded-xl border transition-all text-left p-3.5 space-y-1.5 ${
           selectedDate
             ? "border-emerald-500/70 bg-emerald-950/20 shadow-lg shadow-emerald-950/20"
-            : "border-neutral-800/90 bg-[#0a0a0a] hover:border-emerald-500/50 hover:bg-[#121212]"
+            : "border-neutral-800/90 bg-black hover:border-emerald-500/50 hover:bg-neutral-950/40"
         }`}
       >
         {/* Top Header: Label + Calendar Button */}
@@ -338,7 +338,7 @@ export function UserCalendarKPI({
 
       {/* AMOLED CALENDAR POPOVER */}
       {isOpen && (
-        <div className="absolute top-full left-0 sm:left-auto sm:right-0 mt-2 z-50 w-72 sm:w-80 rounded-2xl border border-neutral-800 bg-[#0a0a0a] shadow-2xl shadow-black/95 p-3.5 space-y-3 animate-in fade-in zoom-in-95 duration-150">
+        <div className="absolute top-full left-0 sm:left-auto sm:right-0 mt-2 z-50 w-72 sm:w-80 rounded-2xl border border-neutral-800 bg-black shadow-2xl shadow-black/95 p-3.5 space-y-3 animate-in fade-in zoom-in-95 duration-150">
           {/* Calendar Header with Month Navigation */}
           <div className="flex items-center justify-between pb-2 border-b border-neutral-800/80">
             <button

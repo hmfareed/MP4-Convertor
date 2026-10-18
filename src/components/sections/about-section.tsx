@@ -18,7 +18,7 @@ export function AboutSection() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         {/* Subsection 1 */}
-        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800/80 bg-white dark:bg-[#0a0a0a] hover:border-neutral-300 dark:hover:border-neutral-700 hover:bg-neutral-50/50 dark:hover:bg-[#121212] p-6 space-y-3 transition-all duration-200 group shadow-sm">
+        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800/80 bg-white dark:bg-black hover:border-neutral-300 dark:hover:border-neutral-700 hover:bg-neutral-50/50 dark:hover:bg-neutral-950/40 p-6 space-y-3 transition-all duration-200 group shadow-sm">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 dark:text-amber-400 border border-amber-500/20 transition-transform group-hover:scale-105">
             <Zap className="h-5 w-5" />
           </div>
@@ -29,7 +29,7 @@ export function AboutSection() {
         </div>
 
         {/* Subsection 2 */}
-        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800/80 bg-white dark:bg-[#0a0a0a] hover:border-neutral-300 dark:hover:border-neutral-700 hover:bg-neutral-50/50 dark:hover:bg-[#121212] p-6 space-y-3 transition-all duration-200 group shadow-sm">
+        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800/80 bg-white dark:bg-black hover:border-neutral-300 dark:hover:border-neutral-700 hover:bg-neutral-50/50 dark:hover:bg-neutral-950/40 p-6 space-y-3 transition-all duration-200 group shadow-sm">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 transition-transform group-hover:scale-105">
             <Sliders className="h-5 w-5" />
           </div>
@@ -40,7 +40,7 @@ export function AboutSection() {
         </div>
 
         {/* Subsection 3 */}
-        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800/80 bg-white dark:bg-[#0a0a0a] hover:border-neutral-300 dark:hover:border-neutral-700 hover:bg-neutral-50/50 dark:hover:bg-[#121212] p-6 space-y-3 transition-all duration-200 group shadow-sm">
+        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800/80 bg-white dark:bg-black hover:border-neutral-300 dark:hover:border-neutral-700 hover:bg-neutral-50/50 dark:hover:bg-neutral-950/40 p-6 space-y-3 transition-all duration-200 group shadow-sm">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 transition-transform group-hover:scale-105">
             <ShieldCheck className="h-5 w-5" />
           </div>

@@ -263,7 +263,7 @@ export default function AdminPage() {
   if (isAuthorized === false) {
     return (
       <div className="min-h-screen bg-black flex flex-col items-center justify-center px-4">
-        <div className="w-full max-w-md rounded-2xl border border-neutral-800 bg-[#0a0a0a] p-8 text-center shadow-2xl">
+        <div className="w-full max-w-md rounded-2xl border border-neutral-800 bg-black p-8 text-center shadow-2xl">
           <div className="h-14 w-14 rounded-2xl bg-rose-500/10 text-rose-400 border border-rose-500/30 flex items-center justify-center mx-auto mb-4">
             <ShieldAlert className="h-7 w-7" />
           </div>
@@ -431,7 +431,7 @@ export default function AdminPage() {
           </Link>
 
           {currentAdmin && (
-            <div className="rounded-xl border border-neutral-800 bg-[#0a0a0a] p-2.5 flex items-center justify-between">
+            <div className="rounded-xl border border-neutral-800 bg-black p-2.5 flex items-center justify-between">
               <div className="flex items-center gap-2 min-w-0">
                 <div className="h-7 w-7 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center font-bold text-xs text-white flex-shrink-0">
                   {currentAdmin.name.charAt(0).toUpperCase()}
@@ -487,7 +487,7 @@ export default function AdminPage() {
               size="sm"
               onClick={() => loadData()}
               disabled={isLoading}
-              className="h-9 gap-1.5 text-xs text-neutral-300 hover:text-white border-neutral-800 bg-[#0a0a0a] hover:bg-neutral-900"
+              className="h-9 gap-1.5 text-xs text-neutral-300 hover:text-white border-neutral-800 bg-black hover:bg-neutral-900"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? "animate-spin text-purple-400" : ""}`} />
               <span className="hidden sm:inline">Refresh Data</span>
@@ -567,7 +567,7 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={() => navigateToJobsWithFilter("all")}
-                    className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1 text-left hover:border-purple-500/50 hover:bg-[#121212] transition-all cursor-pointer group"
+                    className="rounded-xl border border-neutral-800/90 bg-black p-3.5 space-y-1 text-left hover:border-purple-500/50 hover:bg-neutral-950/40 transition-all cursor-pointer group"
                     title="View all jobs"
                   >
                     <div className="flex items-center justify-between">
@@ -586,7 +586,7 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={() => navigateToJobsWithFilter("all")}
-                    className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1 text-left hover:border-blue-500/50 hover:bg-[#121212] transition-all cursor-pointer group"
+                    className="rounded-xl border border-neutral-800/90 bg-black p-3.5 space-y-1 text-left hover:border-blue-500/50 hover:bg-neutral-950/40 transition-all cursor-pointer group"
                     title="View recent jobs"
                   >
                     <div className="flex items-center justify-between">
@@ -618,7 +618,7 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={() => navigateToJobsWithFilter("queued")}
-                    className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1 text-left hover:border-blue-500/50 hover:bg-[#121212] transition-all cursor-pointer group"
+                    className="rounded-xl border border-neutral-800/90 bg-black p-3.5 space-y-1 text-left hover:border-blue-500/50 hover:bg-neutral-950/40 transition-all cursor-pointer group"
                     title="View queued & active jobs"
                   >
                     <div className="flex items-center justify-between">
@@ -639,7 +639,7 @@ export default function AdminPage() {
                   </button>
 
                   {/* Success Rate */}
-                  <div className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1">
+                  <div className="rounded-xl border border-neutral-800/90 bg-black p-3.5 space-y-1">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] uppercase font-semibold text-emerald-400 tracking-wider">Success Rate</span>
                       <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
@@ -649,7 +649,7 @@ export default function AdminPage() {
                   </div>
 
                   {/* Avg Latency */}
-                  <div className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1">
+                  <div className="rounded-xl border border-neutral-800/90 bg-black p-3.5 space-y-1">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] uppercase font-semibold text-amber-400 tracking-wider">Avg Latency</span>
                       <Clock className="h-3.5 w-3.5 text-amber-400" />
@@ -659,7 +659,7 @@ export default function AdminPage() {
                   </div>
 
                   {/* Storage */}
-                  <div className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-3.5 space-y-1">
+                  <div className="rounded-xl border border-neutral-800/90 bg-black p-3.5 space-y-1">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] uppercase font-semibold text-purple-400 tracking-wider">Storage</span>
                       <HardDrive className="h-3.5 w-3.5 text-purple-400" />
@@ -674,7 +674,7 @@ export default function AdminPage() {
                 {/* 2. ANALYTICS ROW: USERS PER DAY GRAPH & RECENT JOBS FEED */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                   {/* USERS PER DAY GRAPH */}
-                  <div className="lg:col-span-7 rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-5 space-y-4">
+                  <div className="lg:col-span-7 rounded-xl border border-neutral-800/90 bg-black p-5 space-y-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-2.5">
                         <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
@@ -931,7 +931,7 @@ export default function AdminPage() {
                   </div>
 
                   {/* RECENT JOBS LIVE FEED */}
-                  <div className="lg:col-span-5 rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-5 space-y-3 flex flex-col justify-between">
+                  <div className="lg:col-span-5 rounded-xl border border-neutral-800/90 bg-black p-5 space-y-3 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between pb-2 border-b border-neutral-800/60">
                         <div className="flex items-center gap-2">
@@ -1023,7 +1023,7 @@ export default function AdminPage() {
 
                 {/* 3. INFRASTRUCTURE BREAKDOWN CARDS */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-5 space-y-3">
+                <div className="rounded-xl border border-neutral-800/90 bg-black p-5 space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-white flex items-center gap-2">
                       <Server className="h-4 w-4 text-purple-400" />
@@ -1098,7 +1098,7 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-neutral-800/90 bg-[#0a0a0a] p-5 space-y-3">
+                <div className="rounded-xl border border-neutral-800/90 bg-black p-5 space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-white flex items-center gap-2">
                       <Activity className="h-4 w-4 text-blue-400" />
@@ -1187,7 +1187,7 @@ export default function AdminPage() {
                     onChange={(e) => setJobSearch(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && loadData()}
                     placeholder="Search by filename or ID..."
-                    className="w-full h-9 pl-9 pr-3 rounded-lg border border-neutral-800 bg-[#0a0a0a] text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full h-9 pl-9 pr-3 rounded-lg border border-neutral-800 bg-black text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
                   />
                 </div>
 
@@ -1199,7 +1199,7 @@ export default function AdminPage() {
                       className={`px-2.5 py-1 rounded-md capitalize font-medium transition-colors ${
                         jobStatusFilter === st
                           ? "bg-purple-600 text-white"
-                          : "bg-[#0a0a0a] border border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-900"
+                          : "bg-black border border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-900"
                       }`}
                     >
                       {st}
@@ -1209,7 +1209,7 @@ export default function AdminPage() {
               </div>
 
               {/* Jobs Table */}
-              <div className="rounded-xl border border-neutral-800 bg-[#0a0a0a] overflow-x-auto">
+              <div className="rounded-xl border border-neutral-800 bg-black overflow-x-auto">
                 <table className="w-full text-left text-xs text-neutral-300">
                   <thead className="bg-black text-neutral-400 uppercase text-[10px] tracking-wider border-b border-neutral-800">
                     <tr>
@@ -1327,7 +1327,7 @@ export default function AdminPage() {
                   )}
                 </div>
 
-                <div className="rounded-xl border border-neutral-800 bg-[#0a0a0a] overflow-x-auto">
+                <div className="rounded-xl border border-neutral-800 bg-black overflow-x-auto">
                   <table className="w-full text-left text-xs text-neutral-300">
                     <thead className="bg-black text-neutral-400 uppercase text-[10px] tracking-wider border-b border-neutral-800">
                       <tr>
@@ -1400,7 +1400,7 @@ export default function AdminPage() {
                 <h3 className="text-sm font-semibold text-white">Active System Configuration</h3>
               </div>
 
-              <div className="rounded-xl border border-neutral-800 bg-[#0a0a0a] p-6 space-y-4 text-xs">
+              <div className="rounded-xl border border-neutral-800 bg-black p-6 space-y-4 text-xs">
                 <div className="space-y-3 divide-y divide-neutral-800">
                   <div className="flex justify-between items-center pt-2">
                     <span className="text-neutral-400">Maximum Upload Size</span>

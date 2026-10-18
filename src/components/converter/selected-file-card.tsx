@@ -21,7 +21,7 @@ export function SelectedFileCard({
   disabled = false,
 }: SelectedFileCardProps) {
   return (
-    <div className="w-full rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#0a0a0a] p-4 sm:p-5 transition-all shadow-sm">
+    <div className="w-full rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black p-4 sm:p-5 transition-all shadow-sm">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         {/* Left: Icon & File Details */}
         <div className="flex items-center gap-3.5 min-w-0 w-full sm:w-auto">

@@ -213,7 +213,7 @@ export function ThemeToggle() {
       <DropdownMenuContent
         align="end"
         sideOffset={8}
-        className="w-64 p-1.5 rounded-2xl bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800 shadow-2xl space-y-1"
+        className="w-64 p-1.5 rounded-2xl bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 shadow-2xl space-y-1"
       >
         {/* 1. Light Option */}
         <button

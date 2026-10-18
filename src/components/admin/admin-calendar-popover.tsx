@@ -246,7 +246,7 @@ export function AdminCalendarPopover({
       {/* AMOLED CALENDAR POPOVER */}
       {isOpen && (
         <div
-          className={`absolute top-full mt-2 z-50 w-72 sm:w-80 rounded-2xl border border-neutral-800 bg-[#0a0a0a] shadow-2xl shadow-black/95 p-3.5 space-y-3 animate-in fade-in zoom-in-95 duration-150 ${
+          className={`absolute top-full mt-2 z-50 w-72 sm:w-80 rounded-2xl border border-neutral-800 bg-black shadow-2xl shadow-black/95 p-3.5 space-y-3 animate-in fade-in zoom-in-95 duration-150 ${
             align === "right" ? "right-0" : "left-0"
           }`}
         >

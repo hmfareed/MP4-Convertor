@@ -94,7 +94,7 @@ export function FeaturesSection() {
           return (
             <div
               key={feature.title}
-              className="rounded-2xl border border-neutral-200 dark:border-neutral-800/80 bg-white dark:bg-[#0a0a0a] p-6 transition-all duration-200 hover:border-neutral-300 dark:hover:border-neutral-700 hover:bg-neutral-50/50 dark:hover:bg-[#121212] flex flex-col justify-between group shadow-sm"
+              className="rounded-2xl border border-neutral-200 dark:border-neutral-800/80 bg-white dark:bg-black p-6 transition-all duration-200 hover:border-neutral-300 dark:hover:border-neutral-700 hover:bg-neutral-50/50 dark:hover:bg-neutral-950/40 flex flex-col justify-between group shadow-sm"
             >
               <div className="space-y-3">
                 <div

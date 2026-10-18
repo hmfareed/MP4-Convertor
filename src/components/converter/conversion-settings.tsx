@@ -189,7 +189,7 @@ export function ConversionSettings({
 
       {/* Expandable Audio Trimming Control Card */}
       {showTrim && hasFile && (
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/60 dark:bg-[#0a0a0a] p-4 space-y-4 animate-in fade-in slide-in-from-top-2">
+        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/60 dark:bg-black p-4 space-y-4 animate-in fade-in slide-in-from-top-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-neutral-900 dark:text-white flex items-center gap-1.5">
               <Scissors className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />

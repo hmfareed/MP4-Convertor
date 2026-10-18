@@ -9,7 +9,7 @@ export function HeroSection() {
       </div>
       <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white mb-4">
         MP4 to{" "}
-        <span className="bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-600 dark:from-purple-400 dark:via-pink-400 dark:to-indigo-400 bg-clip-text text-transparent drop-shadow-sm">
+        <span className="bg-gradient-to-r from-blue-500 via-blue-500 to-blue-600 dark:from-blue-400 dark:via-blue-400 dark:to-blue-500 bg-clip-text text-transparent drop-shadow-sm">
           MP3
         </span>{" "}
         Converter

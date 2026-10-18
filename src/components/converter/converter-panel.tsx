@@ -345,7 +345,7 @@ export function ConverterPanel() {
         />
 
         {/* Inner Card Container on Adaptive Background */}
-        <div className="relative rounded-[14px] bg-white dark:bg-[#0a0a0a] overflow-hidden">
+        <div className="relative rounded-[14px] bg-white dark:bg-black overflow-hidden">
           <CardContent className="p-6 sm:p-8 space-y-6">
           {/* Active Job State Render */}
           {activeJob && !previewState ? (

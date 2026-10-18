@@ -162,7 +162,7 @@ export function Dropzone({
             "relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 sm:p-12 text-center transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
             isDragOver
               ? "border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-500/10 scale-[1.005]"
-              : "border-neutral-300 hover:border-neutral-400 dark:border-neutral-800 dark:hover:border-neutral-700 bg-neutral-50/70 hover:bg-neutral-100/70 dark:bg-black dark:hover:bg-[#080808]",
+              : "border-neutral-300 hover:border-neutral-400 dark:border-neutral-800 dark:hover:border-neutral-700 bg-neutral-50/70 hover:bg-neutral-100/70 dark:bg-black dark:hover:bg-black",
             errorMessage && "border-rose-500/60 bg-rose-500/5",
             disabled && "cursor-not-allowed opacity-50 pointer-events-none"
           )}
