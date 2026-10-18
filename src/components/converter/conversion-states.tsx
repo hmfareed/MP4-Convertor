@@ -259,7 +259,11 @@ export function CompletedState({ job, onReset }: StateProps) {
         <label className="text-xs font-medium text-neutral-700 dark:text-slate-300">
           Audio Preview
         </label>
-        <AudioPlayer src={job.audioUrl} duration={job.duration || 120} />
+        <AudioPlayer
+          src={job.audioUrl}
+          duration={job.duration || 120}
+          title={outputName}
+        />
       </div>
 
       {/* Download Action Button */}
