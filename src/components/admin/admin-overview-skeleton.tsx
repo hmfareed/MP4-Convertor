@@ -53,29 +53,88 @@ export function AdminOverviewSkeleton() {
             </div>
           </div>
 
-          {/* Chart Canvas Placeholder */}
-          <div className="h-48 w-full rounded-xl bg-neutral-950/80 border border-neutral-900/80 p-4 flex flex-col justify-between">
-            <div className="w-full flex justify-between">
-              <div className="h-2 w-32 bg-neutral-900 rounded" />
-              <div className="h-2 w-16 bg-neutral-900 rounded" />
+          {/* Chart Canvas Placeholder - SVG Line Graph Skeleton */}
+          <div className="relative pt-1 space-y-2">
+            {/* Status bar placeholder */}
+            <div className="min-h-7 flex items-center justify-between text-xs px-1">
+              <div className="h-2.5 w-48 bg-neutral-800/90 rounded" />
+              <div className="h-2.5 w-16 bg-neutral-900 rounded font-mono" />
             </div>
 
-            {/* Simulated undulating wave bars */}
-            <div className="h-28 w-full flex items-end gap-2 px-1 pt-4">
-              {[25, 40, 20, 60, 45, 75, 50, 68, 85, 55, 70, 92, 65, 80].map((h, i) => (
-                <div
-                  key={i}
-                  className="flex-1 bg-gradient-to-t from-neutral-900 to-neutral-800/60 rounded-t"
-                  style={{ height: `${h}%` }}
+            {/* SVG Line Graph Container */}
+            <div className="border border-neutral-800/80 bg-black/60 rounded-xl p-3 relative overflow-hidden">
+              <svg
+                viewBox="0 0 500 150"
+                className="w-full h-44 overflow-visible"
+              >
+                <defs>
+                  <linearGradient id="skeletonUserAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
+                    <stop offset="60%" stopColor="#10b981" stopOpacity="0.06" />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
+                  </linearGradient>
+                  <linearGradient id="skeletonUserLineGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
+                    <stop offset="50%" stopColor="#14b8a6" stopOpacity="0.6" />
+                    <stop offset="100%" stopColor="#34d399" stopOpacity="0.3" />
+                  </linearGradient>
+                </defs>
+
+                {/* Horizontal Grid Guides */}
+                <line x1="24" y1="22" x2="476" y2="22" stroke="#262626" strokeDasharray="4 4" strokeWidth="1" />
+                <line x1="24" y1="76" x2="476" y2="76" stroke="#262626" strokeDasharray="4 4" strokeWidth="1" />
+                <line x1="24" y1="130" x2="476" y2="130" stroke="#262626" strokeWidth="1" />
+
+                {/* Smooth Area Wave Fill */}
+                <path
+                  d="M 24 110 C 58 110, 75 80, 108 80 C 142 80, 159 100, 193 90 C 227 80, 244 55, 278 50 C 312 45, 329 85, 363 75 C 397 65, 414 38, 448 38 C 462 38, 470 55, 476 60 L 476 130 L 24 130 Z"
+                  fill="url(#skeletonUserAreaGrad)"
                 />
-              ))}
-            </div>
 
-            <div className="w-full flex justify-between pt-2 border-t border-neutral-900/80">
-              <div className="h-2 w-10 bg-neutral-900 rounded" />
-              <div className="h-2 w-10 bg-neutral-900 rounded" />
-              <div className="h-2 w-10 bg-neutral-900 rounded" />
-              <div className="h-2 w-10 bg-neutral-900 rounded" />
+                {/* Smooth Glowing Line Curve */}
+                <path
+                  d="M 24 110 C 58 110, 75 80, 108 80 C 142 80, 159 100, 193 90 C 227 80, 244 55, 278 50 C 312 45, 329 85, 363 75 C 397 65, 414 38, 448 38 C 462 38, 470 55, 476 60"
+                  fill="none"
+                  stroke="url(#skeletonUserLineGrad)"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+
+                {/* Line Points along the curve */}
+                {[
+                  { cx: 24, cy: 110 },
+                  { cx: 58, cy: 96 },
+                  { cx: 93, cy: 82 },
+                  { cx: 127, cy: 85 },
+                  { cx: 162, cy: 95 },
+                  { cx: 196, cy: 88 },
+                  { cx: 231, cy: 68 },
+                  { cx: 265, cy: 52 },
+                  { cx: 300, cy: 50 },
+                  { cx: 334, cy: 78 },
+                  { cx: 369, cy: 72 },
+                  { cx: 403, cy: 54 },
+                  { cx: 438, cy: 38 },
+                  { cx: 476, cy: 60 },
+                ].map((pt, i) => (
+                  <circle
+                    key={i}
+                    cx={pt.cx}
+                    cy={pt.cy}
+                    r="3"
+                    className="fill-neutral-900 stroke-neutral-700/80"
+                    strokeWidth="1.5"
+                  />
+                ))}
+              </svg>
+
+              {/* X-Axis Date Labels Skeleton */}
+              <div className="flex justify-between items-center text-[10px] pt-2 px-2 border-t border-neutral-900">
+                {[...Array(7)].map((_, i) => (
+                  <div key={i} className="h-2 w-9 bg-neutral-900 rounded" />
+                ))}
+              </div>
             </div>
           </div>
         </div>
