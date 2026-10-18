@@ -14,14 +14,12 @@ import {
   ExpiredState,
 } from "@/components/converter/conversion-states";
 import { CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Eye, SlidersHorizontal, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { DEFAULT_BITRATE, DEFAULT_FORMAT } from "@/lib/constants";
 import {
   SelectedFileMetadata,
   ConversionSettings as IConversionSettings,
   ConversionJob,
-  JobStatus,
 } from "@/types/conversion";
 
 // Conic gradient with short, separated color beams that never touch each other
@@ -42,7 +40,6 @@ export function ConverterPanel() {
   });
   const [activeJob, setActiveJob] = useState<ConversionJob | null>(null);
   const [batchState, setBatchState] = useState<BatchState | null>(null);
-  const [previewState, setPreviewState] = useState<JobStatus | "batch" | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -476,73 +473,8 @@ export function ConverterPanel() {
     setSelectedFiles([]);
     setActiveJob(null);
     setBatchState(null);
-    setPreviewState(null);
     setErrorMessage(null);
   };
-
-  // Demo job for preview button clicks
-  const demoJob: ConversionJob = {
-    id: "job_demo_preview",
-    originalFilename: selectedFile ? selectedFile.name : "presentation_recording.mp4",
-    outputFilename: selectedFile
-      ? `${selectedFile.name.replace(/\.[^/.]+$/, "")}.mp3`
-      : "presentation_recording.mp3",
-    fileSize: selectedFile ? selectedFile.size : 42 * 1024 * 1024,
-    duration: selectedFile?.duration || 184,
-    bitrate: settings.bitrate,
-    format: settings.format,
-    status: previewState === "batch" ? "completed" : previewState || "completed",
-    progress: previewState === "uploading" ? 45 : previewState === "processing" ? 78 : 100,
-    statusMessage:
-      previewState === "uploading"
-        ? "Uploading video chunks (45% complete)..."
-        : previewState === "processing"
-        ? "Extracting audio and encoding with LAME MP3 codec..."
-        : undefined,
-    createdAt: new Date().toISOString(),
-    completedAt: new Date().toISOString(),
-  };
-
-  // Demo batch for preview button clicks
-  const demoBatchJobs: ConversionJob[] = [
-    {
-      id: "demo_1",
-      originalFilename: "lecture_part1.mp4",
-      outputFilename: "lecture_part1.mp3",
-      fileSize: 34 * 1024 * 1024,
-      duration: 320,
-      bitrate: 192,
-      format: "mp3",
-      status: "completed",
-      progress: 100,
-      downloadUrl: "#",
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: "demo_2",
-      originalFilename: "interview_session.mp4",
-      outputFilename: "interview_session.mp3",
-      fileSize: 58 * 1024 * 1024,
-      duration: 480,
-      bitrate: 192,
-      format: "mp3",
-      status: "processing",
-      progress: 68,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: "demo_3",
-      originalFilename: "soundtrack_clip.mp4",
-      outputFilename: "soundtrack_clip.mp3",
-      fileSize: 18 * 1024 * 1024,
-      duration: 145,
-      bitrate: 192,
-      format: "mp3",
-      status: "queued",
-      progress: 0,
-      createdAt: new Date().toISOString(),
-    },
-  ];
 
   return (
     <div id="converter" className="w-full max-w-4xl mx-auto px-4 sm:px-6">
@@ -566,7 +498,7 @@ export function ConverterPanel() {
         <div className="relative rounded-[14px] bg-white dark:bg-black overflow-hidden">
           <CardContent className="p-6 sm:p-8 space-y-6">
             {/* 1. Batch Conversion Active State */}
-            {batchState && !previewState ? (
+            {batchState ? (
               <BatchConversionCard
                 batchId={batchState.batchId}
                 jobs={batchState.jobs}
@@ -574,7 +506,7 @@ export function ConverterPanel() {
                 onReset={handleReset}
                 onCancelAll={handleCancelBatch}
               />
-            ) : activeJob && !previewState ? (
+            ) : activeJob ? (
               /* 2. Single-File Active Job State Render */
               <div className="space-y-4">
                 {activeJob.status === "uploading" && (
@@ -601,57 +533,8 @@ export function ConverterPanel() {
                 )}
                 {activeJob.status === "expired" && <ExpiredState onReset={handleReset} />}
               </div>
-            ) : previewState ? (
-              /* 3. Dev Preview Mode */
-              <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
-                    <Eye className="h-4 w-4" /> State Preview Mode: {previewState.toUpperCase()}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setPreviewState(null)}
-                    className="text-xs text-slate-400 hover:text-white h-7"
-                  >
-                    Exit Preview
-                  </Button>
-                </div>
-
-                {previewState === "batch" && (
-                  <BatchConversionCard
-                    batchId="demo_batch_123"
-                    jobs={demoBatchJobs}
-                    overallProgress={56}
-                    onReset={() => setPreviewState(null)}
-                  />
-                )}
-                {previewState === "uploading" && (
-                  <UploadingState job={demoJob} onCancel={() => setPreviewState("cancelled")} />
-                )}
-                {previewState === "queued" && (
-                  <QueuedState job={demoJob} onCancel={() => setPreviewState("cancelled")} />
-                )}
-                {previewState === "processing" && (
-                  <ProcessingState job={demoJob} onCancel={() => setPreviewState("cancelled")} />
-                )}
-                {previewState === "completed" && (
-                  <CompletedState job={demoJob} onReset={handleReset} />
-                )}
-                {previewState === "failed" && (
-                  <FailedState
-                    job={demoJob}
-                    onRetry={() => setPreviewState("processing")}
-                    onReset={handleReset}
-                  />
-                )}
-                {previewState === "cancelled" && (
-                  <CancelledState job={demoJob} onReset={handleReset} />
-                )}
-                {previewState === "expired" && <ExpiredState onReset={handleReset} />}
-              </div>
             ) : (
-              /* 4. Standard Upload & Conversion Controls */
+              /* 3. Standard Upload & Conversion Controls */
               <>
                 <Dropzone
                   selectedFiles={selectedFiles}
@@ -697,42 +580,6 @@ export function ConverterPanel() {
                 )}
               </>
             )}
-
-            {/* Component State Inspector */}
-            <div className="pt-4 border-t border-neutral-200 dark:border-neutral-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-neutral-500 dark:text-neutral-400">
-              <span className="flex items-center gap-1.5 font-medium text-neutral-700 dark:text-neutral-300">
-                <SlidersHorizontal className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
-                <span>Conversion State Components:</span>
-              </span>
-
-              <div className="flex flex-wrap items-center gap-1.5">
-                {(
-                  [
-                    "batch",
-                    "uploading",
-                    "queued",
-                    "processing",
-                    "completed",
-                    "failed",
-                    "cancelled",
-                    "expired",
-                  ] as Array<JobStatus | "batch">
-                ).map((st) => (
-                  <button
-                    key={st}
-                    onClick={() => setPreviewState(previewState === st ? null : st)}
-                    className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all capitalize ${
-                      previewState === st
-                        ? "bg-blue-600 text-white shadow-sm shadow-blue-900/40"
-                        : "bg-neutral-100 dark:bg-neutral-900/80 border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200 dark:hover:bg-neutral-800"
-                    }`}
-                    title={`Preview ${st} component`}
-                  >
-                    {st}
-                  </button>
-                ))}
-              </div>
-            </div>
           </CardContent>
         </div>
       </div>
