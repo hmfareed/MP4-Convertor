@@ -101,3 +101,11 @@
 .gradient-btn-secondary {
   @apply bg-gradient-to-r from-blue-700/20 to-indigo-700/20 text-white border border-blue-500/30 hover:border-blue-500/60 transition-all duration-150;
 }
+
+/* Allow scrolling through the entire screen even when popups and select menus are open */
+html body[data-scroll-locked],
+html body.with-scroll-bars-hidden {
+  overflow: auto !important;
+  overscroll-behavior: auto !important;
+  margin-right: 0px !important;
+}
