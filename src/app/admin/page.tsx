@@ -41,6 +41,7 @@ import { Badge } from "@/components/ui/badge";
 import { Logo } from "@/components/layout/logo";
 import { UserCalendarKPI } from "@/components/admin/user-calendar-kpi";
 import { AdminCalendarPopover } from "@/components/admin/admin-calendar-popover";
+import { AdminOverviewSkeleton, AdminTableSkeleton } from "@/components/admin/admin-overview-skeleton";
 import { formatBytes, formatDuration, formatTimeAgo } from "@/lib/utils";
 import { JobStatus } from "@/types/conversion";
 
@@ -430,7 +431,7 @@ export default function AdminPage() {
             <span className="truncate">Exit to App</span>
           </Link>
 
-          {currentAdmin && (
+          {currentAdmin ? (
             <div className="rounded-xl border border-neutral-800 bg-black p-2.5 flex items-center justify-between">
               <div className="flex items-center gap-2 min-w-0">
                 <div className="h-7 w-7 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center font-bold text-xs text-white flex-shrink-0">
@@ -448,6 +449,14 @@ export default function AdminPage() {
               >
                 <LogOut className="h-3.5 w-3.5" />
               </button>
+            </div>
+          ) : (
+            <div className="rounded-xl border border-neutral-800 bg-black p-2.5 flex items-center gap-2 animate-pulse">
+              <div className="h-7 w-7 rounded-full bg-neutral-800 flex-shrink-0" />
+              <div className="space-y-1 flex-1 min-w-0">
+                <div className="h-3 w-20 bg-neutral-800 rounded" />
+                <div className="h-2 w-28 bg-neutral-900 rounded" />
+              </div>
             </div>
           )}
         </div>
@@ -498,8 +507,11 @@ export default function AdminPage() {
         {/* WORKSPACE CONTENT AREA */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-7xl w-full">
           {/* TAB 1: OVERVIEW */}
-          {activeTab === "overview" && (() => {
-            const dailyUsers = metrics?.usersPerDay?.slice(-userGraphDays) || [];
+          {activeTab === "overview" && (
+            !metrics ? (
+              <AdminOverviewSkeleton />
+            ) : (() => {
+                const dailyUsers = metrics.usersPerDay?.slice(-userGraphDays) || [];
             const maxUsersInWindow = Math.max(1, ...dailyUsers.map((d) => d.count));
             const totalNewInWindow = dailyUsers.reduce((sum, d) => sum + d.count, 0);
             const peakDay = dailyUsers.reduce(
@@ -1151,7 +1163,8 @@ export default function AdminPage() {
               </div>
             </div>
           );
-        })()}
+        })()
+      )}
 
           {/* TAB 2: JOBS */}
           {activeTab === "jobs" && (
@@ -1222,78 +1235,82 @@ export default function AdminPage() {
                       <th className="p-3 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-neutral-800/70">
-                    {jobs.length === 0 ? (
-                      <tr>
-                        <td colSpan={7} className="p-8 text-center text-neutral-500">
-                          No conversion jobs found matching the current criteria.
-                        </td>
-                      </tr>
-                    ) : (
-                      jobs.map((job) => (
-                        <tr key={job.id} className="hover:bg-neutral-900/40">
-                          <td className="p-3">
-                            <div className="font-medium text-white truncate max-w-xs">{job.originalFilename}</div>
-                            <span className="font-mono text-[10px] text-neutral-500">{job.id.slice(0, 10)}...</span>
-                          </td>
-                          <td className="p-3 capitalize">{job.ownerType}</td>
-                          <td className="p-3 font-mono">{job.bitrateKbps}k</td>
-                          <td className="p-3">{job.durationSec ? formatDuration(job.durationSec) : "—"}</td>
-                          <td className="p-3">
-                            <Badge
-                              variant={
-                                job.status === "completed"
-                                  ? "success"
-                                  : job.status === "failed"
-                                  ? "destructive"
-                                  : job.status === "processing"
-                                  ? "info"
-                                  : "outline"
-                              }
-                              className="text-[10px] px-2 py-0"
-                            >
-                              {job.status}
-                            </Badge>
-                            {job.errorCode && (
-                              <span className="block text-[10px] text-rose-400 font-mono mt-0.5">
-                                {job.errorCode}
-                              </span>
-                            )}
-                          </td>
-                          <td className="p-3 font-mono">{job.attempt}</td>
-                          <td className="p-3 text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              {(job.status === "failed" || job.status === "cancelled") && (
-                                <button
-                                  onClick={() => handleJobRetry(job.id)}
-                                  className="p-1 text-neutral-400 hover:text-purple-400"
-                                  title="Retry conversion"
-                                >
-                                  <RotateCcw className="h-3.5 w-3.5" />
-                                </button>
-                              )}
-                              {(job.status === "queued" || job.status === "processing") && (
-                                <button
-                                  onClick={() => handleJobCancel(job.id)}
-                                  className="p-1 text-neutral-400 hover:text-amber-400"
-                                  title="Cancel job"
-                                >
-                                  <XCircle className="h-3.5 w-3.5" />
-                                </button>
-                              )}
-                              <button
-                                onClick={() => handleJobDelete(job.id)}
-                                className="p-1 text-neutral-400 hover:text-rose-400"
-                                title="Delete job"
-                              >
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </button>
-                            </div>
+                  {isLoading && jobs.length === 0 ? (
+                    <AdminTableSkeleton columns={7} rows={6} />
+                  ) : (
+                    <tbody className="divide-y divide-neutral-800/70">
+                      {jobs.length === 0 ? (
+                        <tr>
+                          <td colSpan={7} className="p-8 text-center text-neutral-500">
+                            No conversion jobs found matching the current criteria.
                           </td>
                         </tr>
-                      ))
-                    )}
-                  </tbody>
+                      ) : (
+                        jobs.map((job) => (
+                          <tr key={job.id} className="hover:bg-neutral-900/40">
+                            <td className="p-3">
+                              <div className="font-medium text-white truncate max-w-xs">{job.originalFilename}</div>
+                              <span className="font-mono text-[10px] text-neutral-500">{job.id.slice(0, 10)}...</span>
+                            </td>
+                            <td className="p-3 capitalize">{job.ownerType}</td>
+                            <td className="p-3 font-mono">{job.bitrateKbps}k</td>
+                            <td className="p-3">{job.durationSec ? formatDuration(job.durationSec) : "—"}</td>
+                            <td className="p-3">
+                              <Badge
+                                variant={
+                                  job.status === "completed"
+                                    ? "success"
+                                    : job.status === "failed"
+                                    ? "destructive"
+                                    : job.status === "processing"
+                                    ? "info"
+                                    : "outline"
+                                }
+                                className="text-[10px] px-2 py-0"
+                              >
+                                {job.status}
+                              </Badge>
+                              {job.errorCode && (
+                                <span className="block text-[10px] text-rose-400 font-mono mt-0.5">
+                                  {job.errorCode}
+                                </span>
+                              )}
+                            </td>
+                            <td className="p-3 font-mono">{job.attempt}</td>
+                            <td className="p-3 text-right">
+                              <div className="flex items-center justify-end gap-1">
+                                {(job.status === "failed" || job.status === "cancelled") && (
+                                  <button
+                                    onClick={() => handleJobRetry(job.id)}
+                                    className="p-1 text-neutral-400 hover:text-purple-400"
+                                    title="Retry conversion"
+                                  >
+                                    <RotateCcw className="h-3.5 w-3.5" />
+                                  </button>
+                                )}
+                                {(job.status === "queued" || job.status === "processing") && (
+                                  <button
+                                    onClick={() => handleJobCancel(job.id)}
+                                    className="p-1 text-neutral-400 hover:text-amber-400"
+                                    title="Cancel job"
+                                  >
+                                    <XCircle className="h-3.5 w-3.5" />
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => handleJobDelete(job.id)}
+                                  className="p-1 text-neutral-400 hover:text-rose-400"
+                                  title="Delete job"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  )}
                 </table>
               </div>
             </div>
@@ -1339,53 +1356,57 @@ export default function AdminPage() {
                         <th className="p-3 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-neutral-800/70">
-                      {filteredUsers.length === 0 ? (
-                        <tr>
-                          <td colSpan={6} className="p-8 text-center text-neutral-500">
-                            {selectedCalendarDate
-                              ? `No user accounts registered on ${selectedCalendarDate}.`
-                              : "No user accounts found."}
-                          </td>
-                        </tr>
-                      ) : (
-                        filteredUsers.map((u) => (
-                          <tr key={u._id} className="hover:bg-neutral-900/40">
-                            <td className="p-3 font-semibold text-white">{u.name}</td>
-                            <td className="p-3 text-neutral-400">{u.email}</td>
-                            <td className="p-3">
-                              <Badge variant={u.role === "admin" ? "gradient" : "outline"} className="text-[10px]">
-                                {u.role}
-                              </Badge>
-                            </td>
-                            <td className="p-3">
-                              <Badge variant={u.status === "active" ? "success" : "destructive"} className="text-[10px]">
-                                {u.status}
-                              </Badge>
-                            </td>
-                            <td className="p-3 text-neutral-500">
-                              {new Date(u.createdAt).toLocaleDateString()}
-                            </td>
-                            <td className="p-3 text-right space-x-2">
-                              <button
-                                onClick={() => handleUserToggleRole(u)}
-                                className="text-[11px] text-purple-400 hover:underline"
-                              >
-                                {u.role === "admin" ? "Demote" : "Make Admin"}
-                              </button>
-                              <button
-                                onClick={() => handleUserToggleStatus(u)}
-                                className={`text-[11px] hover:underline ${
-                                  u.status === "active" ? "text-amber-400" : "text-emerald-400"
-                                }`}
-                              >
-                                {u.status === "active" ? "Suspend" : "Activate"}
-                              </button>
+                    {isLoading && users.length === 0 ? (
+                      <AdminTableSkeleton columns={6} rows={6} />
+                    ) : (
+                      <tbody className="divide-y divide-neutral-800/70">
+                        {filteredUsers.length === 0 ? (
+                          <tr>
+                            <td colSpan={6} className="p-8 text-center text-neutral-500">
+                              {selectedCalendarDate
+                                ? `No user accounts registered on ${selectedCalendarDate}.`
+                                : "No user accounts found."}
                             </td>
                           </tr>
-                        ))
-                      )}
-                    </tbody>
+                        ) : (
+                          filteredUsers.map((u) => (
+                            <tr key={u._id} className="hover:bg-neutral-900/40">
+                              <td className="p-3 font-semibold text-white">{u.name}</td>
+                              <td className="p-3 text-neutral-400">{u.email}</td>
+                              <td className="p-3">
+                                <Badge variant={u.role === "admin" ? "gradient" : "outline"} className="text-[10px]">
+                                  {u.role}
+                                </Badge>
+                              </td>
+                              <td className="p-3">
+                                <Badge variant={u.status === "active" ? "success" : "destructive"} className="text-[10px]">
+                                  {u.status}
+                                </Badge>
+                              </td>
+                              <td className="p-3 text-neutral-500">
+                                {new Date(u.createdAt).toLocaleDateString()}
+                              </td>
+                              <td className="p-3 text-right space-x-2">
+                                <button
+                                  onClick={() => handleUserToggleRole(u)}
+                                  className="text-[11px] text-purple-400 hover:underline"
+                                >
+                                  {u.role === "admin" ? "Demote" : "Make Admin"}
+                                </button>
+                                <button
+                                  onClick={() => handleUserToggleStatus(u)}
+                                  className={`text-[11px] hover:underline ${
+                                    u.status === "active" ? "text-amber-400" : "text-emerald-400"
+                                  }`}
+                                >
+                                  {u.status === "active" ? "Suspend" : "Activate"}
+                                </button>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    )}
                   </table>
                 </div>
               </div>
