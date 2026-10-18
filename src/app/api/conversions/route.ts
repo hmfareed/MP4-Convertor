@@ -18,6 +18,7 @@ const createConversionSchema = z.object({
   bitrate: z.number().refine(isValidBitrate, "Invalid bitrate option"),
   trimStartSec: z.number().optional(),
   trimEndSec: z.number().optional(),
+  batchId: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { uploadId, bitrate, trimStartSec, trimEndSec } = parsed.data;
+    const { uploadId, bitrate, trimStartSec, trimEndSec, batchId } = parsed.data;
 
     // Idempotency support
     const idempotencyKey =
@@ -68,6 +69,7 @@ export async function POST(req: NextRequest) {
     if (existingJob) {
       return NextResponse.json({
         jobId: existingJob._id.toString(),
+        batchId: existingJob.batchId,
         status: existingJob.status,
         progress: existingJob.progressPercent,
         message: "Existing conversion returned via idempotency key.",
@@ -91,6 +93,7 @@ export async function POST(req: NextRequest) {
       ownerType: "guest",
       ownerId: guestTokenHash,
       guestTokenHash,
+      batchId,
       uploadId: upload._id,
       originalFilename: upload.originalNameSafe,
       fileSizeBytes: upload.sizeBytes,
@@ -112,6 +115,7 @@ export async function POST(req: NextRequest) {
 
     const response = NextResponse.json({
       jobId: job._id.toString(),
+      batchId: job.batchId,
       status: "queued",
       progress: 0,
     });

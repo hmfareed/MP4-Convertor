@@ -23,6 +23,7 @@ interface ConversionSettingsProps {
   isLoading?: boolean;
   hasFile: boolean;
   detectedDuration?: number;
+  fileCount?: number;
 }
 
 export function ConversionSettings({
@@ -33,6 +34,7 @@ export function ConversionSettings({
   isLoading = false,
   hasFile,
   detectedDuration = 0,
+  fileCount = 1,
 }: ConversionSettingsProps) {
   const [showTrim, setShowTrim] = useState<boolean>(false);
 
@@ -122,19 +124,21 @@ export function ConversionSettings({
             >
               Quality
             </label>
-            <button
-              type="button"
-              onClick={handleToggleTrim}
-              disabled={disabled || !hasFile}
-              className={`text-xs flex items-center gap-1 transition-colors ${
-                showTrim
-                  ? "text-purple-600 dark:text-purple-400 font-semibold"
-                  : "text-neutral-500 hover:text-neutral-900 dark:text-slate-400 dark:hover:text-white"
-              }`}
-            >
-              <Scissors className="h-3 w-3" />
-              <span>{showTrim ? "Trim Active" : "Trim Audio"}</span>
-            </button>
+            {fileCount <= 1 && (
+              <button
+                type="button"
+                onClick={handleToggleTrim}
+                disabled={disabled || !hasFile}
+                className={`text-xs flex items-center gap-1 transition-colors ${
+                  showTrim
+                    ? "text-purple-600 dark:text-purple-400 font-semibold"
+                    : "text-neutral-500 hover:text-neutral-900 dark:text-slate-400 dark:hover:text-white"
+                }`}
+              >
+                <Scissors className="h-3 w-3" />
+                <span>{showTrim ? "Trim Active" : "Trim Audio"}</span>
+              </button>
+            )}
           </div>
           <Select
             value={settings.bitrate.toString()}
@@ -179,7 +183,11 @@ export function ConversionSettings({
               <>
                 <ArrowRightLeft className="h-4 w-4 text-white" />
                 <span>
-                  {showTrim ? "Trim & Convert to MP3" : "Convert to MP3"}
+                  {fileCount > 1
+                    ? `Convert ${fileCount} Files to MP3`
+                    : showTrim
+                    ? "Trim & Convert to MP3"
+                    : "Convert to MP3"}
                 </span>
               </>
             )}

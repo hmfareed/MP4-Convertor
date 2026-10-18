@@ -1,76 +1,130 @@
 "use client";
 
 import React, { useRef, useState, useCallback } from "react";
-import { UploadCloud, FileText, AlertCircle } from "lucide-react";
+import { UploadCloud, FileText, AlertCircle, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SelectedFileCard } from "@/components/converter/selected-file-card";
+import { SelectedFilesList } from "@/components/converter/selected-files-list";
 import { validateSelectedFile } from "@/lib/validation/converter";
 import { MAX_FILE_SIZE_LABEL } from "@/lib/constants";
 import { SelectedFileMetadata } from "@/types/conversion";
 import { cn } from "@/lib/utils";
 
 interface DropzoneProps {
-  selectedFile: SelectedFileMetadata | null;
-  onFileSelect: (fileMeta: SelectedFileMetadata) => void;
-  onFileRemove: () => void;
+  selectedFile?: SelectedFileMetadata | null;
+  selectedFiles?: SelectedFileMetadata[];
+  onFileSelect?: (fileMeta: SelectedFileMetadata) => void;
+  onFilesSelect?: (fileMetas: SelectedFileMetadata[]) => void;
+  onFileRemove?: (index?: number) => void;
+  onClearAll?: () => void;
   disabled?: boolean;
 }
 
 export function Dropzone({
   selectedFile,
+  selectedFiles,
   onFileSelect,
+  onFilesSelect,
   onFileRemove,
+  onClearAll,
   disabled = false,
 }: DropzoneProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Helper to extract duration via client-side video element
-  const processFile = useCallback(
-    (file: File) => {
-      setErrorMessage(null);
-      const validation = validateSelectedFile(file);
+  // Normalize selected files list
+  const currentFiles: SelectedFileMetadata[] =
+    selectedFiles !== undefined
+      ? selectedFiles
+      : selectedFile
+      ? [selectedFile]
+      : [];
 
-      if (!validation.valid) {
-        setErrorMessage(validation.error || "Invalid file selection.");
-        return;
+  // Helper to extract duration via client-side video element for a single file
+  const readDuration = (file: File): Promise<number | undefined> => {
+    return new Promise((resolve) => {
+      try {
+        const objectUrl = URL.createObjectURL(file);
+        const video = document.createElement("video");
+        video.preload = "metadata";
+
+        const cleanup = () => {
+          URL.revokeObjectURL(objectUrl);
+        };
+
+        video.addEventListener(
+          "loadedmetadata",
+          () => {
+            const dur = video.duration;
+            cleanup();
+            resolve(dur);
+          },
+          { once: true }
+        );
+
+        video.addEventListener(
+          "error",
+          () => {
+            cleanup();
+            resolve(undefined);
+          },
+          { once: true }
+        );
+
+        // Timeout fallback after 2s
+        setTimeout(() => {
+          cleanup();
+          resolve(undefined);
+        }, 2000);
+
+        video.src = objectUrl;
+      } catch {
+        resolve(undefined);
+      }
+    });
+  };
+
+  const processFiles = useCallback(
+    async (fileList: FileList | File[]) => {
+      setErrorMessage(null);
+      const filesArray = Array.from(fileList);
+
+      if (filesArray.length === 0) return;
+
+      const validMetas: SelectedFileMetadata[] = [];
+      const errorMessages: string[] = [];
+
+      for (const file of filesArray) {
+        const validation = validateSelectedFile(file);
+        if (!validation.valid) {
+          errorMessages.push(`${file.name}: ${validation.error || "Invalid file"}`);
+          continue;
+        }
+
+        const duration = await readDuration(file);
+        validMetas.push({
+          file,
+          name: file.name,
+          size: file.size,
+          type: file.type || "video/mp4",
+          duration,
+        });
       }
 
-      // Try reading duration in browser
-      const objectUrl = URL.createObjectURL(file);
-      const video = document.createElement("video");
-      video.preload = "metadata";
+      if (errorMessages.length > 0) {
+        setErrorMessage(errorMessages.join(" • "));
+      }
 
-      const handleLoadedMetadata = () => {
-        onFileSelect({
-          file,
-          name: file.name,
-          size: file.size,
-          type: file.type || "video/mp4",
-          duration: video.duration,
-        });
-        URL.revokeObjectURL(objectUrl);
-      };
-
-      const handleError = () => {
-        // Fallback without duration
-        onFileSelect({
-          file,
-          name: file.name,
-          size: file.size,
-          type: file.type || "video/mp4",
-        });
-        URL.revokeObjectURL(objectUrl);
-      };
-
-      video.addEventListener("loadedmetadata", handleLoadedMetadata, {
-        once: true,
-      });
-      video.addEventListener("error", handleError, { once: true });
-      video.src = objectUrl;
+      if (validMetas.length > 0) {
+        if (onFilesSelect) {
+          onFilesSelect(validMetas);
+        } else if (onFileSelect) {
+          onFileSelect(validMetas[0]);
+        }
+      }
     },
-    [onFileSelect]
+    [onFileSelect, onFilesSelect]
   );
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -93,17 +147,14 @@ export function Dropzone({
     if (disabled) return;
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const file = e.dataTransfer.files[0];
-      processFile(file);
+      processFiles(e.dataTransfer.files);
     }
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      processFile(file);
+      processFiles(e.target.files);
     }
-    // Reset file input so selecting the same file again triggers change
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -121,38 +172,70 @@ export function Dropzone({
     }
   };
 
+  const handleRemoveSingle = () => {
+    if (onFileRemove) onFileRemove(0);
+    if (onClearAll) onClearAll();
+    setErrorMessage(null);
+  };
+
   return (
     <div className="w-full space-y-3">
-      {/* Hidden native input */}
+      {/* Hidden native input supporting multi-selection */}
       <input
         ref={fileInputRef}
         type="file"
+        multiple
         accept=".mp4,video/mp4,video/x-m4v"
         className="sr-only"
         onChange={handleFileInputChange}
         disabled={disabled}
         id="mp4-file-input"
         tabIndex={-1}
-        aria-label="Upload MP4 video"
+        aria-label="Upload MP4 video files"
       />
 
-      {/* Show Selected File Card if a file is already chosen */}
-      {selectedFile ? (
-        <SelectedFileCard
-          fileMeta={selectedFile}
-          onRemove={() => {
-            onFileRemove();
+      {/* Render multi-file batch list if more than 1 file */}
+      {currentFiles.length > 1 ? (
+        <SelectedFilesList
+          files={currentFiles}
+          onRemoveFile={(idx) => {
+            if (onFileRemove) onFileRemove(idx);
+          }}
+          onClearAll={() => {
+            if (onClearAll) onClearAll();
+            else if (onFileRemove) onFileRemove(0);
             setErrorMessage(null);
           }}
-          onReplace={triggerFileInput}
+          onAddMore={triggerFileInput}
           disabled={disabled}
         />
+      ) : currentFiles.length === 1 ? (
+        /* Single file view with option to add more files to turn into batch */
+        <div className="space-y-2">
+          <SelectedFileCard
+            fileMeta={currentFiles[0]}
+            onRemove={handleRemoveSingle}
+            onReplace={triggerFileInput}
+            disabled={disabled}
+          />
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={triggerFileInput}
+              disabled={disabled}
+              className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-500 font-medium px-2 py-1 rounded-lg hover:bg-blue-500/10 transition-colors cursor-pointer"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>Add another video for batch conversion</span>
+            </button>
+          </div>
+        </div>
       ) : (
         /* Empty / Drag-and-Drop Area */
         <div
           role="button"
           tabIndex={disabled ? -1 : 0}
-          aria-label="Drag and drop your MP4 file here or click to choose file"
+          aria-label="Drag and drop your MP4 files here or click to choose files"
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
@@ -167,21 +250,21 @@ export function Dropzone({
             disabled && "cursor-not-allowed opacity-50 pointer-events-none"
           )}
         >
-          {/* Cloud Icon with Subtle Neutral Ring */}
+          {/* Cloud Icon */}
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-300 shadow-md group-hover:scale-105 transition-transform">
             <UploadCloud className="h-8 w-8 text-neutral-600 dark:text-neutral-300" />
           </div>
 
           {/* Heading */}
           <h3 className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-white mb-1.5">
-            {isDragOver ? "Drop your MP4 file here" : "Drag & drop your MP4 file here"}
+            {isDragOver ? "Drop your MP4 files here" : "Drag & drop your MP4 files here"}
           </h3>
 
           <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 mb-5">
-            or select a file from your device
+            Single or multiple files • Batch conversion supported
           </p>
 
-          {/* Choose File Button */}
+          {/* Choose Files Button */}
           <Button
             type="button"
             variant="gradient"
@@ -194,7 +277,7 @@ export function Dropzone({
             className="h-11 px-6 rounded-xl font-medium gap-2 text-sm bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 hover:from-blue-600 hover:via-blue-500 hover:to-indigo-600 text-white shadow-lg shadow-blue-950/60 active:scale-[0.98] transition-all"
           >
             <FileText className="h-4 w-4" />
-            <span>Choose File</span>
+            <span>Choose Files</span>
           </Button>
 
           {/* Guidelines */}

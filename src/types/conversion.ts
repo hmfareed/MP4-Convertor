@@ -28,6 +28,7 @@ export interface SelectedFileMetadata {
 
 export interface ConversionJob {
   id: string;
+  batchId?: string;
   originalFilename: string;
   outputFilename?: string;
   fileSize: number;
@@ -43,4 +44,15 @@ export interface ConversionJob {
   downloadUrl?: string;
   audioUrl?: string;
   expiresAt?: string;
+}
+
+export interface BatchConversion {
+  batchId: string;
+  jobs: ConversionJob[];
+  totalJobs: number;
+  completedCount: number;
+  failedCount: number;
+  overallProgress: number;
+  isComplete: boolean;
+  zipDownloadUrl?: string;
 }

@@ -5,6 +5,7 @@ export interface IConversionJob extends Document {
   ownerType: "guest" | "user";
   ownerId: string;
   guestTokenHash?: string;
+  batchId?: string;
   uploadId: mongoose.Types.ObjectId;
   originalFilename: string;
   fileSizeBytes: number;
@@ -42,6 +43,7 @@ const ConversionJobSchema = new Schema<IConversionJob>(
     ownerType: { type: String, enum: ["guest", "user"], default: "guest", required: true },
     ownerId: { type: String, required: true, index: true },
     guestTokenHash: { type: String, index: true },
+    batchId: { type: String, index: true },
     uploadId: { type: Schema.Types.ObjectId, ref: "Upload", required: true },
     originalFilename: { type: String, required: true },
     fileSizeBytes: { type: Number, required: true },
@@ -84,6 +86,7 @@ const ConversionJobSchema = new Schema<IConversionJob>(
 
 // Indexes
 ConversionJobSchema.index({ ownerId: 1, createdAt: -1 });
+ConversionJobSchema.index({ batchId: 1, createdAt: -1 });
 ConversionJobSchema.index({ status: 1, queuedAt: 1 });
 ConversionJobSchema.index(
   { ownerId: 1, idempotencyKey: 1 },
