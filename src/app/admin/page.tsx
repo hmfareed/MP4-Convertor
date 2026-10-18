@@ -732,12 +732,11 @@ export default function AdminPage() {
                           </button>
                         </div>
 
-                        {/* Prominent Calendar Date Picker for this KPI card */}
+                        {/* Calendar Date Picker for this KPI card */}
                         <AdminCalendarPopover
                           selectedDate={selectedCalendarDate}
                           onSelectDate={(date) => setSelectedCalendarDate(date)}
                           usersPerDay={metrics?.usersPerDay ?? []}
-                          buttonLabel="Calendar"
                           align="right"
                           size="sm"
                         />
@@ -777,11 +776,7 @@ export default function AdminPage() {
                             );
                           })()
                         ) : (
-                          <span className="text-neutral-500 text-[11px] flex items-center gap-1.5">
-                            <span>Hover over curve or click</span>
-                            <span className="text-emerald-400 font-semibold">&apos;Calendar&apos;</span>
-                            <span>to select a specific date</span>
-                          </span>
+                          <div />
                         )}
                         <span className="text-[10px] text-neutral-500 font-mono">
                           Peak: {maxUsersInWindow} / day

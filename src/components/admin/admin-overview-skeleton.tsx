@@ -57,7 +57,7 @@ export function AdminOverviewSkeleton() {
           <div className="relative pt-1 space-y-2">
             {/* Status bar placeholder */}
             <div className="min-h-7 flex items-center justify-between text-xs px-1">
-              <div className="h-2.5 w-48 bg-neutral-800/90 rounded" />
+              <div />
               <div className="h-2.5 w-16 bg-neutral-900 rounded font-mono" />
             </div>
 

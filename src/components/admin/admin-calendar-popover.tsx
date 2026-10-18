@@ -23,7 +23,7 @@ export function AdminCalendarPopover({
   selectedDate,
   onSelectDate,
   usersPerDay = [],
-  buttonLabel = "Select Date",
+  buttonLabel,
   align = "right",
   size = "sm",
 }: AdminCalendarPopoverProps) {
@@ -217,7 +217,13 @@ export function AdminCalendarPopover({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center gap-1.5 rounded-lg border font-medium transition-all cursor-pointer ${
-          size === "sm" ? "px-2.5 py-1 text-[11px]" : "px-3 py-1.5 text-xs"
+          size === "sm"
+            ? selectedDate || buttonLabel
+              ? "px-2.5 py-1 text-[11px]"
+              : "p-1.5 text-[11px]"
+            : selectedDate || buttonLabel
+            ? "px-3 py-1.5 text-xs"
+            : "p-2 text-xs"
         } ${
           selectedDate
             ? "bg-emerald-600/20 text-emerald-300 border-emerald-500/50 shadow-sm shadow-emerald-500/10"
@@ -228,7 +234,9 @@ export function AdminCalendarPopover({
         title="Open calendar to view user registrations for a specific date"
       >
         <CalendarIcon className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0" />
-        <span className="truncate">{selectedDate ? formattedSelected : buttonLabel}</span>
+        {(selectedDate || buttonLabel) && (
+          <span className="truncate">{selectedDate ? formattedSelected : buttonLabel}</span>
+        )}
         {selectedDate && (
           <span
             onClick={(e) => {

@@ -260,7 +260,7 @@ export function UserCalendarKPI({
           </div>
 
           <div className="flex items-center gap-1 flex-shrink-0">
-            {/* Toggle Calendar Button with explicit label */}
+            {/* Toggle Calendar Button */}
             <button
               type="button"
               onClick={(e) => {
@@ -268,16 +268,15 @@ export function UserCalendarKPI({
                 setIsOpen(!isOpen);
               }}
               title={isOpen ? "Close calendar" : "Select date from calendar"}
-              className={`flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-medium transition-all cursor-pointer ${
+              className={`p-1 rounded-lg transition-all cursor-pointer ${
                 selectedDate
-                  ? "bg-emerald-500/25 text-emerald-200 border border-emerald-500/50 shadow-sm shadow-emerald-500/20 font-semibold"
+                  ? "bg-emerald-500/25 text-emerald-200 border border-emerald-500/50 shadow-sm shadow-emerald-500/20"
                   : isOpen
-                  ? "bg-neutral-800 text-white border border-neutral-700 font-semibold"
+                  ? "bg-neutral-800 text-white border border-neutral-700"
                   : "bg-black/60 border border-neutral-800 text-neutral-300 hover:text-emerald-400 hover:border-emerald-500/40 hover:bg-neutral-900"
               }`}
             >
-              <CalendarIcon className="h-3 w-3 text-emerald-400" />
-              <span>Calendar</span>
+              <CalendarIcon className="h-3.5 w-3.5 text-emerald-400" />
             </button>
 
             {/* Clear Filter (if selected) */}
