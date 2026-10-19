@@ -165,19 +165,45 @@ export function ConverterPanel() {
     const xhr = new XMLHttpRequest();
     uploadXhrRef.current = xhr;
 
+    xhr.timeout = 120000;
+
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable) {
-        const percent = Math.min(99, Math.round((event.loaded / event.total) * 100));
-        setActiveJob((prev) =>
-          prev
-            ? {
-                ...prev,
-                progress: percent,
-                statusMessage: `Uploading video chunks (${percent}% complete)...`,
-              }
-            : null
-        );
+        if (event.loaded >= event.total) {
+          setActiveJob((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  progress: 99,
+                  statusMessage: "Upload complete. Analyzing video & audio streams...",
+                }
+              : null
+          );
+        } else {
+          const percent = Math.min(95, Math.round((event.loaded / event.total) * 100));
+          setActiveJob((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  progress: percent,
+                  statusMessage: `Uploading video (${percent}% complete)...`,
+                }
+              : null
+          );
+        }
       }
+    };
+
+    xhr.upload.onload = () => {
+      setActiveJob((prev) =>
+        prev
+          ? {
+              ...prev,
+              progress: 99,
+              statusMessage: "Upload complete. Analyzing video & audio streams...",
+            }
+          : null
+      );
     };
 
     xhr.onload = async () => {
@@ -248,29 +274,45 @@ export function ConverterPanel() {
           );
         }
       } else {
+        let errMessage = "Upload failed. Please try again.";
         try {
           const errJson = JSON.parse(xhr.responseText);
-          setActiveJob((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  status: "failed",
-                  error: errJson.error?.message || "Upload failed. Please try again.",
-                }
-              : null
-          );
+          if (errJson?.error?.message) {
+            errMessage = errJson.error.message;
+          }
         } catch {
-          setActiveJob((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  status: "failed",
-                  error: "Network upload error occurred.",
-                }
-              : null
-          );
+          if (xhr.status === 413) {
+            errMessage = "The video file exceeds the maximum allowed upload size (500 MB).";
+          } else if (xhr.status === 415) {
+            errMessage = "Unsupported file type. Only MP4 videos are supported.";
+          } else if (xhr.status === 429) {
+            errMessage = "Upload rate limit reached. Please wait a few minutes before trying again.";
+          } else if (xhr.status === 504 || xhr.status === 408) {
+            errMessage = "Upload timed out on the server. Please try again.";
+          }
         }
+        setActiveJob((prev) =>
+          prev
+            ? {
+                ...prev,
+                status: "failed",
+                error: errMessage,
+              }
+            : null
+        );
       }
+    };
+
+    xhr.ontimeout = () => {
+      setActiveJob((prev) =>
+        prev
+          ? {
+              ...prev,
+              status: "failed",
+              error: "Upload timed out. The server took too long to respond. Please check your connection and try again.",
+            }
+          : null
+      );
     };
 
     xhr.onerror = () => {
@@ -279,10 +321,14 @@ export function ConverterPanel() {
           ? {
               ...prev,
               status: "failed",
-              error: "Network connection lost during upload.",
+              error: "Network connection lost during upload. Please verify the server is running and try again.",
             }
           : null
       );
+    };
+
+    xhr.onabort = () => {
+      setActiveJob(null);
     };
 
     xhr.open("POST", "/api/uploads");
