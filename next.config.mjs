@@ -51,6 +51,7 @@ const nextConfig = {
       "mongoose",
       "ioredis",
       "bullmq",
+      "archiver",
     ],
   },
 };
