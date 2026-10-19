@@ -25,6 +25,13 @@ export const conversionSettingsSchema = z.object({
     z.literal(256),
     z.literal(320),
   ]),
+  trimStartSec: z.number().min(0).optional(),
+  trimEndSec: z.number().min(0).optional(),
+  normalizeAudio: z.boolean().optional(),
+  volumeMultiplier: z.number().min(0.25).max(3.0).optional(),
+  fadeInDurationSec: z.number().min(0).max(30).optional(),
+  fadeOutDurationSec: z.number().min(0).max(30).optional(),
+  playbackSpeed: z.number().min(0.5).max(2.0).optional(),
 });
 
 export interface FileValidationResult {

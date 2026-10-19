@@ -207,6 +207,11 @@ export function ConverterPanel() {
               bitrate: settings.bitrate,
               trimStartSec: settings.trimStartSec,
               trimEndSec: settings.trimEndSec,
+              normalizeAudio: settings.normalizeAudio,
+              volumeMultiplier: settings.volumeMultiplier,
+              fadeInDurationSec: settings.fadeInDurationSec,
+              fadeOutDurationSec: settings.fadeOutDurationSec,
+              playbackSpeed: settings.playbackSpeed,
             }),
           });
 
@@ -342,6 +347,11 @@ export function ConverterPanel() {
             format: settings.format,
             bitrate: settings.bitrate,
             batchId,
+            normalizeAudio: settings.normalizeAudio,
+            volumeMultiplier: settings.volumeMultiplier,
+            fadeInDurationSec: settings.fadeInDurationSec,
+            fadeOutDurationSec: settings.fadeOutDurationSec,
+            playbackSpeed: settings.playbackSpeed,
           }),
         });
 

@@ -1,7 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
-import { Music, ArrowRightLeft, Loader2, Scissors, Clock, Sparkles } from "lucide-react";
+import {
+  Music,
+  ArrowRightLeft,
+  Loader2,
+  Scissors,
+  Clock,
+  Sparkles,
+  SlidersHorizontal,
+  Volume2,
+  RotateCcw,
+  Gauge,
+  Zap,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -41,10 +53,25 @@ export function ConversionSettings({
   fileCount = 1,
 }: ConversionSettingsProps) {
   const [showTrim, setShowTrim] = useState<boolean>(false);
+  const [showStudio, setShowStudio] = useState<boolean>(false);
 
   const totalDuration = detectedDuration > 0 ? Math.round(detectedDuration) : 300;
   const currentStart = settings.trimStartSec ?? 0;
   const currentEnd = settings.trimEndSec ?? totalDuration;
+
+  const currentVolume = settings.volumeMultiplier ?? 1.0;
+  const currentSpeed = settings.playbackSpeed ?? 1.0;
+  const currentFadeIn = settings.fadeInDurationSec ?? 0;
+  const currentFadeOut = settings.fadeOutDurationSec ?? 0;
+  const isNormalized = !!settings.normalizeAudio;
+
+  const activeEnhancementsCount = [
+    isNormalized ? 1 : 0,
+    currentVolume !== 1.0 ? 1 : 0,
+    currentFadeIn > 0 ? 1 : 0,
+    currentFadeOut > 0 ? 1 : 0,
+    currentSpeed !== 1.0 ? 1 : 0,
+  ].reduce((a, b) => a + b, 0);
 
   const currentFormatConfig = getFormatConfig(settings.format || "mp3");
   const isLossless = !!currentFormatConfig.isLossless;
@@ -110,6 +137,52 @@ export function ConversionSettings({
     });
   };
 
+  const handleToggleNormalize = () => {
+    onSettingsChange({
+      ...settings,
+      normalizeAudio: !isNormalized,
+    });
+  };
+
+  const handleVolumeChange = (vol: number) => {
+    onSettingsChange({
+      ...settings,
+      volumeMultiplier: vol,
+    });
+  };
+
+  const handleFadeInChange = (sec: number) => {
+    onSettingsChange({
+      ...settings,
+      fadeInDurationSec: sec,
+    });
+  };
+
+  const handleFadeOutChange = (sec: number) => {
+    onSettingsChange({
+      ...settings,
+      fadeOutDurationSec: sec,
+    });
+  };
+
+  const handleSpeedChange = (speed: number) => {
+    onSettingsChange({
+      ...settings,
+      playbackSpeed: speed,
+    });
+  };
+
+  const handleResetEnhancements = () => {
+    onSettingsChange({
+      ...settings,
+      normalizeAudio: false,
+      volumeMultiplier: 1.0,
+      fadeInDurationSec: 0,
+      fadeOutDurationSec: 0,
+      playbackSpeed: 1.0,
+    });
+  };
+
   return (
     <div className="pt-4 border-t border-neutral-200 dark:border-neutral-800/80 space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-end">
@@ -169,7 +242,7 @@ export function ConversionSettings({
           </Select>
         </div>
 
-        {/* Quality / Bitrate */}
+        {/* Quality / Bitrate + Studio Tools Toolbar */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <label
@@ -178,21 +251,40 @@ export function ConversionSettings({
             >
               Quality / Bitrate
             </label>
-            {fileCount <= 1 && (
+            <div className="flex items-center gap-2.5">
               <button
                 type="button"
-                onClick={handleToggleTrim}
+                onClick={() => setShowStudio((prev) => !prev)}
                 disabled={disabled || !hasFile}
                 className={`text-xs flex items-center gap-1 transition-colors ${
-                  showTrim
-                    ? "text-blue-500 font-semibold"
+                  showStudio || activeEnhancementsCount > 0
+                    ? "text-cyan-400 font-semibold"
                     : "text-neutral-500 hover:text-neutral-900 dark:text-slate-400 dark:hover:text-white"
                 }`}
               >
-                <Scissors className="h-3 w-3" />
-                <span>{showTrim ? "Trim Active" : "Trim Audio"}</span>
+                <SlidersHorizontal className="h-3 w-3" />
+                <span>
+                  {activeEnhancementsCount > 0
+                    ? `Studio (${activeEnhancementsCount})`
+                    : "Studio"}
+                </span>
               </button>
-            )}
+              {fileCount <= 1 && (
+                <button
+                  type="button"
+                  onClick={handleToggleTrim}
+                  disabled={disabled || !hasFile}
+                  className={`text-xs flex items-center gap-1 transition-colors ${
+                    showTrim
+                      ? "text-blue-500 font-semibold"
+                      : "text-neutral-500 hover:text-neutral-900 dark:text-slate-400 dark:hover:text-white"
+                  }`}
+                >
+                  <Scissors className="h-3 w-3" />
+                  <span>{showTrim ? "Trim Active" : "Trim"}</span>
+                </button>
+              )}
+            </div>
           </div>
 
           {isLossless ? (
@@ -260,6 +352,8 @@ export function ConversionSettings({
                 <span>
                   {fileCount > 1
                     ? `Convert ${fileCount} Files to ${currentFormatConfig.label}`
+                    : activeEnhancementsCount > 0
+                    ? `Enhance & Convert to ${currentFormatConfig.label}`
                     : showTrim
                     ? `Trim & Convert to ${currentFormatConfig.label}`
                     : `Convert to ${currentFormatConfig.label}`}
@@ -269,6 +363,226 @@ export function ConversionSettings({
           </Button>
         </div>
       </div>
+
+      {/* Expandable Audio Studio Enhancements Drawer */}
+      {showStudio && hasFile && (
+        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/70 dark:bg-black p-4 space-y-4 animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center justify-between pb-2 border-b border-neutral-200 dark:border-neutral-800/80">
+            <div className="flex items-center gap-2">
+              <SlidersHorizontal className="h-4 w-4 text-cyan-400" />
+              <span className="text-xs font-semibold text-neutral-900 dark:text-white">
+                Audio Enhancement & Studio Suite
+              </span>
+              {activeEnhancementsCount > 0 ? (
+                <span className="text-[10px] font-medium bg-cyan-950/60 border border-cyan-800 text-cyan-300 px-2 py-0.5 rounded-full">
+                  {activeEnhancementsCount} active
+                </span>
+              ) : (
+                <span className="text-[10px] font-medium text-neutral-500 dark:text-slate-500">
+                  (Original master audio)
+                </span>
+              )}
+            </div>
+
+            {activeEnhancementsCount > 0 && (
+              <button
+                type="button"
+                onClick={handleResetEnhancements}
+                className="text-[11px] text-neutral-500 hover:text-neutral-900 dark:text-slate-400 dark:hover:text-white flex items-center gap-1 transition-colors"
+              >
+                <RotateCcw className="h-3 w-3" />
+                <span>Reset All</span>
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* 1. Loudness Normalization (EBU R128) */}
+            <div className="rounded-lg border border-neutral-200 dark:border-neutral-800/80 bg-white/60 dark:bg-neutral-950/50 p-3 flex items-start justify-between gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5">
+                  <Zap className="h-3.5 w-3.5 text-cyan-400" />
+                  <span className="text-xs font-semibold text-neutral-900 dark:text-white">
+                    Loudness Normalization
+                  </span>
+                  <span className="text-[9px] font-mono bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-800 px-1 rounded">
+                    EBU R128
+                  </span>
+                </div>
+                <p className="text-[11px] text-neutral-500 dark:text-slate-400 leading-relaxed">
+                  Balances inconsistent volume levels across videos & eliminates audio clipping.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleToggleNormalize}
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                  isNormalized ? "bg-cyan-500 shadow-sm shadow-cyan-500/50" : "bg-neutral-300 dark:bg-neutral-800"
+                }`}
+                role="switch"
+                aria-checked={isNormalized}
+                aria-label="Toggle loudness normalization"
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                    isNormalized ? "translate-x-5" : "translate-x-0"
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* 2. Playback Speed & Tempo */}
+            <div className="rounded-lg border border-neutral-200 dark:border-neutral-800/80 bg-white/60 dark:bg-neutral-950/50 p-3 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <Gauge className="h-3.5 w-3.5 text-indigo-400" />
+                  <span className="text-xs font-semibold text-neutral-900 dark:text-white">
+                    Playback Speed / Tempo
+                  </span>
+                </div>
+                <span className="text-[11px] font-mono font-semibold text-indigo-400">
+                  {currentSpeed.toFixed(2).replace(/\.00$/, "")}×
+                </span>
+              </div>
+              <p className="text-[11px] text-neutral-500 dark:text-slate-400">
+                Speed up or slow down while preserving natural voice pitch.
+              </p>
+              <div className="flex items-center gap-1.5 pt-0.5">
+                {[0.75, 1.0, 1.25, 1.5, 2.0].map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => handleSpeedChange(s)}
+                    className={`flex-1 py-1 rounded text-[11px] font-mono font-medium transition-all ${
+                      currentSpeed === s
+                        ? "bg-indigo-600 text-white shadow-sm shadow-indigo-900/50"
+                        : "bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-slate-400 hover:text-white hover:bg-neutral-200 dark:hover:bg-neutral-800"
+                    }`}
+                  >
+                    {s}×
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 3. Volume Booster Slider */}
+            <div className="rounded-lg border border-neutral-200 dark:border-neutral-800/80 bg-white/60 dark:bg-neutral-950/50 p-3 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <Volume2 className="h-3.5 w-3.5 text-blue-400" />
+                  <span className="text-xs font-semibold text-neutral-900 dark:text-white">
+                    Volume Gain / Booster
+                  </span>
+                </div>
+                <span className="text-[11px] font-mono text-blue-400 font-semibold">
+                  {Math.round(currentVolume * 100)}%
+                  <span className="text-neutral-500 dark:text-slate-500 ml-1 font-normal">
+                    {currentVolume === 1.0
+                      ? "(0 dB)"
+                      : currentVolume > 1.0
+                      ? `(+${(20 * Math.log10(currentVolume)).toFixed(1)} dB)`
+                      : `(${(20 * Math.log10(currentVolume)).toFixed(1)} dB)`}
+                  </span>
+                </span>
+              </div>
+
+              <div className="pt-1 px-1">
+                <Slider
+                  min={50}
+                  max={250}
+                  step={10}
+                  value={[Math.round(currentVolume * 100)]}
+                  onValueChange={(vals) => handleVolumeChange(vals[0] / 100)}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="flex items-center justify-between gap-1.5 pt-1 text-[10px]">
+                {[
+                  { label: "50%", val: 0.5 },
+                  { label: "100% (Default)", val: 1.0 },
+                  { label: "150% (+3.5dB)", val: 1.5 },
+                  { label: "200% (+6dB)", val: 2.0 },
+                ].map((preset) => (
+                  <button
+                    key={preset.val}
+                    type="button"
+                    onClick={() => handleVolumeChange(preset.val)}
+                    className={`px-1.5 py-0.5 rounded font-mono transition-colors ${
+                      Math.abs(currentVolume - preset.val) < 0.05
+                        ? "bg-blue-600/30 text-blue-400 border border-blue-500/40"
+                        : "text-neutral-500 dark:text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 4. Fade In & Fade Out Transitions */}
+            <div className="rounded-lg border border-neutral-200 dark:border-neutral-800/80 bg-white/60 dark:bg-neutral-950/50 p-3 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-neutral-900 dark:text-white">
+                  Fade Transitions
+                </span>
+                <span className="text-[10px] text-neutral-500 dark:text-slate-400 font-mono">
+                  Smooth intro & outro
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                {/* Fade In */}
+                <div className="space-y-1">
+                  <span className="text-[10px] text-neutral-500 dark:text-slate-400 block">
+                    Fade In: {currentFadeIn > 0 ? `${currentFadeIn}s` : "Off"}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    {[0, 1, 2, 3, 5].map((sec) => (
+                      <button
+                        key={sec}
+                        type="button"
+                        onClick={() => handleFadeInChange(sec)}
+                        className={`flex-1 py-1 rounded text-[10px] font-mono transition-colors ${
+                          currentFadeIn === sec
+                            ? "bg-cyan-600 text-white font-semibold"
+                            : "bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-slate-400 hover:text-white"
+                        }`}
+                      >
+                        {sec === 0 ? "Off" : `${sec}s`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Fade Out */}
+                <div className="space-y-1">
+                  <span className="text-[10px] text-neutral-500 dark:text-slate-400 block">
+                    Fade Out: {currentFadeOut > 0 ? `${currentFadeOut}s` : "Off"}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    {[0, 1, 2, 3, 5].map((sec) => (
+                      <button
+                        key={sec}
+                        type="button"
+                        onClick={() => handleFadeOutChange(sec)}
+                        className={`flex-1 py-1 rounded text-[10px] font-mono transition-colors ${
+                          currentFadeOut === sec
+                            ? "bg-cyan-600 text-white font-semibold"
+                            : "bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-slate-400 hover:text-white"
+                        }`}
+                      >
+                        {sec === 0 ? "Off" : `${sec}s`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Expandable Audio Trimming Control Card */}
       {showTrim && hasFile && (

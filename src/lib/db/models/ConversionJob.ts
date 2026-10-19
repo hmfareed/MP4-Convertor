@@ -15,6 +15,11 @@ export interface IConversionJob extends Document {
     bitrateKbps: number;
     trimStartSec?: number;
     trimEndSec?: number;
+    normalizeAudio?: boolean;
+    volumeMultiplier?: number;
+    fadeInDurationSec?: number;
+    fadeOutDurationSec?: number;
+    playbackSpeed?: number;
   };
   idempotencyKey?: string;
   attempt: number;
@@ -65,6 +70,11 @@ const ConversionJobSchema = new Schema<IConversionJob>(
       bitrateKbps: { type: Number, required: true },
       trimStartSec: { type: Number },
       trimEndSec: { type: Number },
+      normalizeAudio: { type: Boolean, default: false },
+      volumeMultiplier: { type: Number, default: 1.0 },
+      fadeInDurationSec: { type: Number, default: 0 },
+      fadeOutDurationSec: { type: Number, default: 0 },
+      playbackSpeed: { type: Number, default: 1.0 },
     },
     idempotencyKey: { type: String, index: true },
     attempt: { type: Number, default: 1 },

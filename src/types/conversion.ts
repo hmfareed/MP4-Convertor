@@ -16,6 +16,12 @@ export interface ConversionSettings {
   bitrate: AudioBitrate;
   trimStartSec?: number;
   trimEndSec?: number;
+  // Audio Enhancement Suite
+  normalizeAudio?: boolean;
+  volumeMultiplier?: number;
+  fadeInDurationSec?: number;
+  fadeOutDurationSec?: number;
+  playbackSpeed?: number;
 }
 
 export interface SelectedFileMetadata {

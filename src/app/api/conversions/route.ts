@@ -19,6 +19,11 @@ const createConversionSchema = z.object({
   bitrate: z.number().refine(isValidBitrate, "Invalid bitrate option"),
   trimStartSec: z.number().optional(),
   trimEndSec: z.number().optional(),
+  normalizeAudio: z.boolean().optional().default(false),
+  volumeMultiplier: z.number().min(0.25).max(3.0).optional().default(1.0),
+  fadeInDurationSec: z.number().min(0).max(30).optional().default(0),
+  fadeOutDurationSec: z.number().min(0).max(30).optional().default(0),
+  playbackSpeed: z.number().min(0.5).max(2.0).optional().default(1.0),
   batchId: z.string().optional(),
 });
 
@@ -54,12 +59,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { uploadId, format, bitrate, trimStartSec, trimEndSec, batchId } = parsed.data;
+    const {
+      uploadId,
+      format,
+      bitrate,
+      trimStartSec,
+      trimEndSec,
+      normalizeAudio,
+      volumeMultiplier,
+      fadeInDurationSec,
+      fadeOutDurationSec,
+      playbackSpeed,
+      batchId,
+    } = parsed.data;
 
     // Idempotency support
     const idempotencyKey =
       req.headers.get("idempotency-key") ||
-      `idem_${uploadId}_${format}_${bitrate}_${trimStartSec || 0}_${trimEndSec || 0}`;
+      `idem_${uploadId}_${format}_${bitrate}_${trimStartSec || 0}_${trimEndSec || 0}_${normalizeAudio}_${volumeMultiplier}_${fadeInDurationSec}_${fadeOutDurationSec}_${playbackSpeed}`;
 
     // Check for existing job with same idempotency key and owner
     const existingJob = await ConversionJob.findOne({
@@ -104,6 +121,11 @@ export async function POST(req: NextRequest) {
         bitrateKbps: bitrate,
         trimStartSec,
         trimEndSec,
+        normalizeAudio,
+        volumeMultiplier,
+        fadeInDurationSec,
+        fadeOutDurationSec,
+        playbackSpeed,
       },
       idempotencyKey,
       attempt: 1,

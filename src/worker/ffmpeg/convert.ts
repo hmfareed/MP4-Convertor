@@ -4,7 +4,15 @@ import { getFFmpegPath } from "@/worker/ffmpeg/binaries";
 import { env } from "@/lib/config/env";
 import { OutputFormat } from "@/types/conversion";
 
-export interface ConvertOptions {
+export interface AudioEnhancementOptions {
+  normalizeAudio?: boolean;
+  volumeMultiplier?: number;
+  fadeInDurationSec?: number;
+  fadeOutDurationSec?: number;
+  playbackSpeed?: number;
+}
+
+export interface ConvertOptions extends AudioEnhancementOptions {
   inputPath: string;
   outputPath: string;
   format?: OutputFormat;
@@ -16,6 +24,63 @@ export interface ConvertOptions {
   trimEndSec?: number;
   onProgress?: (progressPercent: number) => void;
   checkCancelled?: () => Promise<boolean>;
+}
+
+export function buildAudioFilterArgs(
+  options: AudioEnhancementOptions,
+  effectiveDurationSeconds: number = 0
+): string[] {
+  const filters: string[] = [];
+
+  // 1. Volume adjustment (multiplier: 1.0 = 100%, 1.5 = 150%, 0.5 = 50%)
+  if (
+    options.volumeMultiplier !== undefined &&
+    options.volumeMultiplier !== 1.0 &&
+    options.volumeMultiplier > 0
+  ) {
+    filters.push(`volume=${options.volumeMultiplier.toFixed(2)}`);
+  }
+
+  // 2. Loudness normalization according to EBU R128 standard
+  if (options.normalizeAudio) {
+    filters.push("loudnorm=I=-16:TP=-1.5:LRA=11");
+  }
+
+  // 3. Playback speed / tempo adjustment (preserves pitch)
+  const speed = options.playbackSpeed ?? 1.0;
+  if (speed !== 1.0 && speed >= 0.5 && speed <= 2.0) {
+    filters.push(`atempo=${speed.toFixed(2)}`);
+  }
+
+  // Calculate duration after speed scaling for accurate fade timings
+  const scaledDuration =
+    effectiveDurationSeconds > 0
+      ? effectiveDurationSeconds / (speed > 0 ? speed : 1.0)
+      : 0;
+
+  // 4. Fade In
+  if (options.fadeInDurationSec !== undefined && options.fadeInDurationSec > 0) {
+    const fadeIn = Math.max(0.1, options.fadeInDurationSec);
+    filters.push(`afade=t=in:ss=0:d=${fadeIn.toFixed(2)}`);
+  }
+
+  // 5. Fade Out
+  if (
+    options.fadeOutDurationSec !== undefined &&
+    options.fadeOutDurationSec > 0 &&
+    scaledDuration > options.fadeOutDurationSec
+  ) {
+    const fadeOutStart = Math.max(0, scaledDuration - options.fadeOutDurationSec);
+    filters.push(
+      `afade=t=out:st=${fadeOutStart.toFixed(2)}:d=${options.fadeOutDurationSec.toFixed(2)}`
+    );
+  }
+
+  if (filters.length === 0) {
+    return [];
+  }
+
+  return ["-af", filters.join(",")];
 }
 
 export function getFfmpegAudioArgs(
@@ -56,6 +121,11 @@ export async function convertMp4ToAudio(options: ConvertOptions): Promise<void> 
     totalDurationSeconds = 0,
     trimStartSec,
     trimEndSec,
+    normalizeAudio,
+    volumeMultiplier,
+    fadeInDurationSec,
+    fadeOutDurationSec,
+    playbackSpeed,
     onProgress,
     checkCancelled,
   } = options;
@@ -72,20 +142,41 @@ export async function convertMp4ToAudio(options: ConvertOptions): Promise<void> 
   // Input file
   args.push("-i", inputPath);
 
-  // Optional trim duration
+  // Compute effective audio duration (before tempo adjustment)
+  let effectiveDuration = totalDurationSeconds;
   if (trimEndSec !== undefined && trimEndSec > 0) {
-    const duration =
+    effectiveDuration =
       trimStartSec !== undefined && trimStartSec > 0
         ? Math.max(0.1, trimEndSec - trimStartSec)
         : trimEndSec;
-    args.push("-t", duration.toString());
+    args.push("-t", effectiveDuration.toString());
   }
 
-  // Encoding params: drop video, set audio codec args, thread limit, progress
+  // Audio enhancements & filters
+  const filterArgs = buildAudioFilterArgs(
+    {
+      normalizeAudio,
+      volumeMultiplier,
+      fadeInDurationSec,
+      fadeOutDurationSec,
+      playbackSpeed,
+    },
+    effectiveDuration
+  );
+
+  // Speed-adjusted duration for progress reporting
+  const speed = playbackSpeed ?? 1.0;
+  const targetOutputDuration =
+    effectiveDuration > 0
+      ? effectiveDuration / (speed > 0 ? speed : 1.0)
+      : totalDurationSeconds;
+
+  // Encoding params: drop video, set audio codec args, filters, thread limit, progress
   const audioArgs = getFfmpegAudioArgs(format, bitrateKbps);
   args.push(
     "-vn",
     ...audioArgs,
+    ...filterArgs,
     "-threads",
     threads.toString(),
     "-progress",
@@ -140,26 +231,26 @@ export async function convertMp4ToAudio(options: ConvertOptions): Promise<void> 
         const trimmed = line.trim();
         if (trimmed.startsWith("out_time_us=")) {
           const us = parseInt(trimmed.split("=")[1], 10);
-          if (!isNaN(us) && totalDurationSeconds > 0) {
+          if (!isNaN(us) && targetOutputDuration > 0) {
             const currentSeconds = us / 1000000;
             const percent = Math.min(
               99,
               Math.max(
                 1,
-                Math.round((currentSeconds / totalDurationSeconds) * 100)
+                Math.round((currentSeconds / targetOutputDuration) * 100)
               )
             );
             onProgress?.(percent);
           }
         } else if (trimmed.startsWith("out_time_ms=")) {
           const ms = parseInt(trimmed.split("=")[1], 10);
-          if (!isNaN(ms) && totalDurationSeconds > 0) {
+          if (!isNaN(ms) && targetOutputDuration > 0) {
             const currentSeconds = ms / 1000;
             const percent = Math.min(
               99,
               Math.max(
                 1,
-                Math.round((currentSeconds / totalDurationSeconds) * 100)
+                Math.round((currentSeconds / targetOutputDuration) * 100)
               )
             );
             onProgress?.(percent);

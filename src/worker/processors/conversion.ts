@@ -94,6 +94,11 @@ export async function processConversionJob(job: Job<ConversionQueuePayload>): Pr
       totalDurationSeconds: preProbe.durationSeconds,
       trimStartSec: processingJob.settings.trimStartSec,
       trimEndSec: processingJob.settings.trimEndSec,
+      normalizeAudio: processingJob.settings.normalizeAudio,
+      volumeMultiplier: processingJob.settings.volumeMultiplier,
+      fadeInDurationSec: processingJob.settings.fadeInDurationSec,
+      fadeOutDurationSec: processingJob.settings.fadeOutDurationSec,
+      playbackSpeed: processingJob.settings.playbackSpeed,
       onProgress: async (percent) => {
         try {
           await ConversionJob.updateOne(
