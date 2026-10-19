@@ -16,6 +16,8 @@ export async function GET() {
       email: user.email,
       role: user.role,
       defaultBitrate: user.defaultBitrate,
+      defaultFormat: user.defaultFormat || "mp3",
+      autoDownload: !!user.autoDownload,
     },
   });
 }

@@ -2,7 +2,7 @@ import { spawn, ChildProcess } from "child_process";
 import fs from "fs";
 import { getFFmpegPath } from "@/worker/ffmpeg/binaries";
 import { env } from "@/lib/config/env";
-import { OutputFormat } from "@/types/conversion";
+import { OutputFormat, AudioMetadata } from "@/types/conversion";
 
 export interface AudioEnhancementOptions {
   normalizeAudio?: boolean;
@@ -22,6 +22,7 @@ export interface ConvertOptions extends AudioEnhancementOptions {
   totalDurationSeconds?: number;
   trimStartSec?: number;
   trimEndSec?: number;
+  metadata?: AudioMetadata;
   onProgress?: (progressPercent: number) => void;
   checkCancelled?: () => Promise<boolean>;
 }
@@ -126,6 +127,7 @@ export async function convertMp4ToAudio(options: ConvertOptions): Promise<void> 
     fadeInDurationSec,
     fadeOutDurationSec,
     playbackSpeed,
+    metadata,
     onProgress,
     checkCancelled,
   } = options;
@@ -171,12 +173,58 @@ export async function convertMp4ToAudio(options: ConvertOptions): Promise<void> 
       ? effectiveDuration / (speed > 0 ? speed : 1.0)
       : totalDurationSeconds;
 
-  // Encoding params: drop video, set audio codec args, filters, thread limit, progress
+  // Video stream mapping: Embed video frame as attached cover art or drop video (-vn)
+  const embedCover =
+    !!metadata?.embedThumbnailArt && (format === "mp3" || format === "flac");
+
+  if (embedCover) {
+    args.push(
+      "-map",
+      "0:a",
+      "-map",
+      "0:v",
+      "-c:v",
+      "mjpeg",
+      "-frames:v",
+      "1",
+      "-id3v2_version",
+      "3",
+      "-metadata:s:v",
+      "title=Album cover",
+      "-metadata:s:v",
+      "comment=Cover (front)",
+      "-disposition:v",
+      "attached_pic"
+    );
+  } else {
+    args.push("-vn");
+  }
+
+  // Audio Codec and Bitrate
   const audioArgs = getFfmpegAudioArgs(format, bitrateKbps);
+  args.push(...audioArgs);
+
+  // Audio Filters
+  args.push(...filterArgs);
+
+  // ID3 / Container Metadata Tags
+  if (metadata?.title) {
+    args.push("-metadata", `title=${metadata.title}`);
+  }
+  if (metadata?.artist) {
+    args.push("-metadata", `artist=${metadata.artist}`);
+  }
+  if (metadata?.album) {
+    args.push("-metadata", `album=${metadata.album}`);
+  }
+  if (metadata?.year) {
+    args.push("-metadata", `date=${metadata.year}`);
+  }
+  if (metadata?.genre) {
+    args.push("-metadata", `genre=${metadata.genre}`);
+  }
+
   args.push(
-    "-vn",
-    ...audioArgs,
-    ...filterArgs,
     "-threads",
     threads.toString(),
     "-progress",

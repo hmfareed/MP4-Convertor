@@ -99,6 +99,7 @@ export async function processConversionJob(job: Job<ConversionQueuePayload>): Pr
       fadeInDurationSec: processingJob.settings.fadeInDurationSec,
       fadeOutDurationSec: processingJob.settings.fadeOutDurationSec,
       playbackSpeed: processingJob.settings.playbackSpeed,
+      metadata: processingJob.settings.metadata,
       onProgress: async (percent) => {
         try {
           await ConversionJob.updateOne(

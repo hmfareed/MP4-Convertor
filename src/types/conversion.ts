@@ -11,6 +11,15 @@ export type JobStatus =
   | "cancelled"
   | "expired";
 
+export interface AudioMetadata {
+  title?: string;
+  artist?: string;
+  album?: string;
+  year?: string;
+  genre?: string;
+  embedThumbnailArt?: boolean;
+}
+
 export interface ConversionSettings {
   format: OutputFormat;
   bitrate: AudioBitrate;
@@ -22,6 +31,8 @@ export interface ConversionSettings {
   fadeInDurationSec?: number;
   fadeOutDurationSec?: number;
   playbackSpeed?: number;
+  // ID3 Tag & Metadata Editor
+  metadata?: AudioMetadata;
 }
 
 export interface SelectedFileMetadata {
@@ -49,6 +60,7 @@ export interface ConversionJob {
   error?: string;
   downloadUrl?: string;
   audioUrl?: string;
+  shareToken?: string;
   expiresAt?: string;
 }
 

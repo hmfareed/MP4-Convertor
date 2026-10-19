@@ -24,6 +24,16 @@ const createConversionSchema = z.object({
   fadeInDurationSec: z.number().min(0).max(30).optional().default(0),
   fadeOutDurationSec: z.number().min(0).max(30).optional().default(0),
   playbackSpeed: z.number().min(0.5).max(2.0).optional().default(1.0),
+  metadata: z
+    .object({
+      title: z.string().max(120).optional(),
+      artist: z.string().max(120).optional(),
+      album: z.string().max(120).optional(),
+      year: z.string().max(10).optional(),
+      genre: z.string().max(50).optional(),
+      embedThumbnailArt: z.boolean().optional(),
+    })
+    .optional(),
   batchId: z.string().optional(),
 });
 
@@ -70,13 +80,15 @@ export async function POST(req: NextRequest) {
       fadeInDurationSec,
       fadeOutDurationSec,
       playbackSpeed,
+      metadata,
       batchId,
     } = parsed.data;
 
     // Idempotency support
+    const metadataHash = metadata ? crypto.createHash("md5").update(JSON.stringify(metadata)).digest("hex").slice(0, 8) : "";
     const idempotencyKey =
       req.headers.get("idempotency-key") ||
-      `idem_${uploadId}_${format}_${bitrate}_${trimStartSec || 0}_${trimEndSec || 0}_${normalizeAudio}_${volumeMultiplier}_${fadeInDurationSec}_${fadeOutDurationSec}_${playbackSpeed}`;
+      `idem_${uploadId}_${format}_${bitrate}_${trimStartSec || 0}_${trimEndSec || 0}_${normalizeAudio}_${volumeMultiplier}_${fadeInDurationSec}_${fadeOutDurationSec}_${playbackSpeed}_${metadataHash}`;
 
     // Check for existing job with same idempotency key and owner
     const existingJob = await ConversionJob.findOne({
@@ -90,6 +102,7 @@ export async function POST(req: NextRequest) {
         batchId: existingJob.batchId,
         status: existingJob.status,
         progress: existingJob.progressPercent,
+        shareToken: existingJob.shareToken,
         message: "Existing conversion returned via idempotency key.",
       });
     }
@@ -105,6 +118,7 @@ export async function POST(req: NextRequest) {
     }
 
     const expiresAt = new Date(Date.now() + env.GUEST_RETENTION_HOURS * 3600 * 1000);
+    const shareToken = crypto.randomBytes(16).toString("hex");
 
     // Create conversion job in MongoDB
     const job = await ConversionJob.create({
@@ -116,6 +130,7 @@ export async function POST(req: NextRequest) {
       originalFilename: upload.originalNameSafe,
       fileSizeBytes: upload.sizeBytes,
       status: "queued",
+      shareToken,
       settings: {
         format,
         bitrateKbps: bitrate,
@@ -126,6 +141,7 @@ export async function POST(req: NextRequest) {
         fadeInDurationSec,
         fadeOutDurationSec,
         playbackSpeed,
+        metadata,
       },
       idempotencyKey,
       attempt: 1,

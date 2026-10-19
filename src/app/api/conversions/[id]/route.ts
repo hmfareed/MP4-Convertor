@@ -40,6 +40,7 @@ export async function GET(
         job.status === "completed"
           ? `/api/conversions/${job._id}/preview`
           : undefined,
+      shareToken: job.shareToken || job._id.toString(),
       createdAt: job.createdAt,
       completedAt: job.finishedAt,
       expiresAt: job.expiresAt,

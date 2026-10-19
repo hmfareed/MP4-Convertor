@@ -212,6 +212,7 @@ export function ConverterPanel() {
               fadeInDurationSec: settings.fadeInDurationSec,
               fadeOutDurationSec: settings.fadeOutDurationSec,
               playbackSpeed: settings.playbackSpeed,
+              metadata: settings.metadata,
             }),
           });
 
@@ -352,6 +353,7 @@ export function ConverterPanel() {
             fadeInDurationSec: settings.fadeInDurationSec,
             fadeOutDurationSec: settings.fadeOutDurationSec,
             playbackSpeed: settings.playbackSpeed,
+            metadata: settings.metadata,
           }),
         });
 

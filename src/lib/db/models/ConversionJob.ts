@@ -20,8 +20,17 @@ export interface IConversionJob extends Document {
     fadeInDurationSec?: number;
     fadeOutDurationSec?: number;
     playbackSpeed?: number;
+    metadata?: {
+      title?: string;
+      artist?: string;
+      album?: string;
+      year?: string;
+      genre?: string;
+      embedThumbnailArt?: boolean;
+    };
   };
   idempotencyKey?: string;
+  shareToken?: string;
   attempt: number;
   progressPercent: number;
   queuedAt: Date;
@@ -75,8 +84,17 @@ const ConversionJobSchema = new Schema<IConversionJob>(
       fadeInDurationSec: { type: Number, default: 0 },
       fadeOutDurationSec: { type: Number, default: 0 },
       playbackSpeed: { type: Number, default: 1.0 },
+      metadata: {
+        title: { type: String },
+        artist: { type: String },
+        album: { type: String },
+        year: { type: String },
+        genre: { type: String },
+        embedThumbnailArt: { type: Boolean, default: false },
+      },
     },
     idempotencyKey: { type: String, index: true },
+    shareToken: { type: String, unique: true, sparse: true, index: true },
     attempt: { type: Number, default: 1 },
     progressPercent: { type: Number, default: 0 },
     queuedAt: { type: Date, default: Date.now },

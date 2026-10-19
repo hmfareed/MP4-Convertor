@@ -16,6 +16,15 @@ export const SUPPORTED_AUDIO_FORMATS: OutputFormat[] = [
   "opus",
 ];
 
+export const audioMetadataSchema = z.object({
+  title: z.string().max(120).optional(),
+  artist: z.string().max(120).optional(),
+  album: z.string().max(120).optional(),
+  year: z.string().max(10).optional(),
+  genre: z.string().max(50).optional(),
+  embedThumbnailArt: z.boolean().optional(),
+});
+
 export const conversionSettingsSchema = z.object({
   format: z.enum(["mp3", "wav", "flac", "aac", "ogg", "opus"]).default("mp3"),
   bitrate: z.union([
@@ -32,6 +41,7 @@ export const conversionSettingsSchema = z.object({
   fadeInDurationSec: z.number().min(0).max(30).optional(),
   fadeOutDurationSec: z.number().min(0).max(30).optional(),
   playbackSpeed: z.number().min(0.5).max(2.0).optional(),
+  metadata: audioMetadataSchema.optional(),
 });
 
 export interface FileValidationResult {

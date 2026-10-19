@@ -13,6 +13,9 @@ import {
   RotateCcw,
   Gauge,
   Zap,
+  Tag,
+  Disc,
+  Image as ImageIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -28,6 +31,7 @@ import { formatDuration } from "@/lib/utils";
 import {
   AudioBitrate,
   OutputFormat,
+  AudioMetadata,
   ConversionSettings as IConversionSettings,
 } from "@/types/conversion";
 
@@ -54,6 +58,7 @@ export function ConversionSettings({
 }: ConversionSettingsProps) {
   const [showTrim, setShowTrim] = useState<boolean>(false);
   const [showStudio, setShowStudio] = useState<boolean>(false);
+  const [showMetadata, setShowMetadata] = useState<boolean>(false);
 
   const totalDuration = detectedDuration > 0 ? Math.round(detectedDuration) : 300;
   const currentStart = settings.trimStartSec ?? 0;
@@ -72,6 +77,33 @@ export function ConversionSettings({
     currentFadeOut > 0 ? 1 : 0,
     currentSpeed !== 1.0 ? 1 : 0,
   ].reduce((a, b) => a + b, 0);
+
+  const currentMetadata = settings.metadata || {};
+  const activeMetadataCount = [
+    currentMetadata.title ? 1 : 0,
+    currentMetadata.artist ? 1 : 0,
+    currentMetadata.album ? 1 : 0,
+    currentMetadata.year ? 1 : 0,
+    currentMetadata.genre ? 1 : 0,
+    currentMetadata.embedThumbnailArt ? 1 : 0,
+  ].reduce((a, b) => a + b, 0);
+
+  const handleMetadataChange = (field: keyof AudioMetadata, val: string | boolean) => {
+    onSettingsChange({
+      ...settings,
+      metadata: {
+        ...settings.metadata,
+        [field]: val,
+      },
+    });
+  };
+
+  const handleResetMetadata = () => {
+    onSettingsChange({
+      ...settings,
+      metadata: undefined,
+    });
+  };
 
   const currentFormatConfig = getFormatConfig(settings.format || "mp3");
   const isLossless = !!currentFormatConfig.isLossless;
@@ -251,7 +283,7 @@ export function ConversionSettings({
             >
               Quality / Bitrate
             </label>
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setShowStudio((prev) => !prev)}
@@ -269,6 +301,25 @@ export function ConversionSettings({
                     : "Studio"}
                 </span>
               </button>
+
+              <button
+                type="button"
+                onClick={() => setShowMetadata((prev) => !prev)}
+                disabled={disabled || !hasFile}
+                className={`text-xs flex items-center gap-1 transition-colors ${
+                  showMetadata || activeMetadataCount > 0
+                    ? "text-fuchsia-400 font-semibold"
+                    : "text-neutral-500 hover:text-neutral-900 dark:text-slate-400 dark:hover:text-white"
+                }`}
+              >
+                <Tag className="h-3 w-3" />
+                <span>
+                  {activeMetadataCount > 0
+                    ? `Tags (${activeMetadataCount})`
+                    : "Tags"}
+                </span>
+              </button>
+
               {fileCount <= 1 && (
                 <button
                   type="button"
@@ -580,6 +631,167 @@ export function ConversionSettings({
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Expandable ID3 Tag & Cover Art Metadata Drawer */}
+      {showMetadata && hasFile && (
+        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/70 dark:bg-black p-4 space-y-4 animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center justify-between pb-2 border-b border-neutral-200 dark:border-neutral-800/80">
+            <div className="flex items-center gap-2">
+              <Tag className="h-4 w-4 text-fuchsia-400" />
+              <span className="text-xs font-semibold text-neutral-900 dark:text-white">
+                ID3 Tag & Cover Art Metadata Editor
+              </span>
+              {activeMetadataCount > 0 ? (
+                <span className="text-[10px] font-medium bg-fuchsia-950/60 border border-fuchsia-800 text-fuchsia-300 px-2 py-0.5 rounded-full">
+                  {activeMetadataCount} active
+                </span>
+              ) : (
+                <span className="text-[10px] font-medium text-neutral-500 dark:text-slate-500">
+                  (Default file tags)
+                </span>
+              )}
+            </div>
+
+            {activeMetadataCount > 0 && (
+              <button
+                type="button"
+                onClick={handleResetMetadata}
+                className="text-[11px] text-neutral-500 hover:text-neutral-900 dark:text-slate-400 dark:hover:text-white flex items-center gap-1 transition-colors"
+              >
+                <RotateCcw className="h-3 w-3" />
+                <span>Reset Tags</span>
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {/* Title */}
+            <div className="space-y-1">
+              <label className="text-[11px] font-medium text-neutral-600 dark:text-neutral-400">
+                Track Title
+              </label>
+              <input
+                type="text"
+                placeholder="Song or speech title"
+                value={currentMetadata.title || ""}
+                onChange={(e) => handleMetadataChange("title", e.target.value)}
+                className="w-full h-8 px-2.5 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-xs text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-600 focus:outline-none focus:ring-1 focus:ring-fuchsia-500"
+              />
+            </div>
+
+            {/* Artist */}
+            <div className="space-y-1">
+              <label className="text-[11px] font-medium text-neutral-600 dark:text-neutral-400">
+                Artist / Speaker
+              </label>
+              <input
+                type="text"
+                placeholder="Artist or author name"
+                value={currentMetadata.artist || ""}
+                onChange={(e) => handleMetadataChange("artist", e.target.value)}
+                className="w-full h-8 px-2.5 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-xs text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-600 focus:outline-none focus:ring-1 focus:ring-fuchsia-500"
+              />
+            </div>
+
+            {/* Album */}
+            <div className="space-y-1">
+              <label className="text-[11px] font-medium text-neutral-600 dark:text-neutral-400">
+                Album / Collection
+              </label>
+              <input
+                type="text"
+                placeholder="Album or podcast name"
+                value={currentMetadata.album || ""}
+                onChange={(e) => handleMetadataChange("album", e.target.value)}
+                className="w-full h-8 px-2.5 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-xs text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-600 focus:outline-none focus:ring-1 focus:ring-fuchsia-500"
+              />
+            </div>
+
+            {/* Year */}
+            <div className="space-y-1">
+              <label className="text-[11px] font-medium text-neutral-600 dark:text-neutral-400">
+                Release Year
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. 2026"
+                maxLength={4}
+                value={currentMetadata.year || ""}
+                onChange={(e) => handleMetadataChange("year", e.target.value)}
+                className="w-full h-8 px-2.5 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-xs text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-600 focus:outline-none focus:ring-1 focus:ring-fuchsia-500 font-mono"
+              />
+            </div>
+
+            {/* Genre */}
+            <div className="space-y-1 sm:col-span-2">
+              <label className="text-[11px] font-medium text-neutral-600 dark:text-neutral-400 flex items-center justify-between">
+                <span>Genre</span>
+                <span className="text-[10px] text-neutral-400">Quick select:</span>
+              </label>
+              <div className="flex gap-1.5 items-center">
+                <input
+                  type="text"
+                  placeholder="Genre"
+                  value={currentMetadata.genre || ""}
+                  onChange={(e) => handleMetadataChange("genre", e.target.value)}
+                  className="flex-1 h-8 px-2.5 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-xs text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-600 focus:outline-none focus:ring-1 focus:ring-fuchsia-500"
+                />
+                <div className="hidden sm:flex items-center gap-1">
+                  {["Podcast", "Speech", "Music", "Audiobook"].map((g) => (
+                    <button
+                      key={g}
+                      type="button"
+                      onClick={() => handleMetadataChange("genre", g)}
+                      className="px-2 py-1 text-[10px] rounded bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-600 dark:text-slate-400 transition-colors"
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Embed Video Frame as Cover Art Card */}
+          <div className="rounded-lg border border-neutral-200 dark:border-neutral-800/80 bg-white/60 dark:bg-neutral-950/50 p-3 flex items-start justify-between gap-3">
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5">
+                <ImageIcon className="h-3.5 w-3.5 text-fuchsia-400" />
+                <span className="text-xs font-semibold text-neutral-900 dark:text-white">
+                  Embed Video Frame as Album Cover Art
+                </span>
+                <span className="text-[9px] font-mono bg-fuchsia-950/60 text-fuchsia-300 border border-fuchsia-800/60 px-1 rounded">
+                  MP3 & FLAC
+                </span>
+              </div>
+              <p className="text-[11px] text-neutral-500 dark:text-slate-400 leading-relaxed">
+                Extracts an HD picture frame from your video and attaches it directly as album cover art in the audio file so it appears in music players.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() =>
+                handleMetadataChange("embedThumbnailArt", !currentMetadata.embedThumbnailArt)
+              }
+              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                currentMetadata.embedThumbnailArt
+                  ? "bg-fuchsia-500 shadow-sm shadow-fuchsia-500/50"
+                  : "bg-neutral-300 dark:bg-neutral-800"
+              }`}
+              role="switch"
+              aria-checked={!!currentMetadata.embedThumbnailArt}
+              aria-label="Toggle embed video frame as album cover art"
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                  currentMetadata.embedThumbnailArt ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </button>
           </div>
         </div>
       )}

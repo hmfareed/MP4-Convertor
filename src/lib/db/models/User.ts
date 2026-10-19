@@ -7,6 +7,8 @@ export interface IUser extends Document {
   role: "user" | "admin";
   status: "active" | "suspended" | "deleted";
   defaultBitrate: number;
+  defaultFormat?: "mp3" | "wav" | "flac" | "aac" | "ogg" | "opus";
+  autoDownload?: boolean;
   lastLoginAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -31,6 +33,12 @@ const UserSchema = new Schema<IUser>(
       default: "active",
     },
     defaultBitrate: { type: Number, default: 192 },
+    defaultFormat: {
+      type: String,
+      enum: ["mp3", "wav", "flac", "aac", "ogg", "opus"],
+      default: "mp3",
+    },
+    autoDownload: { type: Boolean, default: false },
     lastLoginAt: { type: Date },
   },
   {

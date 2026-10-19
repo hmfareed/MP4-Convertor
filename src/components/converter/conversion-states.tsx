@@ -13,7 +13,12 @@ import {
   RotateCcw,
   PlusCircle,
   Info,
+  QrCode,
+  Share2,
+  Check,
+  X,
 } from "lucide-react";
+import QRCode from "qrcode";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -166,12 +171,45 @@ export function ProcessingState({ job, onCancel }: StateProps) {
 
 /** 4. Completed State Component */
 export function CompletedState({ job, onReset }: StateProps) {
+  const [showQrModal, setShowQrModal] = React.useState(false);
+  const [qrSvg, setQrSvg] = React.useState<string>("");
+  const [isCopied, setIsCopied] = React.useState(false);
+
   const formatConfig = getFormatConfig(job.format || "mp3");
   const outputName =
     job.outputFilename ||
     `${job.originalFilename.replace(/\.[^/.]+$/, "")}${formatConfig.ext}`;
   const formatLabel = formatConfig.label;
   const isLossless = !!formatConfig.isLossless;
+
+  const shareToken = job.shareToken || job.id;
+  const shareUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/share/${shareToken}`
+      : `/share/${shareToken}`;
+
+  React.useEffect(() => {
+    if (showQrModal && shareUrl) {
+      QRCode.toString(shareUrl, {
+        type: "svg",
+        margin: 1,
+        color: {
+          dark: "#000000",
+          light: "#ffffff",
+        },
+      })
+        .then(setQrSvg)
+        .catch(console.error);
+    }
+  }, [showQrModal, shareUrl]);
+
+  const handleCopyLink = () => {
+    if (typeof window !== "undefined") {
+      navigator.clipboard.writeText(shareUrl);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2200);
+    }
+  };
 
   const handleDownload = () => {
     if (job.downloadUrl) {
@@ -272,22 +310,99 @@ export function CompletedState({ job, onReset }: StateProps) {
         />
       </div>
 
-      {/* Download Action Button */}
-      <div className="pt-2">
+      {/* Download and Mobile QR Action Buttons */}
+      <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
         <Button
           type="button"
           variant="gradient"
           size="lg"
           onClick={handleDownload}
-          className="w-full h-12 rounded-xl text-base font-semibold gap-2.5 shadow-xl shadow-blue-950/40 bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 hover:from-blue-600 hover:via-blue-500 hover:to-indigo-600 text-white"
+          className="w-full sm:flex-1 h-12 rounded-xl text-base font-semibold gap-2.5 shadow-xl shadow-blue-950/40 bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 hover:from-blue-600 hover:via-blue-500 hover:to-indigo-600 text-white"
         >
           <Download className="h-5 w-5 text-white" />
           <span>Download {formatLabel}</span>
         </Button>
-        <p className="text-center text-[11px] text-neutral-500 pt-2">
-          File available for download for 24 hours per privacy retention policy.
-        </p>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="lg"
+          onClick={() => setShowQrModal(true)}
+          className="w-full sm:w-auto h-12 px-5 rounded-xl text-sm font-semibold gap-2 border-neutral-300 dark:border-neutral-800 text-neutral-800 dark:text-neutral-200 hover:text-white hover:bg-neutral-800"
+          title="Scan QR Code to open & download on mobile"
+        >
+          <QrCode className="h-4 w-4 text-cyan-400" />
+          <span>Mobile QR & Share</span>
+        </Button>
       </div>
+
+      <p className="text-center text-[11px] text-neutral-500 pt-1">
+        File available for download for 24 hours per privacy retention policy.
+      </p>
+
+      {/* Mobile QR & Share Modal */}
+      {showQrModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-sm rounded-2xl border border-neutral-800 bg-[#0d1322] p-6 shadow-2xl space-y-5 text-center">
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={() => setShowQrModal(false)}
+              className="absolute right-4 top-4 text-neutral-400 hover:text-white p-1 rounded-lg hover:bg-neutral-800 transition-colors"
+              aria-label="Close modal"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="space-y-1">
+              <h3 className="text-base font-semibold text-white flex items-center justify-center gap-2">
+                <QrCode className="h-5 w-5 text-cyan-400" />
+                <span>Mobile Instant Download</span>
+              </h3>
+              <p className="text-xs text-neutral-400">
+                Point your phone camera at this QR code to listen and download immediately without logging in.
+              </p>
+            </div>
+
+            {/* QR Code Container */}
+            <div className="flex justify-center">
+              <div className="bg-white p-3 rounded-2xl shadow-xl w-48 h-48 flex items-center justify-center">
+                {qrSvg ? (
+                  <div
+                    className="w-full h-full [&>svg]:w-full [&>svg]:h-full"
+                    dangerouslySetInnerHTML={{ __html: qrSvg }}
+                  />
+                ) : (
+                  <div className="animate-pulse text-xs text-neutral-400">Generating QR...</div>
+                )}
+              </div>
+            </div>
+
+            {/* Copy Link Row */}
+            <div className="space-y-2 pt-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleCopyLink}
+                className="w-full h-9 text-xs gap-1.5 border-neutral-700 text-neutral-200 hover:text-white"
+              >
+                {isCopied ? (
+                  <>
+                    <Check className="h-4 w-4 text-green-400" />
+                    <span className="text-green-400 font-semibold">Share Link Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="h-4 w-4" />
+                    <span>Copy Shareable URL</span>
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
