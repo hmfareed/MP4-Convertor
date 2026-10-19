@@ -7,6 +7,7 @@ import { errorResponse } from "@/lib/errors";
 import { env } from "@/lib/config/env";
 import { cookies } from "next/headers";
 import crypto from "crypto";
+import { Readable } from "stream";
 import { checkRateLimit, getClientIp, rateLimitExceededResponse } from "@/lib/rate-limit/redis-limiter";
 
 export const dynamic = "force-dynamic";
@@ -64,13 +65,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Save to private storage
+    // Save to private storage with streaming to avoid heap memory spikes
     const storage = getStorage();
     const storageKey = generateStorageKey("upload", "mp4");
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    await storage.put(storageKey, buffer);
+    if (typeof (file as unknown as { stream?: () => unknown }).stream === "function") {
+      const nodeStream = Readable.fromWeb((file as unknown as { stream: () => any }).stream());
+      await storage.put(storageKey, nodeStream);
+    } else {
+      const arrayBuffer = await file.arrayBuffer();
+      await storage.put(storageKey, Buffer.from(arrayBuffer));
+    }
     const storedFilePath = storage.getPath(storageKey);
 
     // Initial probe inspection
