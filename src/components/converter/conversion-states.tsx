@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { createPortal } from "react-dom";
 import {
   UploadCloud,
   Clock,
@@ -174,6 +175,11 @@ export function CompletedState({ job, onReset }: StateProps) {
   const [showQrModal, setShowQrModal] = React.useState(false);
   const [qrSvg, setQrSvg] = React.useState<string>("");
   const [isCopied, setIsCopied] = React.useState(false);
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const formatConfig = getFormatConfig(job.format || "mp3");
   const outputName =
@@ -340,9 +346,16 @@ export function CompletedState({ job, onReset }: StateProps) {
         File available for download for 24 hours per privacy retention policy.
       </p>
 
-      {/* Mobile QR & Share Modal */}
-      {showQrModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
+      {/* Mobile QR & Share Modal - Portaled to document.body to cover full viewport including navbar */}
+      {showQrModal && mounted && createPortal(
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowQrModal(false);
+            }
+          }}
+        >
           <div className="relative w-full max-w-sm rounded-2xl border border-neutral-800 bg-[#0d1322] p-6 shadow-2xl space-y-5 text-center">
             {/* Close Button */}
             <button
@@ -401,7 +414,8 @@ export function CompletedState({ job, onReset }: StateProps) {
               </Button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
