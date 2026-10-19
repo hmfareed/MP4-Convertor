@@ -34,6 +34,7 @@ import {
   AudioMetadata,
   ConversionSettings as IConversionSettings,
 } from "@/types/conversion";
+import { WaveformTrimmer } from "@/components/converter/waveform-trimmer";
 
 interface ConversionSettingsProps {
   settings: IConversionSettings;
@@ -44,6 +45,7 @@ interface ConversionSettingsProps {
   hasFile: boolean;
   detectedDuration?: number;
   fileCount?: number;
+  selectedFile?: File | null;
 }
 
 export function ConversionSettings({
@@ -55,6 +57,7 @@ export function ConversionSettings({
   hasFile,
   detectedDuration = 0,
   fileCount = 1,
+  selectedFile = null,
 }: ConversionSettingsProps) {
   const [showTrim, setShowTrim] = useState<boolean>(false);
   const [showStudio, setShowStudio] = useState<boolean>(false);
@@ -798,54 +801,71 @@ export function ConversionSettings({
 
       {/* Expandable Audio Trimming Control Card */}
       {showTrim && hasFile && (
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/60 dark:bg-black p-4 space-y-4 animate-in fade-in slide-in-from-top-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-neutral-900 dark:text-white flex items-center gap-1.5">
-              <Scissors className="h-3.5 w-3.5 text-blue-500" />
-              <span>Select Audio Trim Window</span>
-            </span>
-            <span className="text-[11px] font-mono text-neutral-700 dark:text-neutral-300 bg-neutral-200/80 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 px-2 py-0.5 rounded-full flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              Segment: {formatDuration(currentStart)} - {formatDuration(currentEnd)} ({formatDuration(currentEnd - currentStart)})
-            </span>
-          </div>
+        selectedFile ? (
+          <WaveformTrimmer
+            file={selectedFile}
+            totalDuration={totalDuration}
+            trimStartSec={currentStart}
+            trimEndSec={currentEnd}
+            onTrimChange={(start, end) => {
+              onSettingsChange({
+                ...settings,
+                trimStartSec: start,
+                trimEndSec: end,
+              });
+            }}
+            disabled={disabled}
+          />
+        ) : (
+          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/60 dark:bg-black p-4 space-y-4 animate-in fade-in slide-in-from-top-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-neutral-900 dark:text-white flex items-center gap-1.5">
+                <Scissors className="h-3.5 w-3.5 text-blue-500" />
+                <span>Select Audio Trim Window</span>
+              </span>
+              <span className="text-[11px] font-mono text-neutral-700 dark:text-neutral-300 bg-neutral-200/80 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                Segment: {formatDuration(currentStart)} - {formatDuration(currentEnd)} ({formatDuration(currentEnd - currentStart)})
+              </span>
+            </div>
 
-          <div className="pt-2 px-1">
-            <Slider
-              min={0}
-              max={totalDuration}
-              step={1}
-              value={[currentStart, currentEnd]}
-              onValueChange={handleSliderChange}
-              className="w-full"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 text-xs">
-            <div className="space-y-1">
-              <label className="text-neutral-600 dark:text-neutral-400">Start Time (seconds):</label>
-              <input
-                type="number"
+            <div className="pt-2 px-1">
+              <Slider
                 min={0}
-                max={currentEnd - 1}
-                value={currentStart}
-                onChange={handleStartInputChange}
-                className="w-full h-8 px-2.5 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white font-mono text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                max={totalDuration}
+                step={1}
+                value={[currentStart, currentEnd]}
+                onValueChange={handleSliderChange}
+                className="w-full"
               />
             </div>
-            <div className="space-y-1">
-              <label className="text-neutral-600 dark:text-neutral-400">End Time (seconds):</label>
-              <input
-                type="number"
-                min={currentStart + 1}
-                max={totalDuration}
-                value={currentEnd}
-                onChange={handleEndInputChange}
-                className="w-full h-8 px-2.5 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white font-mono text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
+
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="space-y-1">
+                <label className="text-neutral-600 dark:text-neutral-400">Start Time (seconds):</label>
+                <input
+                  type="number"
+                  min={0}
+                  max={currentEnd - 1}
+                  value={currentStart}
+                  onChange={handleStartInputChange}
+                  className="w-full h-8 px-2.5 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white font-mono text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-neutral-600 dark:text-neutral-400">End Time (seconds):</label>
+                <input
+                  type="number"
+                  min={currentStart + 1}
+                  max={totalDuration}
+                  value={currentEnd}
+                  onChange={handleEndInputChange}
+                  className="w-full h-8 px-2.5 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white font-mono text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )
       )}
     </div>
   );

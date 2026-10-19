@@ -628,6 +628,7 @@ export function ConverterPanel() {
                   hasFile={selectedFiles.length > 0}
                   fileCount={selectedFiles.length}
                   detectedDuration={selectedFiles[0]?.duration}
+                  selectedFile={selectedFiles[0]?.file || null}
                 />
 
                 {errorMessage && (
